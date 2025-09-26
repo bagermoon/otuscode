@@ -1,0 +1,16 @@
+name: pm / new issue
+
+on:
+  issues:
+    types:
+      - opened
+
+jobs:
+  add-to-project:
+    name: Add issue to project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@releases/v1
+        with:
+          project-url: https://github.com/users/bagermoon/projects/1
+          github-token: ${{ secrets.OTUSCODEPROJECT }}
