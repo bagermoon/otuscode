@@ -1,0 +1,186 @@
+###############################################################################
+# Root EditorConfig for multi-service .NET + JS/TS repository
+#
+# Goals:
+#  - Consistent whitespace & encoding across OSes
+#  - Reasonable defaults for C#, JSON, YAML, Docker, PowerShell, JS/TS, Markdown
+#  - Enforce common .NET code style (expression-bodied prefs, var usage, naming)
+#  - Provide baseline analyzer severities you can tune later
+#  - Keep markdown readability (no trailing whitespace trimming in tables)
+#
+# Adjust severities by changing `suggestion|warning|error|silent` values.
+# Reference: https://learn.microsoft.com/dotnet/fundamentals/code-analysis/configuration-options
+###############################################################################
+
+root = true
+
+###############################################################################
+# Global defaults
+###############################################################################
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 4
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+max_line_length = 120
+
+# Allow longer lines in some documentation oriented files
+[*.{md,adoc,txt,ps1,sh,yml,yaml,json}]
+max_line_length = off
+
+###############################################################################
+# Markdown
+###############################################################################
+[*.md]
+trim_trailing_whitespace = false
+indent_size = 2
+
+###############################################################################
+# JSON / JSONC (VSCode settings, tsconfig, etc.)
+###############################################################################
+[*.{json,jsonc}]
+indent_size = 2
+quote_type = double
+
+###############################################################################
+# YAML (pipelines, k8s manifests)
+###############################################################################
+[*.{yml,yaml}]
+indent_size = 2
+indent_style = space
+
+###############################################################################
+# Dockerfiles
+###############################################################################
+[Dockerfile*]
+indent_size = 2
+indent_style = space
+
+###############################################################################
+# Shell / PowerShell scripts
+###############################################################################
+[*.{sh,bash}]
+indent_size = 2
+end_of_line = lf
+
+[*.ps1]
+indent_size = 4
+
+###############################################################################
+# JavaScript / TypeScript
+###############################################################################
+[*.{js,jsx,ts,tsx,mjs,cjs}]
+indent_size = 2
+quote_type = single
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+###############################################################################
+# C# Code Style (Roslyn) - applies to .cs files
+###############################################################################
+[*.cs]
+indent_size = 4
+
+# Prefer 'var' when obvious
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:suggestion
+
+# Expression-bodied members
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_constructors = when_on_single_line:suggestion
+csharp_style_expression_bodied_operators = when_on_single_line:suggestion
+csharp_style_expression_bodied_properties = prefer_expression_bodied:suggestion
+csharp_style_expression_bodied_indexers = prefer_expression_bodied:suggestion
+csharp_style_expression_bodied_accessors = prefer_expression_bodied:suggestion
+
+# Pattern matching & modern language features
+csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
+csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
+csharp_style_inlined_variable_declaration = true:suggestion
+csharp_prefer_simple_using_statement = true:suggestion
+csharp_style_deconstructed_variable_declaration = true:suggestion
+csharp_style_prefer_switch_expression = true:suggestion
+csharp_style_prefer_pattern_matching = true:suggestion
+csharp_style_prefer_tuple_swap = true:suggestion
+csharp_style_prefer_index_operator = true:suggestion
+csharp_style_prefer_range_operator = true:suggestion
+csharp_style_prefer_utf8_string_literals = true:suggestion
+
+# Null / coalesce
+csharp_style_conditional_delegate_call = true:suggestion
+csharp_style_prefer_null_check_over_type_check = true:suggestion
+csharp_style_prefer_is_null_check_over_reference_equality_method = true:suggestion
+
+# Using directives
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = true
+
+# Qualification
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_style_qualification_for_property = false:suggestion
+dotnet_style_qualification_for_method = false:suggestion
+dotnet_style_qualification_for_event = false:suggestion
+
+# this. preferences
+csharp_style_prefer_this_or_me = false:none
+
+# Prefer readonly
+dotnet_style_readonly_field = true:warning
+
+# Naming rules (example: Interfaces start with I, async suffix)
+dotnet_naming_rule.interfaces_should_start_with_i.severity = suggestion
+dotnet_naming_rule.interfaces_should_start_with_i.symbols = interfaces
+dotnet_naming_rule.interfaces_should_start_with_i.style = prefix_i
+
+dotnet_naming_symbols.interfaces.applicable_kinds = interface
+dotnet_naming_style.prefix_i.required_prefix = I
+
+dotnet_naming_rule.async_methods_end_with_async.severity = suggestion
+dotnet_naming_rule.async_methods_end_with_async.symbols = async_methods
+dotnet_naming_rule.async_methods_end_with_async.style = end_with_async
+
+dotnet_naming_symbols.async_methods.applicable_kinds = method
+dotnet_naming_symbols.async_methods.applicable_accessibilities = *
+dotnet_naming_symbols.async_methods.required_modifiers = async
+dotnet_naming_style.end_with_async.required_suffix = Async
+
+# Analyzer severities (baseline) - tune as needed
+dotnet_analyzer_diagnostic.category-Performance.severity = warning
+dotnet_analyzer_diagnostic.category-Reliability.severity = warning
+dotnet_analyzer_diagnostic.category-Security.severity = warning
+dotnet_analyzer_diagnostic.category-Style.severity = suggestion
+dotnet_analyzer_diagnostic.category-Maintainability.severity = suggestion
+dotnet_analyzer_diagnostic.category-Usage.severity = warning
+dotnet_analyzer_diagnostic.category-Design.severity = suggestion
+
+# Files generated by tools (e.g., designer, migrations)
+[*.{designer.cs,generated.cs}]
+generated_code = true
+
+###############################################################################
+# Common exclusions (do not enforce trailing whitespace / etc.)
+###############################################################################
+[*.{png,jpg,jpeg,gif,svg,ico,lock,bin,dll,exe,pfx,sn,kdbx}]
+insert_final_newline = false
+trim_trailing_whitespace = false
+
+###############################################################################
+# Build / config specific
+###############################################################################
+[*.{props,targets}]
+indent_size = 2
+indent_style = space
+
+[*.csproj]
+indent_size = 2
+indent_style = space
+
+[global.json]
+indent_size = 2
+
+###############################################################################
+# End of file
+###############################################################################
