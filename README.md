@@ -5,6 +5,7 @@ C#-2025-09 Команда 2
 * Бархатов Виталий https://github.com/barkhvit
 * Роман Кузнецов https://github.com/bagermen
 * Евгений Кабаев https://github.com/Adeosh
+* Нигматзянов Рашид https://github.com/nrashid71
 
 ## Documentation
 
