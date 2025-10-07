@@ -1,5 +1,9 @@
+using System.Text;
+using RabbitMQ.Client;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
+builder.AddRabbitMQClient(connectionName: "messaging");
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -14,30 +18,26 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
-
-var summaries = new[]
+if (!app.Environment.IsDevelopment())
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
-
-app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    app.UseHttpsRedirection();
 }
+
+app.MapGet("/hello", async Task<string> (IConnection connection, CancellationToken cancellationToken) =>
+{
+    using var channel = await connection.CreateChannelAsync(cancellationToken: cancellationToken);
+
+    var queueName = "hello-queue";
+    await channel.QueueDeclareAsync(queue: queueName, durable: false, exclusive: false, autoDelete: false, cancellationToken: cancellationToken);
+
+    var body = Encoding.UTF8.GetBytes("hello");
+    await channel.BasicPublishAsync(exchange: "", routingKey: queueName, body: body, cancellationToken: cancellationToken);
+
+    // Try to get a message from the queue (simulate "receive results here")
+    var result = await channel.BasicGetAsync(queue: queueName, autoAck: true, cancellationToken: cancellationToken);
+    var received = result != null ? Encoding.UTF8.GetString(result.Body.ToArray()) : "No message";
+    return received;
+})
+.WithName("GetHello");
+
+await app.RunAsync();
