@@ -1,0 +1,6 @@
+@RestoRate.AuthTest_HostAddress = http://localhost:5134
+
+GET {{RestoRate.AuthTest_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

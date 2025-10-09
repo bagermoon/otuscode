@@ -9,11 +9,14 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.AppHost" />
+    <PackageReference Include="Aspire.Hosting.Keycloak" />
     <PackageReference Include="Aspire.Hosting.RabbitMQ" />
     <PackageReference Include="Scalar.Aspire" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RestoRate.AuthTest\RestoRate.AuthTest.csproj" />
+    <ProjectReference Include="..\RestoRate.BlazorUI\RestoRate.BlazorUI.csproj" />
     <ProjectReference Include="..\RestoRate.MessageConsumer\RestoRate.MessageConsumer.csproj" />
   </ItemGroup>
 
