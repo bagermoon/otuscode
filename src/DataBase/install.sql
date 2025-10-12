@@ -1,3 +1,4 @@
+\i tables/t_user.sql
 \i tables/t_category.sql
 \i tables/t_cuisine.sql
 \i tables/t_restaurant.sql

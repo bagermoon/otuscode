@@ -1,4 +1,5 @@
 @rem echo off
+@chcp 65001
 @set PGSQL_HOME=C:\Users\nrash\work\apps\pgsql.17.6
 @set DATABASE=Restaurants
 
