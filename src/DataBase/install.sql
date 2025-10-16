@@ -1,0 +1,10 @@
+\i tables/t_user.sql
+\i tables/t_category.sql
+\i tables/t_cuisine.sql
+\i tables/t_restaurant.sql
+\i tables/t_comment.sql
+\i tables/t_rating.sql
+\i tables/t_restaurantinterior.sql
+\i tables/t_restaurant_cuisine.sql
+\i tables/t_viewlog.sql
+\i tables/t_visitor_profile.sql
