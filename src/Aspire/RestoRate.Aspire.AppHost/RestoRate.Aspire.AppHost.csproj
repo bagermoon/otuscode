@@ -15,9 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RestoRate.AuthTest\RestoRate.AuthTest.csproj" />
-    <ProjectReference Include="..\RestoRate.BlazorUI\RestoRate.BlazorUI.csproj" />
-    <ProjectReference Include="..\RestoRate.MessageConsumer\RestoRate.MessageConsumer.csproj" />
+    <ProjectReference Include="..\..\RestoRate.MessageConsumer\RestoRate.MessageConsumer.csproj" />
   </ItemGroup>
 
 </Project>

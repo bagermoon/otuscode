@@ -5,7 +5,9 @@ VisualStudioVersion = 18.0.11018.127
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestoRate.AppHost", "src\RestoRate.AppHost\RestoRate.AppHost.csproj", "{9A8FB69C-901F-4048-99EB-F02D982A6D16}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Aspire", "Aspire", "{52BF7FB6-37FF-5100-EFD1-124EFF302675}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestoRate.Aspire.AppHost", "src\Aspire\RestoRate.Aspire.AppHost\RestoRate.Aspire.AppHost.csproj", "{9A8FB69C-901F-4048-99EB-F02D982A6D16}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{14557BF6-92C6-4023-B9FA-796DC9235DA1}"
 	ProjectSection(SolutionItems) = preProject
@@ -13,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Packages.props = Directory.Packages.props
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestoRate.ServiceDefaults", "src\RestoRate.ServiceDefaults\RestoRate.ServiceDefaults.csproj", "{AD69EE72-1780-4324-A62A-F0E4D6DEA490}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestoRate.Aspire.ServiceDefaults", "src\Aspire\RestoRate.Aspire.ServiceDefaults\RestoRate.Aspire.ServiceDefaults.csproj", "{AD69EE72-1780-4324-A62A-F0E4D6DEA490}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestoRate.MessageConsumer", "src\RestoRate.MessageConsumer\RestoRate.MessageConsumer.csproj", "{3FAECBC5-A8BB-4579-9CCB-2D5C1BAC5823}"
 EndProject
@@ -68,8 +70,9 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{9A8FB69C-901F-4048-99EB-F02D982A6D16} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
-		{AD69EE72-1780-4324-A62A-F0E4D6DEA490} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{52BF7FB6-37FF-5100-EFD1-124EFF302675} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{9A8FB69C-901F-4048-99EB-F02D982A6D16} = {52BF7FB6-37FF-5100-EFD1-124EFF302675}
+		{AD69EE72-1780-4324-A62A-F0E4D6DEA490} = {52BF7FB6-37FF-5100-EFD1-124EFF302675}
 		{3FAECBC5-A8BB-4579-9CCB-2D5C1BAC5823} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
