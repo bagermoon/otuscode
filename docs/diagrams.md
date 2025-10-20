@@ -7,18 +7,15 @@
     %% Client Layer - Left
     subgraph ClientSide[Клиенты]
         direction LR
-        W[Web / Mobile]
         BZ["`Blazor Dashboard<br/>(:5005)`"]
     end
 
-    %% Gateway Layer - Left-Center
-    GW["`API Gateway<br/>(YARP/Ocelot)`"]
-
-    %% BFF Layer - Center
-    subgraph BFFLayer[BFF Services]
-        direction LR
-        PBFF["`Public BFF<br/>(:5080)`"]
-        ABFF["`Admin BFF<br/>(:5081)`"]
+    %% PublicAPI Layer - Left-Center (public)
+    subgraph PublicAPI[Публичные API]
+        direction TB
+        KC["`Keycloak<br/>(IdP)`"]
+        GW["`API Gateway<br/>(YARP/Ocelot)`"]
+        
     end
 
     %% Service Layer - Center-Right
@@ -44,10 +41,13 @@
 
     %% Horizontal main flow (left to right)
     ClientSide --> GW
-    GW --> BFFLayer
+    ClientSide -->|OIDC login| KC
+    GW -.->|token exchange / introspection| KC
     GW --> Services
-    BFFLayer --> Services
-    Services --> Infra
+    
+    ClientSide -.- PublicAPI
+    PublicAPI -.- Services
+    Services -.- Infra
 
     %% Direct service-to-storage connections
     RSVC -.-> PG
@@ -66,39 +66,34 @@
     classDef store fill:#f59e0b,stroke:#92400e,color:#111
     classDef client fill:#10b981,stroke:#065f46,color:#fff
     classDef gateway fill:#7c3aed,stroke:#3730a3,color:#fff
-    classDef bff fill:#dc2626,stroke:#7f1d1d,color:#fff
+    classDef idp fill:#14b8a6,stroke:#0f766e,color:#fff
     
     class RSVC,RS,RT,MS svc
     class PG,MG,RD,MQ store
-    class W,BZ client
+    class BZ client
     class GW gateway
-    class PBFF,ABFF bff
+    class KC idp
     ```
 1. Контейнерная (C4-подобная)
     ```mermaid
     flowchart LR
     actor(Client):::actor --> Gateway[API Gateway]
     actor(Client):::actor --> Dashboard[Blazor Dashboard]
+    
 
     subgraph Boundary_System[System: RestoRate]
-        Gateway --> PublicBFF[Public BFF]
-        Gateway --> AdminBFF[Admin BFF]
+        Keycloak["`Keycloak<br/>(IdP)`"]
         Gateway --> RestaurantSvc[(Restaurant Service)]
         Gateway --> ReviewSvc[(Review Service)]
         Gateway --> RatingSvc[(Rating Service)]
         Gateway --> ModerationSvc[(Moderation Service)]
         
-        PublicBFF --> RestaurantSvc
-        PublicBFF --> ReviewSvc
-        PublicBFF --> RatingSvc
-        
-        AdminBFF --> RestaurantSvc
-        AdminBFF --> ReviewSvc
-        AdminBFF --> RatingSvc
-        AdminBFF --> ModerationSvc
-        
         Dashboard --> Gateway
     end
+
+    %% Identity and token flows
+    Dashboard -.OIDC login.-> Keycloak
+    Gateway -.token exchange/introspection.-> Keycloak
 
     RestaurantSvc -->|CRUD Restaurants| PostgreSQL[(PostgreSQL)]
     ReviewSvc -->|CRUD Reviews| MongoDB[(MongoDB)]
@@ -115,9 +110,9 @@
     classDef actor fill:#fff,stroke:#000,font-weight:bold
     classDef db fill:#fde68a,stroke:#d97706
     classDef comp fill:#60a5fa,stroke:#1e3a8a,color:#fff
-    classDef bff fill:#dc2626,stroke:#7f1d1d,color:#fff
+    classDef idp fill:#14b8a6,stroke:#0f766e,color:#fff
     class RestaurantSvc,ReviewSvc,RatingSvc,ModerationSvc,Gateway,Dashboard comp
-    class PublicBFF,AdminBFF bff
+    class Keycloak idp
     class PostgreSQL,MongoDB,Redis,RabbitMQ db
     ```
 1. Поток: Добавление отзыва и модерация (Sequence)
@@ -165,27 +160,6 @@
         RT->>RD: Get rating
         RT-->>GW: Rating DTO
         GW-->>C: 200 OK
-    ```
-
-1. Поток: Получение карточки ресторана (Aggregated View)
-    ```mermaid
-    sequenceDiagram
-        participant User
-        participant GW as API Gateway
-        participant AGG as Public BFF API
-        participant RSVC as Restaurant Service
-        participant RT as Rating Service
-        participant RS as Review Service
-
-        User->>GW: GET /api/restaurants/{id}/details
-        GW->>AGG: GET /restaurants/{id}/details
-        par Parallel fan-out
-            AGG->>RSVC: GET /restaurants/{id}
-            AGG->>RT: GET /restaurants/{id}/rating
-            AGG->>RS: GET /restaurants/{id}/reviews?limit=10
-        end
-        AGG-->>GW: { restaurant, rating, reviews }
-        GW-->>User: 200 OK
     ```
 
 1. Схема событий (Топики / Routing Keys)

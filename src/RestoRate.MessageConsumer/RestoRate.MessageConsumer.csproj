@@ -6,7 +6,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Aspire\RestoRate.Aspire.ServiceDefaults\RestoRate.Aspire.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\RestoRate.ServiceDefaults\RestoRate.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>

@@ -15,7 +15,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\RestoRate.MessageConsumer\RestoRate.MessageConsumer.csproj" />
+    <ProjectReference Include="..\Restaurant\RestoRate.Restaurant.Api\RestoRate.Restaurant.Api.csproj" />
+    <ProjectReference Include="..\RestoRate.BlazorDashboard\RestoRate.BlazorDashboard.csproj" />
+    <ProjectReference Include="..\RestoRate.Common\RestoRate.Common.csproj" IsAspireProjectResource="false" />
+    <ProjectReference Include="..\RestoRate.Gateway\RestoRate.Gateway.csproj" />
+    <ProjectReference Include="..\RestoRate.MessageConsumer\RestoRate.MessageConsumer.csproj" />
   </ItemGroup>
 
 </Project>
