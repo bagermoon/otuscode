@@ -27,6 +27,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Restaurant", "Restaurant", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestoRate.Restaurant.Api", "src\Restaurant\RestoRate.Restaurant.Api\RestoRate.Restaurant.Api.csproj", "{E6EDB3C9-CE3E-42CF-90B2-FA2A15D98599}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestoRate.SharedKernel", "src\RestoRate.SharedKernel\RestoRate.SharedKernel.csproj", "{3307F9CB-E468-401B-8B4C-21AD0E979F94}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -121,6 +123,18 @@ Global
 		{E6EDB3C9-CE3E-42CF-90B2-FA2A15D98599}.Release|x64.Build.0 = Release|Any CPU
 		{E6EDB3C9-CE3E-42CF-90B2-FA2A15D98599}.Release|x86.ActiveCfg = Release|Any CPU
 		{E6EDB3C9-CE3E-42CF-90B2-FA2A15D98599}.Release|x86.Build.0 = Release|Any CPU
+		{3307F9CB-E468-401B-8B4C-21AD0E979F94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3307F9CB-E468-401B-8B4C-21AD0E979F94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3307F9CB-E468-401B-8B4C-21AD0E979F94}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3307F9CB-E468-401B-8B4C-21AD0E979F94}.Debug|x64.Build.0 = Debug|Any CPU
+		{3307F9CB-E468-401B-8B4C-21AD0E979F94}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3307F9CB-E468-401B-8B4C-21AD0E979F94}.Debug|x86.Build.0 = Debug|Any CPU
+		{3307F9CB-E468-401B-8B4C-21AD0E979F94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3307F9CB-E468-401B-8B4C-21AD0E979F94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3307F9CB-E468-401B-8B4C-21AD0E979F94}.Release|x64.ActiveCfg = Release|Any CPU
+		{3307F9CB-E468-401B-8B4C-21AD0E979F94}.Release|x64.Build.0 = Release|Any CPU
+		{3307F9CB-E468-401B-8B4C-21AD0E979F94}.Release|x86.ActiveCfg = Release|Any CPU
+		{3307F9CB-E468-401B-8B4C-21AD0E979F94}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -134,6 +148,7 @@ Global
 		{9D37E987-988A-487D-B394-6C472EBCB633} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{E69DF519-012A-0AAA-7E5D-E91DB91E2C0A} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{E6EDB3C9-CE3E-42CF-90B2-FA2A15D98599} = {E69DF519-012A-0AAA-7E5D-E91DB91E2C0A}
+		{3307F9CB-E468-401B-8B4C-21AD0E979F94} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {82009B4F-5227-496F-BB51-71B997B5DEF9}
