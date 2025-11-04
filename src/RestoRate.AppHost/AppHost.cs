@@ -1,3 +1,8 @@
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
+using Npgsql;
+
 using Aspire.Hosting;
 
 using Projects;
@@ -78,6 +83,39 @@ var gateway = builder.AddProject<RestoRate_Gateway>(AppHostProjects.Gateway)
     .WithEnvironment("KeycloakSettings__Realm", keycloakRealm)
     .WithEnvironment("KeycloakSettings__ClientId", gatewayClientId)
     .WithEnvironment("KeycloakSettings__ClientSecret", gatewayClientSecret);
+#endregion
+
+#region PostgreSql
+
+int portPostgreSql = 46819;
+Regex re = new Regex(@"^(.*[/\\]otuscode)[/\\]{0,1}.*$");
+var r = re.Matches(Environment.CurrentDirectory);
+string root_directory = r.Count > 0 ? r[0].Groups[1].Value + "/src/DataBase" : null;
+string data_directory = root_directory + "/restaurants";
+
+var initDirs = builder.AddContainer("create-structure", "alpine:latest")
+.WithArgs("sh", "-c", $"""
+                       mkdir -p /var/lib/postgresql/restaurants_tbs
+                       chown -R 999:1000 /var/lib/postgresql/restaurants_tbs
+                       """)
+.WithBindMount(data_directory, "/var/lib/postgresql");
+
+var postgres = builder.AddPostgres("postgres", port: portPostgreSql)
+.WithDataBindMount(data_directory + "/data")
+.WithBindMount(data_directory + "/restaurants_tbs","/var/lib/postgresql/restaurants_tbs")
+.WithInitFiles(root_directory + "/init-scripts");
+
+var RestaurantsDbConnectionString = new NpgsqlConnectionStringBuilder()
+{
+    Host = "localhost",
+    Port = portPostgreSql,
+    Database = "Restaurants",
+    Username = "master",
+    Password = "master"
+}.ToString();
+
+var RestaurantsDb = builder.AddConnectionString("RestaurantsDb", RestaurantsDbConnectionString);
+
 #endregion
 
 #region blazordashboard
