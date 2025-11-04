@@ -16,6 +16,8 @@
   - `RestoRate.Common` — общие прикладные типы и настройки (см. раздел ниже).
   - `RestoRate.Contracts` — межсервисные DTO и интеграционные события между сервисами (версионируемые, сериализуемые). [Структура и рекомендации](./layout.contracts.md)
   - `RestoRate.SharedKernel` — доменные строительные блоки (см. раздел ниже).
+  - `RestoRate.Application` — общие прикладные абстракции (порты/контракты use‑case уровня, без привязки к конкретной инфраструктуре). Пример: шина событий [`RestoRate.Application.Messaging.IIntegrationEventBus`](../src/RestoRate.Application/Messaging/IIntegrationEventBus.cs).
+  - `RestoRate.Infrastructure` — общие инфраструктурные адаптеры и DI‑расширения (реализации портов для провайдеров: брокер сообщений, кэш и т.п.). Пример: реализация шины на MassTransit/RabbitMQ [`RestoRate.Infrastructure.Messaging.MassTransitEventBus`](../src/RestoRate.Infrastructure/Messaging/MassTransitEventBus.cs) и DI‑настройка [`RestoRate.Infrastructure.Messaging.MassTransitExtensions`](../src/RestoRate.Infrastructure/Messaging/MassTransitExtensions.cs).
   - `RestoRate.Gateway` — шлюз (YARP/Ocelot).
   - `RestoRate.BlazorDashboard` — Blazor Server UI.
   - Доменные сервисы по границам (Bounded Contexts), каждый в 4 слоя:
@@ -32,6 +34,91 @@
 - `Api` → `Application` → `Domain`.
 - `Infrastructure` → `Application` + `Domain`.
 - Сервисы не ссылаются на `Domain/Application` других сервисов. Межсервисный обмен — только через `Contracts`.
+
+- Общие пакеты:
+  - `RestoRate.Application` можно подключать из сервисных `Api/Application/Infrastructure` слоёв, но не из `Domain`.
+  - `RestoRate.Infrastructure` подключайте в сервисные `Api/Infrastructure` слои (для DI и адаптеров), но не в `Domain`.
+
+## Общие пакеты: RestoRate.Application и RestoRate.Infrastructure
+
+Эти пакеты предоставляют переиспользуемые абстракции и адаптеры, не завязанные на конкретный Bounded Context.
+
+- `RestoRate.Application`
+  - Назначение: декларация портов/контрактов прикладного уровня, которыми пользуются сервисы.
+  - Пример: [`RestoRate.Application.Messaging.IIntegrationEventBus`](../src/RestoRate.Application/Messaging/IIntegrationEventBus.cs)
+    - Контракт публикации интеграционных событий (поддерживает заголовки сообщений).
+    - Ориентирован на использование внутри обработчиков Application (MediatR).
+
+- `RestoRate.Infrastructure`
+  - Назначение: общие инфраструктурные реализации и DI‑расширения для провайдеров (брокеры, кэши и т.п.).
+  - Пример (Messaging):
+    - Реализация шины: [`RestoRate.Infrastructure.Messaging.MassTransitEventBus`](../src/RestoRate.Infrastructure/Messaging/MassTransitEventBus.cs)
+    - Регистрация с RabbitMQ: [`RestoRate.Infrastructure.Messaging.MassTransitExtensions`](../src/RestoRate.Infrastructure/Messaging/MassTransitExtensions.cs) — читает строку подключения из `ConnectionStrings:{RabbitMQ}` на основе имени ресурса Aspire [`RestoRate.Common.AppHostProjects.RabbitMQ`](../src/RestoRate.Common/AppHostProjects.cs).
+
+Границы:
+- Эти пакеты не должны тянуть за собой доменную логику.
+- Внутри доменных сервисов используйте их только там, где это уместно по слою: Application/Infrastructure, но не Domain.
+
+## Messaging через MassTransit (RabbitMQ)
+
+Ниже — минимальный пример, как подключить общую шину событий и публиковать события из обработчиков.
+
+1) Регистрация MassTransit/RabbitMQ в сервисе (Api/Infrastructure слой):
+
+```csharp
+// Program.cs
+using RestoRate.Infrastructure.Messaging;
+using MassTransit;
+// ...
+builder.Services.AddMassTransitEventBus(
+    builder.Configuration,
+    addConsumers: x =>
+    {
+        // При необходимости добавить консьюмеры:
+        // x.AddConsumer<ReviewAddedConsumer>();
+        // Либо: x.AddConsumers(typeof(Program).Assembly);
+    });
+```
+
+2) Публикация интеграционного события из обработчика Application (MediatR):
+
+```csharp
+using RestoRate.Application.Messaging;
+using RestoRate.Contracts.Abstractions;
+// ...
+
+public class CreateReviewHandler : IRequestHandler<CreateReviewCommand>
+{
+    private readonly IIntegrationEventBus _bus;
+
+    public CreateReviewHandler(IIntegrationEventBus bus) => _bus = bus;
+
+    public async Task Handle(CreateReviewCommand request, CancellationToken ct)
+    {
+        // ... доменная логика, сохранение ...
+
+        var evt = new ReviewAddedEvent(
+            request.ReviewId,
+            request.RestaurantId,
+            request.UserId,
+            request.Rating,
+            request.Text
+        ); // должен реализовывать IIntegrationEvent
+
+        await _bus.PublishAsync(evt, ct);
+        // также доступен перегруженный метод с заголовками:
+        // await _bus.PublishAsync(evt, new Dictionary<string, object?> { ["tenant"] = request.TenantId }, ct);
+    }
+}
+```
+
+3) Конфигурация строки подключения RabbitMQ
+- В `appsettings*.json` сервисов используйте `ConnectionStrings:RabbitMQ` (имя берётся из [`AppHostProjects.RabbitMQ`](../src/RestoRate.Common/AppHostProjects.cs)).
+- При запуске через Aspire AppHost значение обычно заполняется автоматически.
+
+Примечания и следующая эволюция:
+- Outbox/Inbox, ретраи, idempotency — планируются в сервисных `Infrastructure` слоях.
+- Для консистентной сериализации событий используйте типы из `RestoRate.Contracts` (каждое интеграционное событие реализует `IIntegrationEvent`).
 
 ## Ответственность слоёв (Layer Responsibilities)
 
