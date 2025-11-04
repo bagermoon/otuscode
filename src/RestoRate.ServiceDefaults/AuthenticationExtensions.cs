@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RestoRate.Common;
@@ -14,9 +15,9 @@ public static class AuthenticationExtensions
     /// </summary>
     /// <param name="builder">Host builder</param>
     /// <param name="keycloakServiceName">The Aspire service name for Keycloak (e.g., AppHostProjects.Keycloak)</param>
-    public static IHostApplicationBuilder AddKeycloakJwtAuthentication(
-        this IHostApplicationBuilder builder,
-        string keycloakServiceName)
+    public static TBuilder AddKeycloakJwtAuthentication<TBuilder>(
+        this TBuilder builder,
+        string keycloakServiceName) where TBuilder : IHostApplicationBuilder
     {
         var settings = new KeycloakSettingsOptions();
         builder.Configuration.GetSection(KeycloakSettingsOptions.SectionName).Bind(settings);

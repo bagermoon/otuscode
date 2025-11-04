@@ -65,6 +65,33 @@ var restaurantApi = builder.AddProject<RestoRate_Restaurant_Api>(AppHostProjects
     .WithEnvironment("KeycloakSettings__Realm", keycloakRealm);
 #endregion
 
+#region ServiceModerationApi
+var moderationApiBearerAudience = builder.AddParameter("moderation-api-bearer-audience", secret: false);
+var moderationApi = builder.AddProject<RestoRate_Moderation_Api>(AppHostProjects.ServiceModerationApi)
+    .WithReference(keycloak)
+    .WaitFor(keycloak)
+    .WithEnvironment("KeycloakSettings__Audience", moderationApiBearerAudience)
+    .WithEnvironment("KeycloakSettings__Realm", keycloakRealm);
+#endregion
+
+#region ServiceRatingApi
+var ratingApiBearerAudience = builder.AddParameter("rating-api-bearer-audience", secret: false);
+var ratingApi = builder.AddProject<RestoRate_Rating_Api>(AppHostProjects.ServiceRatingApi)
+    .WithReference(keycloak)
+    .WaitFor(keycloak)
+    .WithEnvironment("KeycloakSettings__Audience", ratingApiBearerAudience)
+    .WithEnvironment("KeycloakSettings__Realm", keycloakRealm);
+#endregion
+
+#region ServiceReviewApi
+var reviewApiBearerAudience = builder.AddParameter("review-api-bearer-audience", secret: false);
+var reviewApi = builder.AddProject<RestoRate_Review_Api>(AppHostProjects.ServiceReviewApi)
+    .WithReference(keycloak)
+    .WaitFor(keycloak)
+    .WithEnvironment("KeycloakSettings__Audience", reviewApiBearerAudience)
+    .WithEnvironment("KeycloakSettings__Realm", keycloakRealm);
+#endregion
+
 #region gateway
 var gatewayClientSecret = builder.AddParameter("gateway-client-secret", secret: true);
 var gatewayClientId = builder.AddParameter("gateway-client-id");
@@ -74,6 +101,9 @@ var gateway = builder.AddProject<RestoRate_Gateway>(AppHostProjects.Gateway)
     .WithReference(keycloak)
     .WaitFor(keycloak)
     .WithReference(restaurantApi)
+    .WithReference(moderationApi)
+    .WithReference(ratingApi)
+    .WithReference(reviewApi)
     .WithEnvironment("KeycloakSettings__Audience", gatewayAudience)
     .WithEnvironment("KeycloakSettings__Realm", keycloakRealm)
     .WithEnvironment("KeycloakSettings__ClientId", gatewayClientId)
