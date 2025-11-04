@@ -17,25 +17,20 @@ title: RestoRate Contracts layout
 RestoRate.Contracts/
 ├── src/
 │   ├── Restaurant/
-│   │   ├── V1/
-│   │   │   ├── Dtos/
-│   │   │   │   ├── RestaurantDto.cs
-│   │   │   │   ├── RestaurantDetailsDto.cs
-│   │   │   │   └── CreateRestaurantRequest.cs
-│   │   │   └── Events/
-│   │   │       ├── RestaurantCreatedEvent.cs
-│   │   │       └── RestaurantUpdatedEvent.cs
-│   │   └── V2/
-│   │       └── ...
+│   │   ├── Dtos/
+│   │   │   ├── RestaurantDto.cs
+│   │   │   ├── RestaurantDetailsDto.cs
+│   │   │   └── CreateRestaurantRequest.cs
+│   │   └── Events/
+│   │       ├── RestaurantCreatedEvent.cs
+│   │       └── RestaurantUpdatedEvent.cs
 │   ├── Review/
-│   │   ├── V1/
-│   │   │   ├── Dtos/
-│   │   │   └── Events/
-│   │   └── V2/
+│   │   ├── Dtos/
+│   │   └── Events/
 │   ├── Rating/
-│   │   └── V1/
+│   │   └── ...
 │   └── Moderation/
-│       └── V1/
+│       └── ...
 ├── src/Common/
 │   ├── IntegrationEvent.cs
 │   ├── IIntegrationEventHandler.cs
@@ -45,7 +40,8 @@ RestoRate.Contracts/
 ```
 
 Ключевые принципы:
-- Версионирование по пространствам имён (`RestoRate.Contracts.Restaurant.V1`) и/или по папкам — позволяет иметь V1 и V2 в одном пакете.
+- Простота вместо версионирования пространств имён: держим одну актуальную версию контрактов без `V1/V2` в путях и неймспейсах.
+- Если потребуются несовместимые изменения — повышайте мажорную версию NuGet‑пакета и синхронно обновляйте потребителей.
 - Контракты — только DTO и события; никакой бизнес‑логики.
 - Избегать ссылок на доменные проекты; допускается только на `SharedKernel` types если это явно необходимо (рекомендуется минимизировать).
 - Сериализация: использовать простые POCO, избегать интерфейсов в полях, явно задавать версии и типы (для JSON: System.Text.Json attributes или Newtonsoft, договориться в проекте).
@@ -65,17 +61,17 @@ public static class EventNames
 
     public static class Review
     {
-        public const string Created = "review.created";
+        public const string Added = "review.added";
         public const string Updated = "review.updated";
         public const string Moderated = "review.moderated";
     }
 }
 ```
 
-Пример DTO (сверху в `Restaurant/V1/Dtos/RestaurantDto.cs`):
+Пример DTO (сверху в `Restaurant/Dtos/RestaurantDto.cs`):
 
 ```csharp
-namespace RestoRate.Contracts.Restaurant.V1.Dtos;
+namespace RestoRate.Contracts.Restaurant.Dtos;
 
 public sealed record RestaurantDto(
     Guid Id,
@@ -86,8 +82,8 @@ public sealed record RestaurantDto(
 ```
 
 Замечания по распространению:
-- Можно публиковать единый NuGet-пакет, содержащий несколько версий (V1, V2) в разных пространствах имён.
-- Для больших изменений — выпускать новую мажорную версию пакета и дополнительно оставить старые V-сборки внутри пакета до тех пор, пока миграция не завершится.
+- Публикуйте единый NuGet‑пакет без параллельных `V1/V2` пространств имён и папок.
+- Для больших несовместимых изменений — повышайте мажорную версию пакета и выполняйте согласованное обновление сервисов.
 - Документировать несовместимые изменения в CHANGELOG и ссылаться на примеры миграции.
 
 Тесты:

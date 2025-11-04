@@ -1,31 +1,14 @@
 using System.IdentityModel.Tokens.Jwt;
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-
 using RestoRate.Common;
+using RestoRate.ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
-var keycloakSettings = new KeycloakSettingsOptions();
-builder.Configuration.GetSection(KeycloakSettingsOptions.SectionName).Bind(keycloakSettings);
-
-builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddKeycloakJwtBearer(
-        serviceName: AppHostProjects.Keycloak,
-        realm: keycloakSettings.Realm!,
-        options =>
-        {
-            options.RequireHttpsMetadata = false; // dev with http Keycloak
-
-            options.Audience = keycloakSettings.Audience;
-            options.MapInboundClaims = false;
-            options.TokenValidationParameters.NameClaimType = JwtRegisteredClaimNames.Name;
-            options.TokenValidationParameters.RoleClaimType = "roles";
-        }
-    );
+// Centralized Keycloak JWT auth wiring
+builder.AddKeycloakJwtAuthentication(AppHostProjects.Keycloak);
 
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy("AdminGroup", policy =>

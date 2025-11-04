@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="MassTransit" />
+    <PackageReference Include="MassTransit.RabbitMQ" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RestoRate.Application\RestoRate.Application.csproj" />
+    <ProjectReference Include="..\RestoRate.Common\RestoRate.Common.csproj" />
+  </ItemGroup>
+</Project>

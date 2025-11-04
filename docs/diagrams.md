@@ -14,7 +14,7 @@
     subgraph PublicAPI[Публичные API]
         direction TB
         KC["`Keycloak<br/>(IdP)`"]
-        GW["`API Gateway<br/>(YARP/Ocelot)`"]
+        GW["`API Gateway<br/>(YARP)`"]
         
     end
 
@@ -162,46 +162,16 @@
         GW-->>C: 200 OK
     ```
 
-1. Схема событий (Топики / Routing Keys)
-    ```mermaid
-    flowchart LR
-        subgraph Producers
-            RSVC[Restaurant Service]
-            RS[Review Service]
-            MS[Moderation Service]
-        end
-        subgraph Exchange[RabbitMQ Events]
-            R1{{restaurant.created}}
-            R2{{review.created}}
-            R3{{review.moderated}}
-            R4{{review.updated}}
-        end
-        subgraph Consumers
-                RS_C["Review Service"]
-                MS_C[Moderation Service]
-                RT_C[Rating Service]
-        end
+2. Схема событий
+   
+    Подробные потоки интеграционных событий описаны по сервисам:
 
-        RSVC --> R1
-        RS --> R2
-        RS --> R4
-        MS --> R3
+    - Restaurant Service: см. [RestaurantService.md](./services/RestaurantService.md#интеграционные-события)
+    - Review Service: см. [ReviewService.md](./services/ReviewService.md#интеграционные-события)
+    - Moderation Service: см. [ModerationService.md](./services/ModerationService.md#интеграционные-события)
+    - Rating Service: см. [RatingService.md](./services/RatingService.md#интеграционные-события)
 
-            R1 --> RS_C
-            R2 --> MS_C
-            R2 --> RT_C
-            R3 --> RS_C
-            R4 --> RT_C
-
-        classDef prod fill:#2563eb,stroke:#1e3a8a,color:#fff
-        classDef ex fill:#f59e0b,stroke:#92400e
-        classDef cons fill:#10b981,stroke:#065f46,color:#fff
-        class RSVC,RS,MS prod
-        class R1,R2,R3,R4 ex
-        class RS_C,MS_C,RT_C cons
-    ```
-
-1. DDD Упрощённая модель (Entities + Events)
+3. DDD Упрощённая модель (Entities + Events)
     ```mermaid
     classDiagram
         class Restaurant {
@@ -282,3 +252,5 @@
         ReviewModeratedEvent ..> Review : updates status (approved/rejected)
         ReviewUpdatedEvent ..> RatingSnapshot : recalculate with new values
     ```
+
+        Примечание: блок выше показывает доменные события. Интеграционные контракты могут отличаться (например, доменное “RestaurantRatingUpdated” → интеграционное “RestaurantRatingRecalculatedEvent”). Фактические интеграционные потоки — в разделах «Интеграционные события» по сервисам.
