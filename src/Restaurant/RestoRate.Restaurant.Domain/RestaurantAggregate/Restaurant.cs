@@ -7,14 +7,15 @@ namespace RestoRate.Restaurant.Domain.RestaurantAggregate;
 
 public class Restaurant : EntityBase, IAggregateRoot
 {
-    public string Name { get; private set; }
-    public string Description { get; private set; }
-    public PhoneNumber PhoneNumber { get; private set; }
-    public Email Email { get; private set; }
-    public Location Location { get; private set; }
-    public Money AverageCheck { get; private set; }
-    public RestaurantTag Tag { get; private set; }
+    public string Name { get; private set; } = default!;
+    public string? Description { get; private set; }
+    public PhoneNumber PhoneNumber { get; private set; } = default!;
+    public Email Email { get; private set; } = default!;
+    public Location Location { get; private set; } = default!;
+    public Money AverageCheck { get; private set; } = default!;
+    public RestaurantTag Tag { get; private set; } = default!;
 
+    private Restaurant() { }
     public Restaurant(
         string name,
         string description,

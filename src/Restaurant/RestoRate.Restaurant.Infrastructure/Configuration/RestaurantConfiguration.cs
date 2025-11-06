@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using RestoRate.Shared.SharedKernel.Enums;
+
 namespace RestoRate.Restaurant.Infrastructure.Configuration;
 
 public class RestaurantConfiguration : IEntityTypeConfiguration<Domain.RestaurantAggregate.Restaurant>
@@ -41,9 +43,12 @@ public class RestaurantConfiguration : IEntityTypeConfiguration<Domain.Restauran
             ac.Property(m => m.Currency).HasColumnName("AverageCheck_Currency");
         });
 
-        builder.Property(r => r.Tag)
-            .HasConversion<string>()
-            .HasMaxLength(50);
+        builder
+            .Property(r => r.Tag)
+            .HasConversion(
+                r => r.Value,
+                value => RestaurantTag.FromValue(value)
+            );
 
         builder.ToTable("Restaurants");
     }
