@@ -26,7 +26,7 @@ var keycloak = builder.AddKeycloak(AppHostProjects.Keycloak,
     adminPassword: keycloakPassword
 )
 .WithRealmImport("realm-restorate.json")
-.WithDataBindMount("keycloak")
+.WithDataVolume("restorate-keycloak")
 .WithExternalHttpEndpoints()
 .WithLifetime(ContainerLifetime.Persistent);
 
@@ -117,6 +117,10 @@ var gateway = builder.AddProject<RestoRate_Gateway>(AppHostProjects.Gateway)
 
 #region PostgreSql
 
+var postgresPassword = builder.AddParameter("postgres-password", secret: true);
+
+/**
+
 int portPostgreSql = 46819;
 Regex re = new Regex(@"^(.*[/\\]otuscode)[/\\]{0,1}.*$");
 var r = re.Matches(Environment.CurrentDirectory);
@@ -145,6 +149,7 @@ var RestaurantsDbConnectionString = new NpgsqlConnectionStringBuilder()
 }.ToString();
 
 var RestaurantsDb = builder.AddConnectionString("RestaurantsDb", RestaurantsDbConnectionString);
+*/
 
 #endregion
 

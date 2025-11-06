@@ -1,5 +1,0 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <ProjectReference Include="..\RestoRate.Contracts\RestoRate.Contracts.csproj" />
-  </ItemGroup>
-</Project>

@@ -3,8 +3,8 @@ using Ardalis.SharedKernel;
 using Mediator;
 using Microsoft.Extensions.Logging;
 using RestoRate.Restaurant.Domain.Interfaces;
-using RestoRate.SharedKernel.Enums;
-using RestoRate.SharedKernel.ValueObjects;
+using RestoRate.Shared.SharedKernel.Enums;
+using RestoRate.Shared.SharedKernel.ValueObjects;
 
 namespace RestoRate.Restaurant.Domain.Services;
 

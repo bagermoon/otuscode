@@ -3,7 +3,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using RestoRate.Restaurant.Application.DTOs;
 using RestoRate.Restaurant.Domain.RestaurantAggregate.Specifications;
-using RestoRate.SharedKernel.Interfaces;
+using RestoRate.Shared.SharedKernel.Interfaces;
 
 namespace RestoRate.Restaurant.Application.UseCases.GetById;
 

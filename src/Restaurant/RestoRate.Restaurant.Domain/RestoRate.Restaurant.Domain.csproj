@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\RestoRate.SharedKernel\RestoRate.SharedKernel.csproj" />
+      <ProjectReference Include="..\..\Shared\RestoRate.Shared.SharedKernel\RestoRate.Shared.SharedKernel.csproj" />
     </ItemGroup>
 
 </Project>

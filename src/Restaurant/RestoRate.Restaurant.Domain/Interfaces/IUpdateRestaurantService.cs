@@ -1,7 +1,7 @@
 using Ardalis.Result;
 
-using RestoRate.SharedKernel.Enums;
-using RestoRate.SharedKernel.ValueObjects;
+using RestoRate.Shared.SharedKernel.Enums;
+using RestoRate.Shared.SharedKernel.ValueObjects;
 
 namespace RestoRate.Restaurant.Domain.Interfaces;
 

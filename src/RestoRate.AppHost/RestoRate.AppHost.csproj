@@ -12,7 +12,6 @@
     <PackageReference Include="Aspire.Hosting.Keycloak" />
     <PackageReference Include="Aspire.Hosting.RabbitMQ" />
     <PackageReference Include="Aspire.Hosting.PostgreSQL" />
-    <PackageReference Include="Npgsql" />
     <PackageReference Include="Scalar.Aspire" />
   </ItemGroup>
 
