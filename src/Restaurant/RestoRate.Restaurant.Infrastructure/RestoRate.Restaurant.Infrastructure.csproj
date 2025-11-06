@@ -1,12 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.EntityFrameworkCore" />
-      <PackageReference Include="Npgsql" />
-      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+      <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" />
+      <PackageReference Include="EFCore.NamingConventions" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PrivateAssets>all</PrivateAssets>
+      </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\RestoRate.Common\RestoRate.Common.csproj" />
+      <ProjectReference Include="..\..\Shared\RestoRate.Shared.Infrastructure\RestoRate.Shared.Infrastructure.csproj" />
       <ProjectReference Include="..\..\Shared\RestoRate.Shared.SharedKernel\RestoRate.Shared.SharedKernel.csproj" />
       <ProjectReference Include="..\RestoRate.Restaurant.Domain\RestoRate.Restaurant.Domain.csproj" />
     </ItemGroup>

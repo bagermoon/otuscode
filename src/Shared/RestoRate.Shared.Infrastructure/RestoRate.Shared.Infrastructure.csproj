@@ -2,8 +2,11 @@
   <ItemGroup>
     <PackageReference Include="MassTransit" />
     <PackageReference Include="MassTransit.RabbitMQ" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\RestoRate.ServiceDefaults\RestoRate.ServiceDefaults.csproj" />
     <ProjectReference Include="..\RestoRate.Shared.Application\RestoRate.Shared.Application.csproj" />
     <ProjectReference Include="..\..\RestoRate.Common\RestoRate.Common.csproj" />
   </ItemGroup>

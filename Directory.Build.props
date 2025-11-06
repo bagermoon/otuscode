@@ -15,4 +15,8 @@
   <PropertyGroup Condition="'$(CI)'=='true' or '$(GITHUB_ACTIONS)'=='true'">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
+
+  <!-- To use dotnet ef without 'msbuildprojectextensionspath' -->
+    <Import Condition="Exists('$(MSBuildProjectDirectory)\obj\$(MSBuildProjectFile).EntityFrameworkCore.targets')"
+            Project="$(MSBuildProjectDirectory)\obj\$(MSBuildProjectFile).EntityFrameworkCore.targets"/>
 </Project>

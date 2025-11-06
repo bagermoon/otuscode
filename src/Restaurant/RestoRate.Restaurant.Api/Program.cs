@@ -1,4 +1,5 @@
 using RestoRate.Common;
+using RestoRate.Restaurant.Infrastructure;
 using RestoRate.ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,8 @@ builder.Services.AddAuthorizationBuilder()
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.AddInfrastructureServices();
 
 var app = builder.Build();
 
