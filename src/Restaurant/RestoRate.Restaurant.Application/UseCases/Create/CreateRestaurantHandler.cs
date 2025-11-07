@@ -3,8 +3,8 @@ using Mediator;
 using Microsoft.Extensions.Logging;
 using RestoRate.Restaurant.Application.DTOs;
 using RestoRate.Restaurant.Domain.Interfaces;
-using RestoRate.Shared.SharedKernel.Enums;
-using RestoRate.Shared.SharedKernel.ValueObjects;
+using RestoRate.SharedKernel.Enums;
+using RestoRate.SharedKernel.ValueObjects;
 
 namespace RestoRate.Restaurant.Application.UseCases.Create;
 

@@ -15,6 +15,10 @@
     <Project Path="src/RestoRate.Gateway/RestoRate.Gateway.csproj" />
     <Project Path="src/RestoRate.MessageConsumer/RestoRate.MessageConsumer.csproj" />
     <Project Path="src/RestoRate.ServiceDefaults/RestoRate.ServiceDefaults.csproj" />
+    <Project Path="src/RestoRate.SharedKernel/RestoRate.SharedKernel.csproj" />
+    <Project Path="src/RestoRate.Contracts/RestoRate.Contracts.csproj" />
+    <Project Path="src/RestoRate.Abstractions/RestoRate.Abstractions.csproj" />
+    <Project Path="src/RestoRate.BuildingBlocks/RestoRate.BuildingBlocks.csproj" />
   </Folder>
   <Folder Name="/src/Moderation/">
     <Project Path="src/Moderation/RestoRate.Moderation.Api/RestoRate.Moderation.Api.csproj" />
@@ -30,11 +34,5 @@
   </Folder>
   <Folder Name="/src/Review/">
     <Project Path="src/Review/RestoRate.Review.Api/RestoRate.Review.Api.csproj" />
-  </Folder>
-  <Folder Name="/src/Shared/">
-    <Project Path="src/Shared/RestoRate.Shared.Application/RestoRate.Shared.Application.csproj" />
-    <Project Path="src/Shared/RestoRate.Shared.Contracts/RestoRate.Shared.Contracts.csproj" />
-    <Project Path="src/Shared/RestoRate.Shared.Infrastructure/RestoRate.Shared.Infrastructure.csproj" />
-    <Project Path="src/Shared/RestoRate.Shared.SharedKernel/RestoRate.Shared.SharedKernel.csproj" />
   </Folder>
 </Solution>

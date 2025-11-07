@@ -11,8 +11,8 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\RestoRate.Common\RestoRate.Common.csproj" />
-      <ProjectReference Include="..\..\Shared\RestoRate.Shared.Infrastructure\RestoRate.Shared.Infrastructure.csproj" />
-      <ProjectReference Include="..\..\Shared\RestoRate.Shared.SharedKernel\RestoRate.Shared.SharedKernel.csproj" />
+      <ProjectReference Include="..\..\RestoRate.BuildingBlocks\RestoRate.BuildingBlocks.csproj" />
+      <ProjectReference Include="..\..\RestoRate.SharedKernel\RestoRate.SharedKernel.csproj" />
       <ProjectReference Include="..\RestoRate.Restaurant.Domain\RestoRate.Restaurant.Domain.csproj" />
     </ItemGroup>
 

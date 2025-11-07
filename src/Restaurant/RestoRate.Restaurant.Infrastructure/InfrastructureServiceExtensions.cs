@@ -9,7 +9,7 @@ using RestoRate.Restaurant.Domain.Interfaces;
 using RestoRate.Restaurant.Domain.Services;
 using RestoRate.Restaurant.Infrastructure.Data;
 using RestoRate.Restaurant.Infrastructure.Repositories;
-using RestoRate.Shared.Infrastructure.Migrations;
+using RestoRate.BuildingBlocks.Migrations;
 
 namespace RestoRate.Restaurant.Infrastructure;
 

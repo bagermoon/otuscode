@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>RestoRate.Contracts</PackageId>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RestoRate.Abstractions\RestoRate.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

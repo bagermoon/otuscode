@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Shared\RestoRate.Shared.SharedKernel\RestoRate.Shared.SharedKernel.csproj" />
+      <ProjectReference Include="..\..\RestoRate.SharedKernel\RestoRate.SharedKernel.csproj" />
     </ItemGroup>
 
 </Project>
