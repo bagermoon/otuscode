@@ -1,0 +1,40 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/RestoRate.AppHost/RestoRate.AppHost.csproj" />
+    <Project Path="src/RestoRate.BlazorDashboard/RestoRate.BlazorDashboard.csproj" />
+    <Project Path="src/RestoRate.Common/RestoRate.Common.csproj" />
+    <Project Path="src/RestoRate.Gateway/RestoRate.Gateway.csproj" />
+    <Project Path="src/RestoRate.MessageConsumer/RestoRate.MessageConsumer.csproj" />
+    <Project Path="src/RestoRate.ServiceDefaults/RestoRate.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/src/Moderation/">
+    <Project Path="src/Moderation/RestoRate.Moderation.Api/RestoRate.Moderation.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/Rating/">
+    <Project Path="src/Rating/RestoRate.Rating.Api/RestoRate.Rating.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/Restaurant/">
+    <Project Path="src/Restaurant/RestoRate.Restaurant.Api/RestoRate.Restaurant.Api.csproj" />
+    <Project Path="src/Restaurant/RestoRate.Restaurant.Application/RestoRate.Restaurant.Application.csproj" />
+    <Project Path="src/Restaurant/RestoRate.Restaurant.Domain/RestoRate.Restaurant.Domain.csproj" />
+    <Project Path="src/Restaurant/RestoRate.Restaurant.Infrastructure/RestoRate.Restaurant.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Review/">
+    <Project Path="src/Review/RestoRate.Review.Api/RestoRate.Review.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/Shared/">
+    <Project Path="src/Shared/RestoRate.Shared.Application/RestoRate.Shared.Application.csproj" />
+    <Project Path="src/Shared/RestoRate.Shared.Contracts/RestoRate.Shared.Contracts.csproj" />
+    <Project Path="src/Shared/RestoRate.Shared.Infrastructure/RestoRate.Shared.Infrastructure.csproj" />
+    <Project Path="src/Shared/RestoRate.Shared.SharedKernel/RestoRate.Shared.SharedKernel.csproj" />
+  </Folder>
+</Solution>
