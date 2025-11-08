@@ -2,7 +2,7 @@ namespace RestoRate.Common;
 
 public class AppHostProjects
 {
-    public const string RestaurnatDb = nameof(RestaurnatDb);
+    public const string RestaurantDb = nameof(RestaurantDb);
     public const string RabbitMQ = nameof(RabbitMQ);
     public const string Keycloak = nameof(Keycloak);
     public const string BlazorDashboard = nameof(BlazorDashboard);

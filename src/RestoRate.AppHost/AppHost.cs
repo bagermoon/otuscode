@@ -26,7 +26,7 @@ var postgres = builder.AddPostgres("postgres",
     .WithDataVolume()
     .WithLifetime(ContainerLifetime.Persistent);
 
-var restaurantDb = postgres.AddDatabase(AppHostProjects.RestaurnatDb, "Restaurants");
+var restaurantDb = postgres.AddDatabase(AppHostProjects.RestaurantDb, "Restaurants");
 
 
 /**

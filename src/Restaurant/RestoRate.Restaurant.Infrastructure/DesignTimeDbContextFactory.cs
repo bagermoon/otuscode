@@ -14,7 +14,7 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<Restaurant
             .AddJsonFile("appsettings.json", optional: true)
             .AddEnvironmentVariables()
             .Build();
-        var connectionString = config.GetConnectionString(AppHostProjects.RestaurnatDb);
+        var connectionString = config.GetConnectionString(AppHostProjects.RestaurantDb);
             
         var optionsBuilder = new DbContextOptionsBuilder<RestaurantDbContext>();
         optionsBuilder

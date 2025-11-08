@@ -14,6 +14,7 @@
     <Project Path="src/RestoRate.Common/RestoRate.Common.csproj" />
     <Project Path="src/RestoRate.Gateway/RestoRate.Gateway.csproj" />
     <Project Path="src/RestoRate.MessageConsumer/RestoRate.MessageConsumer.csproj" />
+    <Project Path="src/RestoRate.Migrations/RestoRate.Migrations.csproj" />
     <Project Path="src/RestoRate.ServiceDefaults/RestoRate.ServiceDefaults.csproj" />
     <Project Path="src/RestoRate.SharedKernel/RestoRate.SharedKernel.csproj" />
     <Project Path="src/RestoRate.Contracts/RestoRate.Contracts.csproj" />

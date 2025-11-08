@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <UserSecretsId>dotnet-RestoRate.Migrations-b0468863-e5ee-491c-a173-7408ba264bf2</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Restaurant\RestoRate.Restaurant.Infrastructure\RestoRate.Restaurant.Infrastructure.csproj" />
+    <ProjectReference Include="..\RestoRate.BuildingBlocks\RestoRate.BuildingBlocks.csproj" />
+    <ProjectReference Include="..\RestoRate.ServiceDefaults\RestoRate.ServiceDefaults.csproj" />
+  </ItemGroup>
+</Project>

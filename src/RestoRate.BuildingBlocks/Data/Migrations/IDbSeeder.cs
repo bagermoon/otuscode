@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace RestoRate.BuildingBlocks.Migrations;
+namespace RestoRate.BuildingBlocks.Data.Migrations;
 
 public interface IDbSeeder<in TContext> where TContext : DbContext
 {

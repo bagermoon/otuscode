@@ -2,9 +2,10 @@ using System.Reflection;
 
 using Microsoft.EntityFrameworkCore;
 
+using RestoRate.BuildingBlocks.Data.DbContexts;
 namespace RestoRate.Restaurant.Infrastructure.Data;
 
-public class RestaurantDbContext : DbContext
+public class RestaurantDbContext : DbContextBase
 {
     public RestaurantDbContext(DbContextOptions<RestaurantDbContext> options) : base(options)
     { }

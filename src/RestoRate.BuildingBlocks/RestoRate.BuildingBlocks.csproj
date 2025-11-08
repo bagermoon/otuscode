@@ -1,5 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
+    <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="EFCore.NamingConventions" />
     <PackageReference Include="MassTransit" />
     <PackageReference Include="MassTransit.RabbitMQ" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
@@ -9,5 +11,6 @@
     <ProjectReference Include="..\RestoRate.ServiceDefaults\RestoRate.ServiceDefaults.csproj" />
     <ProjectReference Include="..\RestoRate.Abstractions\RestoRate.Abstractions.csproj" />
     <ProjectReference Include="..\RestoRate.Common\RestoRate.Common.csproj" />
+    <ProjectReference Include="..\RestoRate.SharedKernel\RestoRate.SharedKernel.csproj" />
   </ItemGroup>
 </Project>
