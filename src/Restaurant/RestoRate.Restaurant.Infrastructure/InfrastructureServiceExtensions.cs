@@ -9,6 +9,7 @@ using RestoRate.Restaurant.Infrastructure.Data;
 using RestoRate.Restaurant.Infrastructure.Repositories;
 using RestoRate.BuildingBlocks.Data;
 using RestaurantEntity = RestoRate.Restaurant.Domain.RestaurantAggregate.Restaurant;
+using RestoRate.BuildingBlocks.Messaging;
 
 namespace RestoRate.Restaurant.Infrastructure;
 
@@ -19,6 +20,7 @@ public static class InfrastructureServiceExtensions
     )
     {
         builder.AddPostgresDbContext<RestaurantDbContext>(AppHostProjects.RestaurantDb);
+        builder.AddMassTransitEventBus(AppHostProjects.RabbitMQ);
 
         builder.Services
             .AddScoped<IRepository<RestaurantEntity>, RestaurantRepository>()

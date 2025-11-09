@@ -78,7 +78,7 @@ var keycloak = builder.AddKeycloak(AppHostProjects.Keycloak,
 var rabbitUsername = builder.AddParameter("rabbitmq-username", "admin", secret: true);
 var rabbitPassword = builder.AddParameter("rabbitmq-password", "admin", secret: true);
 
-var rabbitmq = builder.AddRabbitMQ("messaging", userName: rabbitUsername, password: rabbitPassword)
+var rabbitmq = builder.AddRabbitMQ(AppHostProjects.RabbitMQ, userName: rabbitUsername, password: rabbitPassword)
     .WithImageTag("4.1")
     .WithDataVolume(isReadOnly: false)
     .WithManagementPlugin()
@@ -114,6 +114,7 @@ var restaurantApiBearerAudience = builder.AddParameter("restaurant-api-bearer-au
 var restaurantApi = builder.AddProject<RestoRate_Restaurant_Api>(AppHostProjects.ServiceRestaurantApi)
     .WithReference(keycloak)
     .WithReference(restaurantDb)
+    .WithReference(rabbitmq)
     .WaitFor(keycloak).WaitFor(migrations)
     .WithEnvironment("KeycloakSettings__Audience", restaurantApiBearerAudience)
     .WithEnvironment("KeycloakSettings__Realm", keycloakRealm);
@@ -123,6 +124,7 @@ var restaurantApi = builder.AddProject<RestoRate_Restaurant_Api>(AppHostProjects
 var moderationApiBearerAudience = builder.AddParameter("moderation-api-bearer-audience", secret: false);
 var moderationApi = builder.AddProject<RestoRate_Moderation_Api>(AppHostProjects.ServiceModerationApi)
     .WithReference(keycloak)
+    .WithReference(rabbitmq)
     .WaitFor(keycloak).WaitFor(migrations)
     .WithEnvironment("KeycloakSettings__Audience", moderationApiBearerAudience)
     .WithEnvironment("KeycloakSettings__Realm", keycloakRealm);
@@ -132,6 +134,7 @@ var moderationApi = builder.AddProject<RestoRate_Moderation_Api>(AppHostProjects
 var ratingApiBearerAudience = builder.AddParameter("rating-api-bearer-audience", secret: false);
 var ratingApi = builder.AddProject<RestoRate_Rating_Api>(AppHostProjects.ServiceRatingApi)
     .WithReference(keycloak)
+    .WithReference(rabbitmq)
     .WaitFor(keycloak).WaitFor(migrations)
     .WithEnvironment("KeycloakSettings__Audience", ratingApiBearerAudience)
     .WithEnvironment("KeycloakSettings__Realm", keycloakRealm);
@@ -141,6 +144,7 @@ var ratingApi = builder.AddProject<RestoRate_Rating_Api>(AppHostProjects.Service
 var reviewApiBearerAudience = builder.AddParameter("review-api-bearer-audience", secret: false);
 var reviewApi = builder.AddProject<RestoRate_Review_Api>(AppHostProjects.ServiceReviewApi)
     .WithReference(keycloak)
+    .WithReference(rabbitmq)
     .WaitFor(keycloak).WaitFor(migrations)
     .WithEnvironment("KeycloakSettings__Audience", reviewApiBearerAudience)
     .WithEnvironment("KeycloakSettings__Realm", keycloakRealm);

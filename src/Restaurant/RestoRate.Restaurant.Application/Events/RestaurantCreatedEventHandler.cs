@@ -1,20 +1,19 @@
-using Mediator;
+using Ardalis.SharedKernel;
+
 using Microsoft.Extensions.Logging;
 using RestoRate.Restaurant.Domain.RestaurantAggregate.Events;
 
-namespace RestoRate.Restaurant.Domain.RestaurantAggregate.Handlers;
+namespace RestoRate.Restaurant.Application.Events;
 
 internal sealed class RestaurantCreatedEventHandler(ILogger<RestaurantCreatedEventHandler> logger)
-    : INotificationHandler<RestaurantCreatedEvent>
+    : IDomainEventHandler<RestaurantCreatedEvent>
 {
-    public async ValueTask Handle(RestaurantCreatedEvent domainEvent, CancellationToken cancellationToken)
+    public ValueTask Handle(RestaurantCreatedEvent domainEvent, CancellationToken cancellationToken)
     {
         logger.LogInformation("Обработка события: Ресторан '{RestaurantName}' создан (ID: {RestaurantId})",
             domainEvent.Name,
             domainEvent.RestaurantId);
 
-        //
-
-        await ValueTask.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 }

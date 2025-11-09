@@ -1,9 +1,11 @@
 using System.Text;
 using RabbitMQ.Client;
 
+using RestoRate.ServiceDefaults;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
-builder.AddRabbitMQClient(connectionName: "messaging");
+builder.AddRabbitMQClient(connectionName: AppHostProjects.RabbitMQ);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

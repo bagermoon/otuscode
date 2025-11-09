@@ -1,32 +1,32 @@
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 using RestoRate.Abstractions.Messaging;
-using RestoRate.ServiceDefaults;
 
 namespace RestoRate.BuildingBlocks.Messaging;
 
 public static class MassTransitExtensions
 {
-    public static IServiceCollection AddMassTransitEventBus(
-        this IServiceCollection services,
-        IConfiguration config,
+    public static IHostApplicationBuilder AddMassTransitEventBus(
+        this IHostApplicationBuilder builder,
+        string connectionName,
         Action<IBusRegistrationConfigurator>? addConsumers = null)
     {
-        services.AddMassTransit(x =>
+        builder.Services.AddMassTransit(x =>
         {
             addConsumers?.Invoke(x);
 
             x.UsingRabbitMq((context, cfg) =>
             {
-                cfg.Host(new Uri(config.GetConnectionString(AppHostProjects.RabbitMQ)!));
+                cfg.Host(new Uri(builder.Configuration.GetConnectionString(connectionName)!));
 
                 cfg.ConfigureEndpoints(context);
             });
         });
 
-        services.AddScoped<IIntegrationEventBus, MassTransitEventBus>();
-        return services;
+        builder.Services.AddScoped<IIntegrationEventBus, MassTransitEventBus>();
+        return builder;
     }
 }

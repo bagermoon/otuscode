@@ -1,11 +1,12 @@
-using Mediator;
+using Ardalis.SharedKernel;
+
 using Microsoft.Extensions.Logging;
 using RestoRate.Restaurant.Domain.RestaurantAggregate.Events;
 
-namespace RestoRate.Restaurant.Domain.RestaurantAggregate.Handlers;
+namespace RestoRate.Restaurant.Application.Events;
 
 internal sealed class RestaurantDeletedEventHandler(ILogger<RestaurantDeletedEventHandler> logger)
-    : INotificationHandler<RestaurantDeletedEvent>
+    : IDomainEventHandler<RestaurantDeletedEvent>
 {
     public ValueTask Handle(RestaurantDeletedEvent domainEvent, CancellationToken cancellationToken)
     {

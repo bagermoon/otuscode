@@ -17,7 +17,7 @@
   - `RestoRate.Abstractions` — чистые интерфейсы/примитивы (напр. `Messaging.IIntegrationEventBus`) без зависимостей от транспорта/EF.
   - `RestoRate.BuildingBlocks` — переиспользуемые инфраструктурные реализации (MassTransitEventBus, миграции/сидеры EF, resilience middleware).
   - `RestoRate.SharedKernel` — доменные строительные блоки (entity base, value object, domain event, Result).
-  - `RestoRate.Common` — опции конфигурации, имена Aspire ресурсов, утилиты без доменной логики.
+  - `RestoRate.Migrations` — дизайн‑тайм хост для EF Core (используется как `--startup-project` для CLI и в Aspire при выполнении миграций). Хранит только запуск и DI, без доменной логики.
   - `RestoRate.Gateway` — шлюз (YARP) + токен exchange.
   - `RestoRate.BlazorDashboard` — Blazor Server UI.
   - Доменные сервисы по границам (Bounded Contexts), каждый в 4 слоя:
@@ -25,6 +25,10 @@
     - `RestoRate.<Context>.Application`
     - `RestoRate.<Context>.Infrastructure`
     - `RestoRate.<Context>.Api`
+  - Текущий прогресс по контекстам:
+    - `Restaurant` — все 4 слоя присутствуют.
+    - `Moderation`, `Rating` — пока есть слой `Api` (заготовки); остальные планируются.
+    - `Review` — в планах.
 - tests/
   - Юнит‑тесты домена/приложения и интеграционные тесты инфраструктуры (с Testcontainers).
 
@@ -80,7 +84,7 @@ builder.Services.AddMassTransitEventBus(
   });
 ```
 
-2) Публикация интеграционного события из обработчика Application (MediatR):
+2) Публикация интеграционного события из обработчика Application (Mediator):
 
 ```csharp
 using RestoRate.Abstractions.Messaging; // IIntegrationEventBus
@@ -93,7 +97,7 @@ public class CreateReviewHandler : IRequestHandler<CreateReviewCommand>
 
   public CreateReviewHandler(IIntegrationEventBus bus) => _bus = bus;
 
-  public async Task Handle(CreateReviewCommand request, CancellationToken ct)
+  public async ValueTask Handle(CreateReviewCommand request, CancellationToken ct)
   {
     // ... доменная логика, сохранение ...
 
@@ -113,7 +117,7 @@ public class CreateReviewHandler : IRequestHandler<CreateReviewCommand>
 ```
 
 3) Конфигурация строки подключения RabbitMQ
-- В `appsettings*.json` сервисов используйте `ConnectionStrings:RabbitMQ` (имя берётся из [`AppHostProjects.RabbitMQ`](../src/RestoRate.Common/AppHostProjects.cs)).
+- В `appsettings*.json` сервисов используйте `ConnectionStrings:RabbitMQ` (имя берётся из [`AppHostProjects.RabbitMQ`](../src/RestoRate.ServiceDefaults/AppHostProjects.cs)).
 - При запуске через Aspire AppHost значение обычно заполняется автоматически.
 
 Примечания и следующая эволюция:
@@ -126,12 +130,12 @@ public class CreateReviewHandler : IRequestHandler<CreateReviewCommand>
   - Endpoints (Controllers/Minimal APIs/SignalR) и HTTP‑контракты сервиса.
   - Аутентификация/авторизация (Keycloak/JWT), политики/роллинг‑зоны доступа.
   - Валидация входа на уровне API (model binding, basic validation) и преобразование в команды/запросы Application.
-  - Делегирование бизнес‑действий через MediatR: только `Send()`/`Publish()` без бизнес‑логики.
+  - Делегирование бизнес‑действий через Mediator: только `Send()`/`Publish()` без бизнес‑логики.
   - Версионирование HTTP‑контракта (если нужно), OpenAPI в Dev, `app.MapDefaultEndpoints()` для health.
   - Никаких доступов к БД/шинам/внешним API напрямую — только через Application.
 
 - Application (use‑cases, orchestration)
-  - Команды и запросы (MediatR) + их обработчики: бизнес‑правила сценариев и координация домена.
+  - Команды и запросы (Mediator) + их обработчики: бизнес‑правила сценариев и координация домена.
   - Порты/интерфейсы для инфраструктуры (например, репозитории, брокеры сообщений, внешние API, кэш).
   - Транзакционные границы use‑case’ов; применение доменных событий/правил; идемпотентность при необходимости.
   - Pipeline Behaviors (валидация, логирование, ретраи, performance) — без привязки к конкретной инфраструктуре.
@@ -150,7 +154,7 @@ public class CreateReviewHandler : IRequestHandler<CreateReviewCommand>
   - Регистрация DI (composition root) и интеграция с `RestoRate.ServiceDefaults` (resilience, discovery, telemetry).
   - Никакой бизнес‑логики; только технические детали и маппинг к домену/Application.
 
-## Common vs SharedKernel vs Contracts vs Константы
+## SharedKernel vs Contracts vs Константы
 
 - `SharedKernel` (только домен):
   - Доменные строительные блоки: `Entity<TId>`, `AggregateRoot<TId>`, `ValueObject`, `IDomainEvent`, `Result` и т.п.
@@ -161,14 +165,7 @@ public class CreateReviewHandler : IRequestHandler<CreateReviewCommand>
   - DTO и интеграционные события: сериализуемые, стабильные, версиируемые.
   - Без бизнес‑логики — только данные.
 
-- `Common` (кросс‑сервисная прикладная инфраструктура):
-  - Типизированные настройки и их `SectionName` (напр., `KeycloakSettingsOptions`).
-  - Константы, связанные с хостингом/инфраструктурой: имена ресурсов Aspire и имена `HttpClient` (напр., `AppHostProjects.Keycloak`, `AppHostProjects.Gateway`).
-  - Общие расширения DI, утилиты для аутентификации/авторизации, Blazor‑специфичные helper’ы, обработчики токенов.
-  - Не содержит доменной логики.
-
 - Константы:
-  - Имена сервисов/ресурсов Aspire и HttpClient — в `Common`.
   - Доменные константы — в конкретном `...Domain` или, если действительно обще‑доменные, в `SharedKernel`.
   - Избегать «магических» строк: выносить в единые константы.
 
@@ -186,6 +183,13 @@ public class CreateReviewHandler : IRequestHandler<CreateReviewCommand>
 - `app.MapDefaultEndpoints();` — health‑эндпойнты (в Dev).
 - В Dev — OpenAPI (по необходимости), в Prod — согласно политике безопасности.
 
+Дополнительно для EF Core:
+- В `DbContext` используем `UseSnakeCaseNamingConvention()` для таблиц/столбцов (PostgreSQL / Npgsql).
+- Явные `HasColumnName(...)` не требуются, если совпадают с результатом конвенции (рекомендовано удалять избыточные маппинги).
+- С `AddDbContextPool` перехватчики EF должны быть безопасны для корневого контейнера. Наш `EventDispatchInterceptor` регистрируется как singleton и вытягивает scoped‑сервисы внутри обработчика через контекст.
+
+Смотрите `RestoRate.BuildingBlocks/Data/DbContextExtensions.cs` и `.../Data/Interceptors/EventDispatchInterceptor.cs`.
+
 ## Тестирование (???)
 - Юнит‑тесты домена (Domain) без инфраструктуры.
 - Тесты Application‑слоя (моки портов).
@@ -196,11 +200,16 @@ public class CreateReviewHandler : IRequestHandler<CreateReviewCommand>
 - Проекты: `RestoRate.<Context>.<Layer>`.
 - Пространства имён соответствуют структуре каталогов.
 - События и маршруты RabbitMQ: доменные префиксы (`restaurant.*`, `review.*`).
-- HttpClient‑имена и имена ресурсов Aspire — централизовать в `Common.AppHostProjects`.
+
 
 ## Чек‑лист
 - Доменные объекты — только в `Domain` (или в `SharedKernel`, если общий доменный блок).
 - Никакой инфраструктуры в `Domain` и `SharedKernel`.
-- `Common` — прикладные/инфраструктурные общие вещи (опции, константы, расширения), без бизнес‑логики.
+
 - Межсервисный обмен — через `Contracts`.
 - Публичные точки входа — `WithExternalHttpEndpoints()`; остальное — через Gateway и discovery.
+
+## Миграции EF Core и инструменты
+
+- Для генерации/просмотра миграций используем дизайн‑тайм хост `RestoRate.Migrations` и инфраструктуру `RestoRate.<Context>.Infrastructure`.
+- Документация и команды: см. `docs/migrations.md` (есть команды для списка и добавления миграций для сервиса Restaurant). Для корректной работы рекомендуется запускать через Aspire AppHost, чтобы были доступны БД и конфигурация.
