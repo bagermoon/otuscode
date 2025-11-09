@@ -1,5 +1,5 @@
 using Ardalis.Result;
-using MediatR;
+using Mediator;
 using RestoRate.Restaurant.Application.DTOs;
 
 namespace RestoRate.Restaurant.Application.UseCases.Update;

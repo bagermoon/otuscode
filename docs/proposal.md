@@ -8,7 +8,7 @@
 
 ### Архитектура и компоненты
 
-1.  **API Gateway (Ocelot / YARP):**
+1.  **API Gateway (YARP):**
     *   Единая точка входа для клиента.
     *   Маршрутизация запросов к соответствующим микросервисам.
 
@@ -24,13 +24,13 @@
     *   **Rating Service:** Агрегирование и кеширование. `Порт: 5003`
         *   **Кеш:** Redis.
         *   **Метрики:** AverageRate (средняя оценка), ReviewCount (количество рецензий), AverageCheck (средний чек).
-        *   **Источник:** Слушает `ReviewAddedEvent`, `ReviewUpdatedEvent`, `ReviewModeratedEvent`.
+        *   **Источник:** Слушает `ReviewAddedEvent`, `ReviewUpdatedEvent` (финальное обновление приходит после модерации через Review Service).
 
 3.  **Связь между сервисами:**
     *   **События (RabbitMQ):**
         *   `RestaurantCreatedEvent` (от Restaurant Service).
         *   `ReviewAddedEvent`, `ReviewUpdatedEvent` (от Review Service).
-        *   `ReviewModeratedEvent` (от Moderation Service / Review Service).
+        *   `ReviewModeratedEvent` (от Moderation Service).
     *   **Синхронные вызовы (минимально):**
         *   Review Service при отсутствии локально кэшируемого значения может проверить ресторан через REST.
 
@@ -143,16 +143,24 @@ public class MongoDbReviewRepository : IReviewRepository
     }
 }
 ```
-*   **Сериализация в RabbitMQ** с использованием `System.Text.Json`.
+*   **MassTransit + RabbitMQ (рекомендуется)** — краткий пример публикации, потребления и настройки:
 ```csharp
-// Publisher
-var message = JsonSerializer.Serialize(new ReviewAddedEvent(review.Id, review.RestaurantId, review.Rating));
-var body = Encoding.UTF8.GetBytes(message);
-channel.BasicPublish(exchange: "reviews", routingKey: "review.added", body: body);
+// Publish (например, в Review Service)
+await publish.Publish(new ReviewAddedEvent(reviewId, restaurantId, authorId, rating, text, tags));
 
-// Consumer
-var message = Encoding.UTF8.GetString(ea.Body.ToArray());
-var @event = JsonSerializer.Deserialize<ReviewAddedEvent>(message);
+// Consumer (например, в Moderation Service)
+public sealed class ReviewAddedConsumer : IConsumer<ReviewAddedEvent>
+{
+    public Task Consume(ConsumeContext<ReviewAddedEvent> ctx)
+        => HandleAsync(ctx.Message);
+}
+
+// Minimal setup (в любом сервисе)
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<ReviewAddedConsumer>();
+    x.UsingRabbitMq((ctx, cfg) => cfg.ConfigureEndpoints(ctx));
+});
 ```
 
 #### 3. Логи и Метрики
@@ -170,8 +178,9 @@ var @event = JsonSerializer.Deserialize<ReviewAddedEvent>(message);
 1.  **Клиент** отправляет `POST /api/restaurants/{id}/reviews`.
 2.  **Gateway** перенаправляет в **Review Service**.
 3.  **Review Service** сохраняет рецензию (status=pending) и публикует `ReviewAddedEvent`.
-4.  **Moderation Service** (если требуется) обрабатывает и при необходимости публикует `ReviewModeratedEvent`.
-5.  **Rating Service** на событиях пересчитывает агрегаты и обновляет Redis.
+4.  **Moderation Service** (если требуется) обрабатывает и публикует `ReviewModeratedEvent`.
+5.  **Review Service** принимает `ReviewModeratedEvent`, обновляет статус и публикует `ReviewUpdatedEvent`.
+6.  **Rating Service** на `ReviewAddedEvent`/`ReviewUpdatedEvent` пересчитывает агрегаты и обновляет Redis.
 6.  **Клиент** при чтении получает актуальный рейтинг из кеша.
 
 ---
@@ -189,10 +198,10 @@ var @event = JsonSerializer.Deserialize<ReviewAddedEvent>(message);
 ## Архитектурная схема RestoRate
 
 ```
-┌─────────────────┐    ┌───────────────────────────────────┐    ┌─────────────────┐
-│   Клиент        │    │         API Gateway               │    │   Blazor Server │
-│   (Web/Mobile)  │◄──►│   (Ocelot/YARP)                   │◄──►│   Dashboard     │
-└─────────────────┘    └───────────────────────────────────┘    └─────────────────┘
+                       ┌───────────────────────────────────┐    ┌─────────────────┐
+                       │         API Gateway               │    │   Blazor Server │
+                       │           (YARP)                  │◄──►│   Dashboard     │
+                       └───────────────────────────────────┘    └─────────────────┘
                               │              │                         │
                               │              │                         │
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -212,7 +221,7 @@ var @event = JsonSerializer.Deserialize<ReviewAddedEvent>(message);
                     ┌─────▼───────────────▼─────┐
                     │    RabbitMQ (Events)      │
                     │  ┌─────────────────────┐  │
-                    │  │ review.created      │  │
+                    │  │ review.added        │  │
                     │  │ review.updated      │  │
                     │  │ review.moderated    │  │
                     │  │ restaurant.created  │  │
@@ -286,13 +295,13 @@ public class ModerationTask
 
 ```
 1. Клиент ───POST /reviews───► Gateway ───► Review Service ───► MongoDB
-2. Review Service ───ReviewCreatedEvent───► RabbitMQ
+2. Review Service ───ReviewAddedEvent───► RabbitMQ
 3. RabbitMQ ───► Moderation Service (авто-проверка + создание задачи)
 4. RabbitMQ ───► Rating Service (временный расчет)
 5. Модератор в Blazor Dashboard ───► Moderation Service
 6. Moderation Service ───ReviewModeratedEvent───► RabbitMQ
-7. RabbitMQ ───► Review Service (обновляет статус)
-8. RabbitMQ ───► Rating Service (финальный расчет)
+7. RabbitMQ ───► Review Service (обновляет статус и публикует ReviewUpdatedEvent)
+8. RabbitMQ ───► Rating Service (финальный расчет на ReviewUpdatedEvent)
 9. Клиент видит одобренный отзыв
 ```
 
@@ -302,18 +311,16 @@ public class ModerationTask
 | Метод | Эндпоинт | Сервис | Описание |
 |-------|----------|---------|-----------|
 | `GET` | `/api/restaurants` | Restaurant | Список ресторанов |
-| `GET` | `/api/restaurants/{id}/details` | BFF | Детали ресторана |
 | `GET` | `/api/restaurants/{id}/reviews` | Review | Рецензии ресторана |
 | `POST` | `/api/restaurants/{id}/reviews` | Review | Добавить рецензию |
 | `GET` | `/api/restaurants/{id}/rating` | Rating | Рейтинг ресторана |
 
-### Admin/Moderation API
+### Moderation API
 | Метод | Эндпоинт | Сервис | Описание |
 |-------|----------|---------|-----------|
 | `GET` | `/api/moderation/pending` | Moderation | Задачи на модерацию |
 | `POST` | `/api/moderation/{taskId}/approve` | Moderation | Одобрить отзыв |
 | `POST` | `/api/moderation/{taskId}/reject` | Moderation | Отклонить отзыв |
-| `GET` | `/api/admin/dashboard` | BFF | Статистика |
 
 ### Blazor Pages
 | URL | Компонент | Назначение |
@@ -321,29 +328,28 @@ public class ModerationTask
 | `/` | RestaurantCatalog.razor | Каталог ресторанов |
 | `/restaurant/{id}` | RestaurantDetail.razor | Детали ресторана + рецензии |
 | `/moderation` | Moderation.razor | Панель модерации |
-| `/admin` | AdminDashboard.razor | Админ-панель |
 
 ## Детали реализации Moderation Service
 
 ```csharp
 // Автоматическая проверка на запрещенные слова + создание задачи
-public class ReviewCreatedEventHandler
+public class ReviewAddedEventHandler
 {
     private readonly IModerationTaskRepository _repository;
     private readonly IProfanityFilter _filter;
 
-    public async Task Handle(ReviewCreatedEvent @event)
+    public async Task Handle(ReviewAddedEvent @event)
     {
         // Авто-проверка
-        var autoCheck = _filter.Check(@event.ReviewText);
+        var autoCheck = _filter.Check(@event.Text);
         
         var task = new ModerationTask
         {
             ReviewId = @event.ReviewId,
-            ReviewText = @event.ReviewText,
+            ReviewText = @event.Text,
             Rating = @event.Rating,
             RestaurantId = @event.RestaurantId,
-            UserId = @event.UserId,
+            UserId = @event.AuthorId.ToString(),
             Status = autoCheck.IsApproved ? 
                 ModerationStatus.AutoApproved : 
                 ModerationStatus.Pending,

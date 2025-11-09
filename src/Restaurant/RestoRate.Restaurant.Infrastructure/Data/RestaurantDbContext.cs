@@ -1,14 +1,14 @@
+using System.Reflection;
+
 using Microsoft.EntityFrameworkCore;
 
-using RestoRate.Restaurant.Infrastructure.Configuration;
-
+using RestoRate.BuildingBlocks.Data.DbContexts;
 namespace RestoRate.Restaurant.Infrastructure.Data;
 
-public class RestaurantDbContext : DbContext
+public class RestaurantDbContext : DbContextBase
 {
     public RestaurantDbContext(DbContextOptions<RestaurantDbContext> options) : base(options)
-    {
-    }
+    { }
 
     public DbSet<Domain.RestaurantAggregate.Restaurant> Restaurants { get; set; }
 
@@ -16,7 +16,7 @@ public class RestaurantDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.ApplyConfiguration(new RestaurantConfiguration());
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
     }
 }

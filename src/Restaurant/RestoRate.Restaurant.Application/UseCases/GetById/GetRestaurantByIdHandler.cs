@@ -1,18 +1,20 @@
 using Ardalis.Result;
-using MediatR;
+using Ardalis.SharedKernel;
+
+using Mediator;
 using Microsoft.Extensions.Logging;
 using RestoRate.Restaurant.Application.DTOs;
 using RestoRate.Restaurant.Domain.RestaurantAggregate.Specifications;
-using RestoRate.SharedKernel.Interfaces;
+using RestaurantEntity = RestoRate.Restaurant.Domain.RestaurantAggregate.Restaurant;
 
 namespace RestoRate.Restaurant.Application.UseCases.GetById;
-
+    
 internal class GetRestaurantByIdHandler(
-    IReadRepository<Domain.RestaurantAggregate.Restaurant> readRepository,
+    IReadRepository<RestaurantEntity> readRepository,
     ILogger<GetRestaurantByIdHandler> logger)
     : IRequestHandler<GetRestaurantByIdQuery, Result<RestaurantDto>>
 {
-    public async Task<Result<RestaurantDto>> Handle(
+    public async ValueTask<Result<RestaurantDto>> Handle(
         GetRestaurantByIdQuery request,
         CancellationToken cancellationToken)
     {

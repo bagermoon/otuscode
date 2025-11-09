@@ -12,16 +12,19 @@
     <PackageReference Include="Aspire.Hosting.Keycloak" />
     <PackageReference Include="Aspire.Hosting.RabbitMQ" />
     <PackageReference Include="Aspire.Hosting.PostgreSQL" />
-    <PackageReference Include="Npgsql" />
     <PackageReference Include="Scalar.Aspire" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Moderation\RestoRate.Moderation.Api\RestoRate.Moderation.Api.csproj" />
+    <ProjectReference Include="..\Rating\RestoRate.Rating.Api\RestoRate.Rating.Api.csproj" />
     <ProjectReference Include="..\Restaurant\RestoRate.Restaurant.Api\RestoRate.Restaurant.Api.csproj" />
     <ProjectReference Include="..\RestoRate.BlazorDashboard\RestoRate.BlazorDashboard.csproj" />
-    <ProjectReference Include="..\RestoRate.Common\RestoRate.Common.csproj" IsAspireProjectResource="false" />
     <ProjectReference Include="..\RestoRate.Gateway\RestoRate.Gateway.csproj" />
     <ProjectReference Include="..\RestoRate.MessageConsumer\RestoRate.MessageConsumer.csproj" />
+    <ProjectReference Include="..\RestoRate.Migrations\RestoRate.Migrations.csproj" />
+    <ProjectReference Include="..\RestoRate.ServiceDefaults\RestoRate.ServiceDefaults.csproj" IsAspireProjectResource="false" />
+    <ProjectReference Include="..\Review\RestoRate.Review.Api\RestoRate.Review.Api.csproj" />
   </ItemGroup>
 
 </Project>

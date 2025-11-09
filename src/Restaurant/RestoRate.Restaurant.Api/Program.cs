@@ -1,39 +1,7 @@
-using System.IdentityModel.Tokens.Jwt;
-
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-
-using RestoRate.Common;
+using RestoRate.Restaurant.Api;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.AddServiceDefaults();
-
-var keycloakSettings = new KeycloakSettingsOptions();
-builder.Configuration.GetSection(KeycloakSettingsOptions.SectionName).Bind(keycloakSettings);
-
-builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddKeycloakJwtBearer(
-        serviceName: AppHostProjects.Keycloak,
-        realm: keycloakSettings.Realm!,
-        options =>
-        {
-            options.RequireHttpsMetadata = false; // dev with http Keycloak
-
-            options.Audience = keycloakSettings.Audience;
-            options.MapInboundClaims = false;
-            options.TokenValidationParameters.NameClaimType = JwtRegisteredClaimNames.Name;
-            options.TokenValidationParameters.RoleClaimType = "roles";
-        }
-    );
-
-builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("AdminGroup", policy =>
-        policy.RequireRole("admin")); // Checks for a "roles" claim with value "admin"
-
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.AddRestaurantModule();
 
 var app = builder.Build();
 

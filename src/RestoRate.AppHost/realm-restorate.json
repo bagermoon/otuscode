@@ -65,6 +65,15 @@
         "composite": true,
         "composites": {
           "client": {
+            "service-rating-api": [
+              "service-rating-api"
+            ],
+            "service-moderation-api": [
+              "service-moderation-api"
+            ],
+            "service-review-api": [
+              "service-review-api"
+            ],
             "service-restaurant-api": [
               "service-restaurant-api"
             ]
@@ -375,6 +384,28 @@
           "attributes": {}
         }
       ],
+      "service-rating-api": [
+        {
+          "id": "091e443f-fb42-469c-9e83-e55e269ea2b5",
+          "name": "service-rating-api",
+          "description": "",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "f0f6ce41-d4f9-402c-9c2b-769ceb81471a",
+          "attributes": {}
+        }
+      ],
+      "service-moderation-api": [
+        {
+          "id": "9987bfdc-2594-4306-8fb1-43dabd4d8951",
+          "name": "service-moderation-api",
+          "description": "",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "140eb49f-c688-4455-897d-acb5119f2b51",
+          "attributes": {}
+        }
+      ],
       "restorate_gateway": [
         {
           "id": "92e345a5-e4a1-4181-959e-eb7e349ffda5",
@@ -387,6 +418,17 @@
         }
       ],
       "security-admin-console": [],
+      "service-review-api": [
+        {
+          "id": "471a6b89-90cb-49d7-a40b-62cbab9f080d",
+          "name": "service-review-api",
+          "description": "",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "16de394b-ef4d-4814-9743-4ba02657ed39",
+          "attributes": {}
+        }
+      ],
       "blazordashboard": [
         {
           "id": "6aa55988-7188-4848-902b-103f3844deaf",
@@ -1101,8 +1143,176 @@
       ]
     },
     {
+      "id": "140eb49f-c688-4455-897d-acb5119f2b51",
+      "clientId": "service-moderation-api",
+      "name": "",
+      "description": "",
+      "rootUrl": "",
+      "adminUrl": "",
+      "baseUrl": "",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "alwaysDisplayInConsole": false,
+      "clientAuthenticatorType": "client-secret",
+      "redirectUris": [
+        "/*"
+      ],
+      "webOrigins": [
+        "/*"
+      ],
+      "notBefore": 0,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "publicClient": true,
+      "frontchannelLogout": true,
+      "protocol": "openid-connect",
+      "attributes": {
+        "realm_client": "false",
+        "oidc.ciba.grant.enabled": "false",
+        "backchannel.logout.session.required": "true",
+        "standard.token.exchange.enabled": "false",
+        "oauth2.device.authorization.grant.enabled": "false",
+        "backchannel.logout.revoke.offline.tokens": "false"
+      },
+      "authenticationFlowBindingOverrides": {},
+      "fullScopeAllowed": true,
+      "nodeReRegistrationTimeout": -1,
+      "defaultClientScopes": [
+        "web-origins",
+        "realm_roles",
+        "acr",
+        "profile",
+        "roles",
+        "basic",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "organization",
+        "microprofile-jwt"
+      ]
+    },
+    {
+      "id": "f0f6ce41-d4f9-402c-9c2b-769ceb81471a",
+      "clientId": "service-rating-api",
+      "name": "",
+      "description": "",
+      "rootUrl": "",
+      "adminUrl": "",
+      "baseUrl": "",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "alwaysDisplayInConsole": false,
+      "clientAuthenticatorType": "client-secret",
+      "redirectUris": [
+        "/*"
+      ],
+      "webOrigins": [
+        "/*"
+      ],
+      "notBefore": 0,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "publicClient": true,
+      "frontchannelLogout": true,
+      "protocol": "openid-connect",
+      "attributes": {
+        "realm_client": "false",
+        "oidc.ciba.grant.enabled": "false",
+        "backchannel.logout.session.required": "true",
+        "standard.token.exchange.enabled": "false",
+        "oauth2.device.authorization.grant.enabled": "false",
+        "backchannel.logout.revoke.offline.tokens": "false"
+      },
+      "authenticationFlowBindingOverrides": {},
+      "fullScopeAllowed": true,
+      "nodeReRegistrationTimeout": -1,
+      "defaultClientScopes": [
+        "web-origins",
+        "realm_roles",
+        "acr",
+        "profile",
+        "roles",
+        "basic",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "organization",
+        "microprofile-jwt"
+      ]
+    },
+    {
       "id": "09ffeb28-f818-4e25-b00b-7e24a045a9a3",
       "clientId": "service-restaurant-api",
+      "name": "",
+      "description": "",
+      "rootUrl": "",
+      "adminUrl": "",
+      "baseUrl": "",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "alwaysDisplayInConsole": false,
+      "clientAuthenticatorType": "client-secret",
+      "redirectUris": [
+        "/*"
+      ],
+      "webOrigins": [
+        "/*"
+      ],
+      "notBefore": 0,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "publicClient": true,
+      "frontchannelLogout": true,
+      "protocol": "openid-connect",
+      "attributes": {
+        "realm_client": "false",
+        "oidc.ciba.grant.enabled": "false",
+        "backchannel.logout.session.required": "true",
+        "standard.token.exchange.enabled": "false",
+        "oauth2.device.authorization.grant.enabled": "false",
+        "backchannel.logout.revoke.offline.tokens": "false"
+      },
+      "authenticationFlowBindingOverrides": {},
+      "fullScopeAllowed": true,
+      "nodeReRegistrationTimeout": -1,
+      "defaultClientScopes": [
+        "web-origins",
+        "realm_roles",
+        "acr",
+        "profile",
+        "roles",
+        "basic",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "organization",
+        "microprofile-jwt"
+      ]
+    },
+    {
+      "id": "16de394b-ef4d-4814-9743-4ba02657ed39",
+      "clientId": "service-review-api",
       "name": "",
       "description": "",
       "rootUrl": "",

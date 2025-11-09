@@ -1,7 +1,7 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
-using RestoRate.Common;
+using RestoRate.ServiceDefaults;
 using RestoRate.Gateway;
 
 var builder = WebApplication.CreateBuilder(args);

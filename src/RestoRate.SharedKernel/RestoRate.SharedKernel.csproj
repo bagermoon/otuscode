@@ -1,11 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
-
     <ItemGroup>
       <PackageReference Include="Ardalis.GuardClauses" />
       <PackageReference Include="Ardalis.Result" />
@@ -15,7 +9,10 @@
       <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" />
       <PackageReference Include="FluentValidation" />
       <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
-      <PackageReference Include="MediatR" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Interfaces\" />
     </ItemGroup>
 
 </Project>
