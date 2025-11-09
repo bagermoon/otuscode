@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using RestoRate.Abstractions.Messaging;
-using RestoRate.Common;
+using RestoRate.ServiceDefaults;
 
 namespace RestoRate.BuildingBlocks.Messaging;
 

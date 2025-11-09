@@ -1,7 +1,7 @@
 using RestoRate.BuildingBlocks.Data;
 using RestoRate.BuildingBlocks.Data.Migrations;
 using RestoRate.BuildingBlocks.Diagnostics;
-using RestoRate.Common;
+using RestoRate.ServiceDefaults;
 using RestoRate.Restaurant.Infrastructure.Data;
 
 var builder = Host.CreateApplicationBuilder(args);

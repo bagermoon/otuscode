@@ -5,11 +5,12 @@ using Microsoft.Extensions.Logging;
 using RestoRate.Restaurant.Domain.Interfaces;
 using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
+using RestaurantEntity = RestoRate.Restaurant.Domain.RestaurantAggregate.Restaurant;
 
 namespace RestoRate.Restaurant.Domain.Services;
 
 public class CreateRestaurantService(
-    IRepository<RestaurantAggregate.Restaurant> repository,
+    IRepository<RestaurantEntity> repository,
     IMediator mediator,
     ILogger<CreateRestaurantService> logger) : ICreateRestaurantService
 {

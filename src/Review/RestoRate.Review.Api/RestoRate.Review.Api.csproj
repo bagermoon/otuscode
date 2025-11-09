@@ -5,7 +5,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\RestoRate.Common\RestoRate.Common.csproj" />
     <ProjectReference Include="..\..\RestoRate.ServiceDefaults\RestoRate.ServiceDefaults.csproj" />
   </ItemGroup>
 

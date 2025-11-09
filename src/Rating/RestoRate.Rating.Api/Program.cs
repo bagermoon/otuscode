@@ -1,4 +1,4 @@
-using RestoRate.Common;
+using RestoRate.ServiceDefaults;
 using RestoRate.ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);

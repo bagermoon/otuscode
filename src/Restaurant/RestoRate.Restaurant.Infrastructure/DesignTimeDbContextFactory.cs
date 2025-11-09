@@ -2,10 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
-using RestoRate.Common;
+using RestoRate.ServiceDefaults;
 
 namespace RestoRate.Restaurant.Infrastructure.Data;
-
+/**
 public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<RestaurantDbContext>
 {
     public RestaurantDbContext CreateDbContext(string[] args)
@@ -25,3 +25,4 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<Restaurant
         return new RestaurantDbContext(optionsBuilder.Options);
     }
 }
+*/

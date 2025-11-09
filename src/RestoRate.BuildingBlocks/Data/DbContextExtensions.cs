@@ -37,7 +37,7 @@ public static class DbContextExtensions
             configureDbContextOptions?.Invoke(sp, options);
         });
 
-        builder.Services.TryAddScoped<EventDispatchInterceptor>();
+        builder.Services.TryAddSingleton<EventDispatchInterceptor>();
         builder.Services.TryAddScoped<IDomainEventDispatcher, NoOpDomainEventDispatcher>();
         builder.EnrichNpgsqlDbContext<TContext>(configureSettings);
 

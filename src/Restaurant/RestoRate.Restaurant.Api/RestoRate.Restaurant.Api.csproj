@@ -10,7 +10,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\RestoRate.Common\RestoRate.Common.csproj" />
     <ProjectReference Include="..\..\RestoRate.SharedKernel\RestoRate.SharedKernel.csproj" />
     <ProjectReference Include="..\..\RestoRate.ServiceDefaults\RestoRate.ServiceDefaults.csproj" />
     <ProjectReference Include="..\RestoRate.Restaurant.Application\RestoRate.Restaurant.Application.csproj" />

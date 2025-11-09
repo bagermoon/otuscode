@@ -1,6 +1,5 @@
 using System;
 
-using RestoRate.Common;
 using RestoRate.ServiceDefaults;
 
 namespace RestoRate.Restaurant.Api.Configurations;

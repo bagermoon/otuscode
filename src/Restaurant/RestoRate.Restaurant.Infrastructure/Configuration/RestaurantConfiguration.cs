@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using RestoRate.SharedKernel.Enums;
+using RestaurantEntity = RestoRate.Restaurant.Domain.RestaurantAggregate.Restaurant;
 
 namespace RestoRate.Restaurant.Infrastructure.Configuration;
 
@@ -21,26 +22,26 @@ public class RestaurantConfiguration : IEntityTypeConfiguration<Domain.Restauran
 
         builder.OwnsOne(r => r.PhoneNumber, pn =>
         {
-            pn.Property(p => p.OperatorCode).HasColumnName("PhoneNumber_OperatorCode");
-            pn.Property(p => p.Number).HasColumnName("PhoneNumber_Number");
-            pn.Property(p => p.Extension).HasColumnName("PhoneNumber_Extension");
+            pn.Property(p => p.OperatorCode);
+            pn.Property(p => p.Number);
+            pn.Property(p => p.Extension);
         });
 
         builder.OwnsOne(r => r.Email, e =>
         {
-            e.Property(em => em.Address).HasColumnName("Email_Address");
+            e.Property(em => em.Address);
         });
 
         builder.OwnsOne(r => r.Location, l =>
         {
-            l.Property(loc => loc.Latitude).HasColumnName("Location_Latitude");
-            l.Property(loc => loc.Longitude).HasColumnName("Location_Longitude");
+            l.Property(loc => loc.Latitude);
+            l.Property(loc => loc.Longitude);
         });
 
         builder.OwnsOne(r => r.AverageCheck, ac =>
         {
-            ac.Property(m => m.Amount).HasColumnName("AverageCheck_Amount");
-            ac.Property(m => m.Currency).HasColumnName("AverageCheck_Currency");
+            ac.Property(m => m.Amount);
+            ac.Property(m => m.Currency);
         });
 
         builder
@@ -50,6 +51,6 @@ public class RestaurantConfiguration : IEntityTypeConfiguration<Domain.Restauran
                 value => RestaurantTag.FromValue(value)
             );
 
-        builder.ToTable("Restaurants");
+        builder.ToTable("restaurants");
     }
 }

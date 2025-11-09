@@ -1,15 +1,14 @@
 using Ardalis.SharedKernel;
 
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 using RestoRate.BuildingBlocks.Data.DbContexts;
 
 namespace RestoRate.BuildingBlocks.Data.Interceptors;
 
-public class EventDispatchInterceptor(IDomainEventDispatcher domainEventDispatcher) : SaveChangesInterceptor
+public class EventDispatchInterceptor : SaveChangesInterceptor
 {
-    private readonly IDomainEventDispatcher _domainEventDispatcher = domainEventDispatcher;
-
     // Called after SaveChangesAsync has completed successfully
     public override async ValueTask<int> SavedChangesAsync(SaveChangesCompletedEventData eventData, int result,
       CancellationToken cancellationToken = new CancellationToken())
@@ -22,9 +21,10 @@ public class EventDispatchInterceptor(IDomainEventDispatcher domainEventDispatch
 
         // Retrieve all tracked entities that have domain events
         var entitiesWithEvents = appDbContext.GetEntitiesWithDomainEvents();
+        var dispatcher = context.GetService<IDomainEventDispatcher>();
 
         // Dispatch and clear domain events
-        await _domainEventDispatcher.DispatchAndClearEvents(entitiesWithEvents);
+        await dispatcher.DispatchAndClearEvents(entitiesWithEvents);
 
         return await base.SavedChangesAsync(eventData, result, cancellationToken);
 

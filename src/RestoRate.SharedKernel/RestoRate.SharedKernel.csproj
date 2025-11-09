@@ -11,4 +11,8 @@
       <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Interfaces\" />
+    </ItemGroup>
+
 </Project>

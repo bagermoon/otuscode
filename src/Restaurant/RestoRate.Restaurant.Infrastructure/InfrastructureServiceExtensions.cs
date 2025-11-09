@@ -2,12 +2,13 @@ using Ardalis.SharedKernel;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-using RestoRate.Common;
+using RestoRate.ServiceDefaults;
 using RestoRate.Restaurant.Domain.Interfaces;
 using RestoRate.Restaurant.Domain.Services;
 using RestoRate.Restaurant.Infrastructure.Data;
 using RestoRate.Restaurant.Infrastructure.Repositories;
 using RestoRate.BuildingBlocks.Data;
+using RestaurantEntity = RestoRate.Restaurant.Domain.RestaurantAggregate.Restaurant;
 
 namespace RestoRate.Restaurant.Infrastructure;
 
@@ -20,8 +21,8 @@ public static class InfrastructureServiceExtensions
         builder.AddPostgresDbContext<RestaurantDbContext>(AppHostProjects.RestaurantDb);
 
         builder.Services
-            .AddScoped<IRepository<Domain.RestaurantAggregate.Restaurant>, RestaurantRepository>()
-            .AddScoped<IReadRepository<Domain.RestaurantAggregate.Restaurant>, RestaurantReadRepository>()
+            .AddScoped<IRepository<RestaurantEntity>, RestaurantRepository>()
+            .AddScoped<IReadRepository<RestaurantEntity>, RestaurantReadRepository>()
 
             .AddScoped<ICreateRestaurantService, CreateRestaurantService>()
             .AddScoped<IUpdateRestaurantService, UpdateRestaurantService>()

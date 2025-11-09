@@ -1,15 +1,8 @@
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
-using Npgsql;
-
-using Aspire.Hosting;
-
-using Projects;
-
-using RestoRate.Common;
+using RestoRate.ServiceDefaults;
 
 using Scalar.Aspire;
+using Projects;
+using Microsoft.Extensions.Hosting;
 
 // https://fiodar.substack.com/p/a-guide-to-securing-net-aspire-apps
 // https://www.youtube.com/watch?v=_aCuwWiKncY
@@ -19,7 +12,8 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 var postgresPassword = builder.AddParameter("postgres-password", secret: true);
 var postgres = builder.AddPostgres("postgres",
-        password: postgresPassword
+        password: postgresPassword,
+        port: builder.Environment.IsDevelopment() ? 55432 : null
      )
     .WithPgWeb()
     .WithImageTag("17.6")

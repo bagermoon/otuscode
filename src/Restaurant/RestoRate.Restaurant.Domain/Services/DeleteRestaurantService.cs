@@ -3,11 +3,12 @@ using Ardalis.SharedKernel;
 using Mediator;
 using Microsoft.Extensions.Logging;
 using RestoRate.Restaurant.Domain.Interfaces;
+using RestaurantEntity = RestoRate.Restaurant.Domain.RestaurantAggregate.Restaurant;
 
 namespace RestoRate.Restaurant.Domain.Services;
 
 public class DeleteRestaurantService(
-    IRepository<RestaurantAggregate.Restaurant> repository,
+    IRepository<RestaurantEntity> repository,
     IMediator mediator,
     ILogger<DeleteRestaurantService> logger) : IDeleteRestaurantService
 {

@@ -1,4 +1,4 @@
-using RestoRate.Common;
+using RestoRate.ServiceDefaults;
 using RestoRate.Restaurant.Infrastructure;
 using RestoRate.Restaurant.Application;
 using RestoRate.Restaurant.Api.Configurations;

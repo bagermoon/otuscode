@@ -8,10 +8,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\RestoRate.Common\RestoRate.Common.csproj" />
       <ProjectReference Include="..\..\RestoRate.BuildingBlocks\RestoRate.BuildingBlocks.csproj" />
       <ProjectReference Include="..\..\RestoRate.SharedKernel\RestoRate.SharedKernel.csproj" />
       <ProjectReference Include="..\RestoRate.Restaurant.Domain\RestoRate.Restaurant.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Migrations\" />
     </ItemGroup>
 
 </Project>
