@@ -13,18 +13,20 @@ namespace RestoRate.Restaurant.Infrastructure;
 
 public static class InfrastructureServiceExtensions
 {
-    public static TBuilder AddInfrastructureServices<TBuilder>(
-        this TBuilder builder
-    ) where TBuilder : IHostApplicationBuilder
+    public static IHostApplicationBuilder AddRestaurantInfrastructure(
+        this IHostApplicationBuilder builder
+    )
     {
         builder.AddPostgresDbContext<RestaurantDbContext>(AppHostProjects.RestaurantDb);
 
-        builder.Services.AddScoped<IRepository<Domain.RestaurantAggregate.Restaurant>, RestaurantRepository>();
-        builder.Services.AddScoped<IReadRepository<Domain.RestaurantAggregate.Restaurant>, RestaurantReadRepository>();
+        builder.Services
+            .AddScoped<IRepository<Domain.RestaurantAggregate.Restaurant>, RestaurantRepository>()
+            .AddScoped<IReadRepository<Domain.RestaurantAggregate.Restaurant>, RestaurantReadRepository>()
 
-        builder.Services.AddScoped<ICreateRestaurantService, CreateRestaurantService>();
-        builder.Services.AddScoped<IUpdateRestaurantService, UpdateRestaurantService>();
-        builder.Services.AddScoped<IDeleteRestaurantService, DeleteRestaurantService>();
+            .AddScoped<ICreateRestaurantService, CreateRestaurantService>()
+            .AddScoped<IUpdateRestaurantService, UpdateRestaurantService>()
+            .AddScoped<IDeleteRestaurantService, DeleteRestaurantService>()
+        ;
 
         return builder;
     }

@@ -1,6 +1,6 @@
 using Ardalis.Result;
 
-using MediatR;
+using Mediator;
 
 using Microsoft.Extensions.Logging;
 using RestoRate.Restaurant.Domain.Interfaces;
@@ -14,7 +14,7 @@ internal class UpdateRestaurantHandler(
     ILogger<UpdateRestaurantHandler> logger)
     : IRequestHandler<UpdateRestaurantCommand, Result>
 {
-    public async Task<Result> Handle(
+    public async ValueTask<Result> Handle(
         UpdateRestaurantCommand request,
         CancellationToken cancellationToken)
     {

@@ -1,25 +1,26 @@
+
 using FluentValidation;
 
-using MediatR;
+using Mediator;
 
-namespace RestoRate.Restaurant.Application;
+namespace RestoRate.Restaurant.Application.Behaviors;
 
 public class ValidationBehavior<TRequest, TResponse>(IValidator<TRequest>? validator)
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
 {
-    public async Task<TResponse> Handle(
+    public async ValueTask<TResponse> Handle(
         TRequest request,
-        RequestHandlerDelegate<TResponse> next,
+        MessageHandlerDelegate<TRequest, TResponse> next,
         CancellationToken cancellationToken)
     {
         if (validator == null)
-            return await next();
+            return await next(request, cancellationToken);
 
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
         if (validationResult.IsValid)
-            return await next();
+            return await next(request, cancellationToken);
 
         throw new ValidationException(validationResult.Errors);
     }

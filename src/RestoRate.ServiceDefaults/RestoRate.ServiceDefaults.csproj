@@ -17,8 +17,4 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\RestoRate.Common\RestoRate.Common.csproj" />
-  </ItemGroup>
-
 </Project>

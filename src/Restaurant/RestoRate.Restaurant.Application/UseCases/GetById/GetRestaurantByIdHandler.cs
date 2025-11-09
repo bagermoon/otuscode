@@ -1,5 +1,5 @@
 using Ardalis.Result;
-using MediatR;
+using Mediator;
 using Microsoft.Extensions.Logging;
 using RestoRate.Restaurant.Application.DTOs;
 using RestoRate.Restaurant.Domain.RestaurantAggregate.Specifications;
@@ -12,7 +12,7 @@ internal class GetRestaurantByIdHandler(
     ILogger<GetRestaurantByIdHandler> logger)
     : IRequestHandler<GetRestaurantByIdQuery, Result<RestaurantDto>>
 {
-    public async Task<Result<RestaurantDto>> Handle(
+    public async ValueTask<Result<RestaurantDto>> Handle(
         GetRestaurantByIdQuery request,
         CancellationToken cancellationToken)
     {

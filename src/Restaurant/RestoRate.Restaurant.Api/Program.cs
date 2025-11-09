@@ -1,21 +1,7 @@
-using RestoRate.Common;
-using RestoRate.Restaurant.Infrastructure;
-using RestoRate.ServiceDefaults;
+using RestoRate.Restaurant.Api;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.AddServiceDefaults();
-builder.AddKeycloakJwtAuthentication(AppHostProjects.Keycloak);
-
-builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("AdminGroup", policy =>
-        policy.RequireRole("admin")); // Checks for a "roles" claim with value "admin"
-
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-
-builder.AddInfrastructureServices();
+builder.AddRestaurantModule();
 
 var app = builder.Build();
 

@@ -1,6 +1,6 @@
 using Ardalis.Result;
 
-using MediatR;
+using Mediator;
 
 using Microsoft.Extensions.Logging;
 
@@ -13,7 +13,7 @@ internal class DeleteRestaurantHandler(
     ILogger<DeleteRestaurantHandler> logger)
     : IRequestHandler<DeleteRestaurantCommand, Result>
 {
-    public async Task<Result> Handle(
+    public async ValueTask<Result> Handle(
         DeleteRestaurantCommand request,
         CancellationToken cancellationToken)
     {

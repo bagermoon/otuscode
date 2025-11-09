@@ -1,5 +1,5 @@
 using Ardalis.SharedKernel;
-using MediatR;
+using Mediator;
 
 namespace RestoRate.Restaurant.Domain.RestaurantAggregate.Events;
 
