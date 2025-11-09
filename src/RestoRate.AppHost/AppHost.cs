@@ -109,12 +109,18 @@ scalar.WithApiReference(consumer, options =>
 });
 #endregion
 
+#region Migrations
+var migrations = builder.AddProject<RestoRate_Migrations>("migrations")
+    .WithReference(restaurantDb)
+    .WaitFor(restaurantDb);
+#endregion
+
 #region ServiceRestaurantApi
 var restaurantApiBearerAudience = builder.AddParameter("restaurant-api-bearer-audience", secret: false);
 var restaurantApi = builder.AddProject<RestoRate_Restaurant_Api>(AppHostProjects.ServiceRestaurantApi)
     .WithReference(keycloak)
     .WithReference(restaurantDb)
-    .WaitFor(keycloak).WaitFor(restaurantDb)
+    .WaitFor(keycloak).WaitFor(migrations)
     .WithEnvironment("KeycloakSettings__Audience", restaurantApiBearerAudience)
     .WithEnvironment("KeycloakSettings__Realm", keycloakRealm);
 #endregion
@@ -123,7 +129,7 @@ var restaurantApi = builder.AddProject<RestoRate_Restaurant_Api>(AppHostProjects
 var moderationApiBearerAudience = builder.AddParameter("moderation-api-bearer-audience", secret: false);
 var moderationApi = builder.AddProject<RestoRate_Moderation_Api>(AppHostProjects.ServiceModerationApi)
     .WithReference(keycloak)
-    .WaitFor(keycloak)
+    .WaitFor(keycloak).WaitFor(migrations)
     .WithEnvironment("KeycloakSettings__Audience", moderationApiBearerAudience)
     .WithEnvironment("KeycloakSettings__Realm", keycloakRealm);
 #endregion
@@ -132,7 +138,7 @@ var moderationApi = builder.AddProject<RestoRate_Moderation_Api>(AppHostProjects
 var ratingApiBearerAudience = builder.AddParameter("rating-api-bearer-audience", secret: false);
 var ratingApi = builder.AddProject<RestoRate_Rating_Api>(AppHostProjects.ServiceRatingApi)
     .WithReference(keycloak)
-    .WaitFor(keycloak)
+    .WaitFor(keycloak).WaitFor(migrations)
     .WithEnvironment("KeycloakSettings__Audience", ratingApiBearerAudience)
     .WithEnvironment("KeycloakSettings__Realm", keycloakRealm);
 #endregion
@@ -141,7 +147,7 @@ var ratingApi = builder.AddProject<RestoRate_Rating_Api>(AppHostProjects.Service
 var reviewApiBearerAudience = builder.AddParameter("review-api-bearer-audience", secret: false);
 var reviewApi = builder.AddProject<RestoRate_Review_Api>(AppHostProjects.ServiceReviewApi)
     .WithReference(keycloak)
-    .WaitFor(keycloak)
+    .WaitFor(keycloak).WaitFor(migrations)
     .WithEnvironment("KeycloakSettings__Audience", reviewApiBearerAudience)
     .WithEnvironment("KeycloakSettings__Realm", keycloakRealm);
 #endregion

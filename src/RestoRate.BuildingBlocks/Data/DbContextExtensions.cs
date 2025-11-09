@@ -1,5 +1,6 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
+
+using Ardalis.SharedKernel;
 
 using Aspire.Npgsql.EntityFrameworkCore.PostgreSQL;
 
@@ -10,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
 using RestoRate.BuildingBlocks.Data.Interceptors;
+using RestoRate.SharedKernel;
 
 namespace RestoRate.BuildingBlocks.Data;
 
@@ -29,12 +31,14 @@ public static class DbContextExtensions
             options
                 .UseNpgsql(builder.Configuration.GetConnectionString(connectionName))
                 .UseSnakeCaseNamingConvention()
-                .AddInterceptors(sp.GetRequiredService<EventDispatchInterceptor>());
+                .AddInterceptors(sp.GetRequiredService<EventDispatchInterceptor>())
+            ;
 
             configureDbContextOptions?.Invoke(sp, options);
         });
 
         builder.Services.TryAddScoped<EventDispatchInterceptor>();
+        builder.Services.TryAddScoped<IDomainEventDispatcher, NoOpDomainEventDispatcher>();
         builder.EnrichNpgsqlDbContext<TContext>(configureSettings);
 
         return builder;

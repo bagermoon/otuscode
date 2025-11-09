@@ -23,6 +23,7 @@
     <ProjectReference Include="..\RestoRate.Common\RestoRate.Common.csproj" IsAspireProjectResource="false" />
     <ProjectReference Include="..\RestoRate.Gateway\RestoRate.Gateway.csproj" />
     <ProjectReference Include="..\RestoRate.MessageConsumer\RestoRate.MessageConsumer.csproj" />
+    <ProjectReference Include="..\RestoRate.Migrations\RestoRate.Migrations.csproj" />
     <ProjectReference Include="..\Review\RestoRate.Review.Api\RestoRate.Review.Api.csproj" />
   </ItemGroup>
 
