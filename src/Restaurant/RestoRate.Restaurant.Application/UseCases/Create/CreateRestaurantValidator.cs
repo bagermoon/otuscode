@@ -1,7 +1,6 @@
 using FluentValidation;
-using RestoRate.Restaurant.Application.UseCases.Create;
 
-namespace RestoRate.Restaurant.Application.Validators;
+namespace RestoRate.Restaurant.Application.UseCases.Create;
 
 public class CreateRestaurantValidator : AbstractValidator<CreateRestaurantCommand>
 {

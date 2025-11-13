@@ -1,6 +1,6 @@
 using RestoRate.BuildingBlocks.Data;
 using RestoRate.BuildingBlocks.Data.Migrations;
-using RestoRate.BuildingBlocks.Diagnostics;
+using RestoRate.SharedKernel.Diagnostics;
 using RestoRate.ServiceDefaults;
 using RestoRate.Restaurant.Infrastructure.Data;
 

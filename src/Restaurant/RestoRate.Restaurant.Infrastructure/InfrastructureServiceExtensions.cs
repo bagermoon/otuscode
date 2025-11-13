@@ -3,8 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using RestoRate.ServiceDefaults;
-using RestoRate.Restaurant.Domain.Interfaces;
-using RestoRate.Restaurant.Domain.Services;
 using RestoRate.Restaurant.Infrastructure.Data;
 using RestoRate.Restaurant.Infrastructure.Repositories;
 using RestoRate.BuildingBlocks.Data;
@@ -25,10 +23,6 @@ public static class InfrastructureServiceExtensions
         builder.Services
             .AddScoped<IRepository<RestaurantEntity>, RestaurantRepository>()
             .AddScoped<IReadRepository<RestaurantEntity>, RestaurantReadRepository>()
-
-            .AddScoped<ICreateRestaurantService, CreateRestaurantService>()
-            .AddScoped<IUpdateRestaurantService, UpdateRestaurantService>()
-            .AddScoped<IDeleteRestaurantService, DeleteRestaurantService>()
         ;
 
         return builder;

@@ -11,6 +11,11 @@
     <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>$(ArtifactsPath)/Generated/$(MSBuildProjectName)</CompilerGeneratedFilesOutputPath>
+  </PropertyGroup>
+
   <!-- Signal CI builds (GitHub Actions sets GITHUB_ACTIONS=true automatically) -->
   <PropertyGroup Condition="'$(CI)'=='true' or '$(GITHUB_ACTIONS)'=='true'">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>

@@ -1,6 +1,9 @@
 using Ardalis.Result;
 using Mediator;
 using Microsoft.Extensions.Logging;
+
+using RestoRate.Abstractions.Messaging;
+using RestoRate.Contracts.Restaurant.Events;
 using RestoRate.Restaurant.Application.DTOs;
 using RestoRate.Restaurant.Domain.Interfaces;
 using RestoRate.SharedKernel.Enums;
@@ -8,10 +11,11 @@ using RestoRate.SharedKernel.ValueObjects;
 
 namespace RestoRate.Restaurant.Application.UseCases.Create;
 
-internal class CreateRestaurantHandler(
-    ICreateRestaurantService createService,
+public sealed class CreateRestaurantHandler(
+    IRestaurantService restaurantService,
+    IIntegrationEventBus integrationEventBus,
     ILogger<CreateRestaurantHandler> logger)
-    : IRequestHandler<CreateRestaurantCommand, Result<RestaurantDto>>
+    : ICommandHandler<CreateRestaurantCommand, Result<RestaurantDto>>
 {
     public async ValueTask<Result<RestaurantDto>> Handle(
         CreateRestaurantCommand request,
@@ -27,7 +31,7 @@ internal class CreateRestaurantHandler(
             var averageCheck = new Money(request.Dto.AverageCheckAmount, request.Dto.AverageCheckCurrency);
             var tag = RestaurantTag.FromName(request.Dto.Tag);
 
-            var result = await createService.CreateRestaurant(
+            var result = await restaurantService.CreateRestaurant(
                 request.Dto.Name,
                 request.Dto.Description,
                 phoneNumber,
@@ -41,6 +45,12 @@ internal class CreateRestaurantHandler(
                 logger.LogWarning("Не удалось создать ресторан");
                 return Result<RestaurantDto>.Error(result.Errors.FirstOrDefault() ?? "Неизвестная ошибка");
             }
+
+            await integrationEventBus.PublishAsync(new RestaurantCreatedEvent
+                (
+                    RestaurantId: result.Value,
+                    Name: request.Dto.Name
+                ), cancellationToken);
 
             var dto = new RestaurantDto(
                 result.Value,

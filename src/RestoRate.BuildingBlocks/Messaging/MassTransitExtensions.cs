@@ -16,6 +16,7 @@ public static class MassTransitExtensions
     {
         builder.Services.AddMassTransit(x =>
         {
+            x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter(includeNamespace: true));
             addConsumers?.Invoke(x);
 
             x.UsingRabbitMq((context, cfg) =>
