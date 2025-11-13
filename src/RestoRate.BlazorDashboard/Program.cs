@@ -7,7 +7,6 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using RestoRate.BlazorDashboard;
 using RestoRate.BlazorDashboard.Components;
 using RestoRate.ServiceDefaults;
-using RestoRate.ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
 

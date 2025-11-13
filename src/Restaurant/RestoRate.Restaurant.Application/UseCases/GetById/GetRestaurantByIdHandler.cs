@@ -3,16 +3,17 @@ using Ardalis.SharedKernel;
 
 using Mediator;
 using Microsoft.Extensions.Logging;
+
 using RestoRate.Restaurant.Application.DTOs;
 using RestoRate.Restaurant.Domain.RestaurantAggregate.Specifications;
 using RestaurantEntity = RestoRate.Restaurant.Domain.RestaurantAggregate.Restaurant;
 
 namespace RestoRate.Restaurant.Application.UseCases.GetById;
-    
-internal class GetRestaurantByIdHandler(
+
+public sealed class GetRestaurantByIdHandler(
     IReadRepository<RestaurantEntity> readRepository,
     ILogger<GetRestaurantByIdHandler> logger)
-    : IRequestHandler<GetRestaurantByIdQuery, Result<RestaurantDto>>
+    : IQueryHandler<GetRestaurantByIdQuery, Result<RestaurantDto>>
 {
     public async ValueTask<Result<RestaurantDto>> Handle(
         GetRestaurantByIdQuery request,

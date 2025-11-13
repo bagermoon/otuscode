@@ -118,6 +118,11 @@ var restaurantApi = builder.AddProject<RestoRate_Restaurant_Api>(AppHostProjects
     .WaitFor(keycloak).WaitFor(migrations)
     .WithEnvironment("KeycloakSettings__Audience", restaurantApiBearerAudience)
     .WithEnvironment("KeycloakSettings__Realm", keycloakRealm);
+
+scalar.WithApiReference(restaurantApi, options =>
+{
+    options.AddDocument("v1", "Restaurant API");
+});
 #endregion
 
 #region ServiceModerationApi
@@ -148,6 +153,11 @@ var reviewApi = builder.AddProject<RestoRate_Review_Api>(AppHostProjects.Service
     .WaitFor(keycloak).WaitFor(migrations)
     .WithEnvironment("KeycloakSettings__Audience", reviewApiBearerAudience)
     .WithEnvironment("KeycloakSettings__Realm", keycloakRealm);
+
+scalar.WithApiReference(reviewApi, options =>
+{
+    options.AddDocument("v1", "Review API");
+});
 #endregion
 
 #region gateway

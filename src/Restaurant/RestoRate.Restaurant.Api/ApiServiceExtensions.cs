@@ -1,29 +1,16 @@
-using RestoRate.ServiceDefaults;
 using RestoRate.Restaurant.Infrastructure;
 using RestoRate.Restaurant.Application;
 using RestoRate.Restaurant.Api.Configurations;
 
-namespace RestoRate.Restaurant.Api;
+namespace Microsoft.Extensions.Hosting;
 
-internal static class ApiServiceExtensions
+internal static class HostBuilderExtensions
 {
-    public static IHostApplicationBuilder AddRestaurantModule(this IHostApplicationBuilder builder)
-    {
-        builder.AddServiceDefaults();
-        // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-        builder.Services.AddOpenApi();
-    
-        builder.ConfigureAuthentication();
-        builder.Services.AddApplicationServices();
-        builder.AddRestaurantInfrastructure();
-        builder.AddRestaurantApi();
-
-        return builder;
-    }
-
     public static IHostApplicationBuilder AddRestaurantApi(this IHostApplicationBuilder builder)
-    {
-        builder.Services.AddMediatorConfigs();
+    {    
+        builder.ConfigureAuthentication();
+        builder.Services.AddRestaurantApplication();
+        builder.AddRestaurantInfrastructure();
 
         return builder;
     }

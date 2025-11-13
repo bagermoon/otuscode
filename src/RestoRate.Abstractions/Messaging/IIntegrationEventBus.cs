@@ -1,5 +1,3 @@
-using System;
-
 namespace RestoRate.Abstractions.Messaging;
 
 public interface IIntegrationEventBus

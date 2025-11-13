@@ -2,8 +2,9 @@ using Ardalis.SharedKernel;
 
 namespace RestoRate.Restaurant.Domain.RestaurantAggregate.Events;
 
-public sealed class RestaurantUpdatedEvent(int restaurantId, string name) : DomainEventBase
+public sealed class RestaurantUpdatedEvent(Restaurant restaurant) : DomainEventBase
 {
-    public int RestaurantId { get; init; } = restaurantId;
-    public string Name { get; init; } = name;
+    public Restaurant Restaurant { get; } = restaurant;
+    public int RestaurantId => Restaurant.Id;
+    public string Name => Restaurant.Name;
 }

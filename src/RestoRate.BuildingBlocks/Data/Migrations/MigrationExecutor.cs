@@ -43,6 +43,4 @@ internal sealed class MigrationExecutor<TContext> where TContext : DbContext
             throw;
         }
     }
-
-    // No logging here to avoid duplication; tracing only via ActivitySource.
 }

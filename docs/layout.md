@@ -8,13 +8,18 @@
 - Повторно используемые, но корректно изолированные общие компоненты.
 - Удобная локальная разработка и запуск через Aspire AppHost.
 
+## Как принимать решение (быстрый чек‑лист)
+- Общий доменный базовый тип/утилита для нескольких сервисов → `RestoRate.SharedKernel`.
+- Порт/интерфейс для реализации инфраструктурой (репозиторий, шина, время, контекст пользователя) → `RestoRate.Abstractions` (а также application‑pipeline behaviors — валидация/логирование на базе Mediator и logging abstractions).
+- Переносимый «wire»‑контракт (HTTP DTO, интеграционное событие) между сервисами → `RestoRate.Contracts`.
+
 ## Базовая структура репозитория
 
 - src/
   - `RestoRate.AppHost` — оркестратор Aspire (Keycloak, RabbitMQ, Gateway, UI и доменные сервисы).
   - `RestoRate.ServiceDefaults` — настройки хостинга: service discovery, resilience HttpClient, OpenTelemetry, health.
   - `RestoRate.Contracts` — межсервисные DTO и интеграционные события (версионирование, сериализация). [Структура и рекомендации](./layout.contracts.md)
-  - `RestoRate.Abstractions` — чистые интерфейсы/примитивы (напр. `Messaging.IIntegrationEventBus`) без зависимостей от транспорта/EF.
+  - `RestoRate.Abstractions` — интерфейсы/примитивы и application‑pipeline behaviors (напр. `Messaging.IIntegrationEventBus`, Mediation behaviors). Без зависимостей от транспорта/ORM/веб‑фреймворков; допускается зависимость от Mediator и `Microsoft.Extensions.Logging.Abstractions`.
   - `RestoRate.BuildingBlocks` — переиспользуемые инфраструктурные реализации (MassTransitEventBus, миграции/сидеры EF, resilience middleware).
   - `RestoRate.SharedKernel` — доменные строительные блоки (entity base, value object, domain event, Result).
   - `RestoRate.Migrations` — дизайн‑тайм хост для EF Core (используется как `--startup-project` для CLI и в Aspire при выполнении миграций). Хранит только запуск и DI, без доменной логики.
@@ -37,92 +42,16 @@
 ### Зависимости между слоями (строго)
 - `Api` → `Application` → `Domain`.
 - `Infrastructure` → `Application` + `Domain`.
+- `Application` и `Infrastructure` могут ссылаться на `RestoRate.Abstractions` и `RestoRate.SharedKernel`; `Domain` остаётся зависимым только от `RestoRate.SharedKernel`.
+- `RestoRate.Abstractions` допускает зависимость от `RestoRate.SharedKernel`, но сам `SharedKernel` не ссылается на слои выше.
 - Сервисы не ссылаются на `Domain/Application` других сервисов. Межсервисный обмен — только через `Contracts`.
 
 ### Общие пакеты (границы использования)
-  - `RestoRate.Abstractions` — допустимо в слоях `Api`, `Application`, `Infrastructure`; НЕ в `Domain`.
+  - `RestoRate.Abstractions` — допустимо в слоях `Api`, `Application`, `Infrastructure`; НЕ в `Domain`. Пакет может ссылаться на `RestoRate.SharedKernel`, если портам нужны доменные базовые типы.
   - `RestoRate.BuildingBlocks` — только `Api` и `Infrastructure`; НЕ в `Domain`; в `Application` только если тип не тянет инфраструктуру (редко).
   - `RestoRate.ServiceDefaults` — в каждом `Program.cs` внешних точек входа.
   - `RestoRate.Contracts` — в `Api`, `Application`, `Infrastructure`; НЕ в `Domain`.
-  - `RestoRate.SharedKernel` — только доменные проекты.
-
-## Общие пакеты: Abstractions и BuildingBlocks
-
-Эволюция: прежние `RestoRate.Application`/`RestoRate.Infrastructure` заменены на более чёткие:
-
-- `RestoRate.Abstractions`
-  - Декларация чистых портов/контрактов (например, `Messaging.IIntegrationEventBus`, `IIntegrationEvent`).
-  - Без зависимостей от EF/MassTransit/ASP.NET.
-- `RestoRate.BuildingBlocks`
-  - Реализации и DI‑расширения провайдеров (MassTransit/RabbitMQ), миграции/сидеры EF, технические middleware.
-  - Примеры:
-    - `Messaging.MassTransitEventBus`, `Messaging.MassTransitExtensions` (читает `ConnectionStrings:RabbitMQ`, использует `AppHostProjects.RabbitMQ`).
-    - `Migrations.AddMigration<TContext, TSeeder>()` и `IDbSeeder<TContext>`.
-
-Границы:
-- `Abstractions` не тянут инфраструктуру и не попадают в Domain.
-- `BuildingBlocks` не просачиваются в Domain и минимально используются в Application.
-
-## Messaging через MassTransit (RabbitMQ)
-
-Ниже — минимальный пример, как подключить общую шину событий и публиковать события из обработчиков.
-
-1) Регистрация MassTransit/RabbitMQ в сервисе (Api/Infrastructure слой):
-
-```csharp
-// Program.cs
-using RestoRate.BuildingBlocks.Messaging;
-using MassTransit;
-// ...
-builder.Services.AddMassTransitEventBus(
-  builder.Configuration,
-  addConsumers: x =>
-  {
-    // При необходимости добавить консьюмеры:
-    // x.AddConsumer<ReviewAddedConsumer>();
-    // Либо: x.AddConsumers(typeof(Program).Assembly);
-  });
-```
-
-2) Публикация интеграционного события из обработчика Application (Mediator):
-
-```csharp
-using RestoRate.Abstractions.Messaging; // IIntegrationEventBus
-using RestoRate.Contracts.Events;       // ReviewAddedEvent
-// ...
-
-public class CreateReviewHandler : IRequestHandler<CreateReviewCommand>
-{
-  private readonly IIntegrationEventBus _bus;
-
-  public CreateReviewHandler(IIntegrationEventBus bus) => _bus = bus;
-
-  public async ValueTask Handle(CreateReviewCommand request, CancellationToken ct)
-  {
-    // ... доменная логика, сохранение ...
-
-    var evt = new ReviewAddedEvent(
-      request.ReviewId,
-      request.RestaurantId,
-      request.UserId,
-      request.Rating,
-      request.Text
-    );
-
-    await _bus.PublishAsync(evt, ct);
-    // также доступен перегруженный метод с заголовками:
-    // await _bus.PublishAsync(evt, new Dictionary<string, object?> { ["tenant"] = request.TenantId }, ct);
-  }
-}
-```
-
-3) Конфигурация строки подключения RabbitMQ
-- В `appsettings*.json` сервисов используйте `ConnectionStrings:RabbitMQ` (имя берётся из [`AppHostProjects.RabbitMQ`](../src/RestoRate.ServiceDefaults/AppHostProjects.cs)).
-- При запуске через Aspire AppHost значение обычно заполняется автоматически.
-
-Примечания и следующая эволюция:
-- Outbox/Inbox, ретраи, idempotency — планируются в сервисных `Infrastructure` слоях.
-- Для консистентной сериализации событий используйте типы из `RestoRate.Contracts` (каждое интеграционное событие реализует `IIntegrationEvent`).
+  - `RestoRate.SharedKernel` — первоочередно для доменных проектов; может использоваться в `Application`, если необходимо работать с доменными событиями, при этом пакет не ссылается на слои выше.
 
 ## Ответственность слоёв (Layer Responsibilities)
 
@@ -145,7 +74,7 @@ public class CreateReviewHandler : IRequestHandler<CreateReviewCommand>
 - Domain (чистый домен)
   - Сущности/агрегаты, Value Objects, доменные сервисы, доменные события, инварианты.
   - Полная независимость от инфраструктуры и фреймворков; только .NET/язык.
-  - Логика изменения состояния и генерация доменных событий; отсутствие побочных эффектов наружу.
+  - Логика изменения состояния и генерация доменных событий (агрегаты регистрируют события, Application публикует их после успешной транзакции через адаптер к Mediator); отсутствие побочных эффектов наружу.
 
 - Infrastructure (адаптеры и реализации портов)
   - Реализации портов Application: репозитории (EF Core/Dapper), клиенты внешних сервисов/HTTP, кэш, брокер сообщений.
@@ -154,20 +83,87 @@ public class CreateReviewHandler : IRequestHandler<CreateReviewCommand>
   - Регистрация DI (composition root) и интеграция с `RestoRate.ServiceDefaults` (resilience, discovery, telemetry).
   - Никакой бизнес‑логики; только технические детали и маппинг к домену/Application.
 
-## SharedKernel vs Contracts vs Константы
+## Общие пакеты
 
-- `SharedKernel` (только домен):
-  - Доменные строительные блоки: `Entity<TId>`, `AggregateRoot<TId>`, `ValueObject`, `IDomainEvent`, `Result` и т.п.
-  - Никакой ASP.NET, Aspire, Keycloak, HTTP, RabbitMQ, EF — только домен.
-  - Доменные константы (инварианты) допустимы, если не завязаны на инфраструктуру.
+### Матрица использования пакетов
 
-- `Contracts` (межсервисные договорённости):
-  - DTO и интеграционные события: сериализуемые, стабильные, версиируемые.
-  - Без бизнес‑логики — только данные.
+| Пакет           | Domain | Application | Infrastructure | Api | Содержит                                 | Избегать                                   |
+|-----------------|:------:|:-----------:|:--------------:|:---:|-------------------------------------------|--------------------------------------------|
+| SharedKernel    |   ✔    |      ◐      |       ✖        |  ✖  | Доменные базовые типы/утилиты; Diagnostics IDs/sources | Порты/интерфейсы, инфраструктурные детали  |
+| Abstractions    |   ✖    |      ✔      |       ✔        |  ✔  | Порты/интерфейсы, application pipeline behaviors | Доменные базовые типы, конкретные реализации|
+| Contracts       |   ✖    |      ✔      |       ✔        |  ✔  | Wire DTO/интеграционные события           | Бизнес‑логика                               |
+| BuildingBlocks  |   ✖    |     ◐       |       ✔        |  ✔  | Инфраструктурные реализации/DI‑расширения | Доменные типы                               |
+| ServiceDefaults |   ✖    |      ✖      |       ✔        |  ✔  | Хостинг, discovery, resilience, telemetry | Бизнес‑логика                               |
 
-- Константы:
-  - Доменные константы — в конкретном `...Domain` или, если действительно обще‑доменные, в `SharedKernel`.
-  - Избегать «магических» строк: выносить в единые константы.
+Примечание: ◐ — допускается редко и только если тип не тянет инфраструктуру. `Application` может брать отдельные базовые типы из `SharedKernel` (например, доменные события) без формирования обратных зависимостей.
+
+### Abstractions и BuildingBlocks
+
+Эволюция: прежние `RestoRate.Application`/`RestoRate.Infrastructure` заменены на более чёткие:
+
+- `RestoRate.Abstractions`
+  - Декларация портов/контрактов (например, `Messaging.IIntegrationEventBus`, `IIntegrationEvent`) и application‑pipeline behaviors (валидация, логирование) на базе Mediator.
+  - Без зависимостей от транспортов/ORM/веб‑фреймворков; допускаются Mediator и logging abstractions.
+- `RestoRate.BuildingBlocks`
+  - Реализации и DI‑расширения провайдеров (MassTransit/RabbitMQ), миграции/сидеры EF, технические middleware.
+  - Примеры:
+    - `Messaging.MassTransitEventBus`, `Messaging.MassTransitExtensions` (читает `ConnectionStrings:RabbitMQ`, использует `AppHostProjects.RabbitMQ`).
+    - `Migrations.AddMigration<TContext, TSeeder>()` и `IDbSeeder<TContext>`.
+
+Границы:
+- `Abstractions` не тянут инфраструктуру и не попадают в Domain.
+- `BuildingBlocks` не просачиваются в Domain и минимально используются в Application.
+
+## SharedKernel vs Abstractions vs Contracts — различия и правила
+
+- Назначение:
+  - `RestoRate.SharedKernel`: общие доменные строительные блоки (чистый код домена), переиспользуемые в разных bounded context‑ах.
+  - `RestoRate.Abstractions`: кросс‑срезовые порты/интерфейсы и небольшие контракты, реализуемые инфраструктурой, чтобы избежать жёсткой связности.
+
+- Содержимое (ориентиры):
+  - `SharedKernel`: `Entity<TId>`, `AggregateRoot<TId>`, `ValueObject`, `IDomainEvent` и базовые реализации доменных событий, `Result/Maybe`, Guard/Specification‑утилиты, простые доменные исключения.
+  - `Abstractions`: интерфейсы шины и сообщений (`Messaging.IIntegrationEventBus`, `IIntegrationEvent`), `IClock`, `IUserContext`, контракты репозиториев/юнита работы, маркерные интерфейсы/атрибуты; по необходимости могут ссылаться на типы из `SharedKernel`, но не на конкретные домены.
+
+- Зависимости и область применения:
+  - `SharedKernel`: без зависимостей от ASP.NET/EF/MassTransit и т.п.; используется в проектах слоя `...Domain` и, при необходимости, в `Application` для работы с доменными событиями/базовыми типами.
+  - `Abstractions`: без инфраструктурных реализаций и фреймворков; допустим в `Api`, `Application`, `Infrastructure`; НЕ в `Domain`. Пакет может зависеть от `SharedKernel`, но не наоборот.
+
+- Чего НЕ должно быть:
+  - В `SharedKernel`: никаких интерфейсов, требующих реализации инфраструктурой; никаких межсервисных DTO/«wire»‑контрактов.
+  - В `Abstractions`: никаких базовых доменных типов и логики; никаких конкретных реализаций/клиентов.
+  - В обоих: отсутствие внешних транспортов/ORM/веб‑зависимостей.
+
+- Связь с `RestoRate.Contracts`:
+  - `Contracts` держит публичные «wire»‑модели (HTTP DTO, интеграционные события) для обмена между сервисами.
+  - `SharedKernel` предоставляет доменные основы внутри границ сервиса.
+  - `Abstractions` объявляет порты (например, `IIntegrationEventBus`, репозитории), которые реализует слой `Infrastructure`.
+  - Межсервисный обмен выполняется ТОЛЬКО через `Contracts`.
+
+- Константы и диагностика:
+  - Доменные инварианты размещайте в конкретном `...Domain`; если они действительно обще‑доменные — в `SharedKernel`.
+  - Диагностические константы — в `RestoRate.SharedKernel.Diagnostics`: `ActivitySources` (строки) и `LoggingEventIds` (int). Преобразование в `EventId` — на местах использования.
+  - Избегайте «магических» строк: группируйте в единые константы и не смешивайте доменные константы с инфраструктурными.
+
+### Именование DI‑расширений
+- Application DI: `Add<Context>Application()` в `<Context>.Application` (пространство имён `Microsoft.Extensions.DependencyInjection` или используемое из проекта).
+- API host: `Add<Context>Api(this IHostApplicationBuilder)` в `<Context>.Api` (пространство имён `Microsoft.Extensions.Hosting`).
+- Папка с обработчиками событий/уведомлений в Application — `Handlers`.
+
+- Быстрые правила выбора:
+  - Нужен общий доменный базовый тип/утилита? → `SharedKernel`.
+  - Нужен интерфейс/порт, который реализует инфраструктура? → `Abstractions`.
+  - Нужен переносимый контракт между сервисами? → `Contracts`.
+
+<!-- Объединено в раздел "SharedKernel vs Abstractions vs Contracts — различия и правила" -->
+
+### Доменные события
+
+- Агрегаты регистрируют события через базовые типы `SharedKernel` (например, `RegisterDomainEvent`).
+- После успешного сохранения (`Application`/`Infrastructure`) события выгружаются и передаются в адаптер Mediator (Dispatcher), реализованный на стороне `Application`.
+- `Domain` не зависит от Mediator или других фреймворков; адаптация происходят выше слоя.
+- При добавлении новых событий держите синхронизацию с обработчиками `Application` и, при необходимости, интеграционными событиями в `Contracts`.
+
+## Runtime и инфраструктура
 
 ## Aspire: внутренние и внешние эндпойнты
 - Публичные точки входа (Gateway, Blazor UI, Keycloak UI) помечайте как внешние:

@@ -3,7 +3,8 @@ using RestoRate.Abstractions.Messaging;
 namespace RestoRate.Contracts.Restaurant.Events;
 
 public sealed record RestaurantCreatedEvent(
-    Guid RestaurantId,
-    string Slug,
+    int RestaurantId,
     string Name,
-    string Cuisine) : IIntegrationEvent;
+    string? Slug = default,
+    string? Cuisine = default
+) : IIntegrationEvent;
