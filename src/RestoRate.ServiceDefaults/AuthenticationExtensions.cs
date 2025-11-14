@@ -33,7 +33,7 @@ public static class AuthenticationExtensions
 
                     options.Audience = settings.Audience;
                     options.MapInboundClaims = false;
-                    options.TokenValidationParameters.NameClaimType = JwtRegisteredClaimNames.Name;
+                    options.TokenValidationParameters.NameClaimType = "preferred_username";
                     options.TokenValidationParameters.RoleClaimType = "roles";
                 }
             );

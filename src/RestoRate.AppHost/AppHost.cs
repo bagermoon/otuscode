@@ -67,7 +67,7 @@ var keycloak = builder.AddKeycloak(AppHostProjects.Keycloak,
     adminUsername: keycloakUsername,
     adminPassword: keycloakPassword
 )
-.WithRealmImport("realm-restorate.json")
+.WithRealmImport("restorate-realm.json")
 .WithDataVolume("restorate-keycloak")
 .WithExternalHttpEndpoints()
 .WithLifetime(ContainerLifetime.Persistent);
