@@ -1,19 +1,23 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RestoRate.Auth.Authentication;
 
 namespace Microsoft.AspNetCore.Routing;
 
-internal static class LoginLogoutEndpointRouteBuilderExtensions
+public static class AuthRouteBuilderExtensions
 {
-    internal static IEndpointConventionBuilder MapLoginAndLogout(this IEndpointRouteBuilder endpoints)
+    public static IEndpointConventionBuilder MapCookieOidcAuthEndpoints(this IEndpointRouteBuilder endpoints)
     {
         var group = endpoints.MapGroup("");
 
         group.MapGet("/login", (string? returnUrl) =>
             TypedResults.Challenge(GetAuthProperties(returnUrl)))
-                .AllowAnonymous();
+                .AllowAnonymous()
+                .WithName(AuthRouteNames.CookieOidcLogin);
 
         group.MapPost("/logout", ([FromForm] string? returnUrl) =>
             TypedResults.SignOut(GetAuthProperties(returnUrl),
@@ -22,17 +26,16 @@ internal static class LoginLogoutEndpointRouteBuilderExtensions
                     OpenIdConnectDefaults.AuthenticationScheme,
                 ]
             )
-        );
+        )
+        .WithName(AuthRouteNames.CookieOidcLogout);
 
         return group;
     }
 
     private static AuthenticationProperties GetAuthProperties(string? returnUrl)
     {
-        // TODO: Use HttpContext.Request.PathBase instead.
         const string pathBase = "/";
 
-        // Prevent open redirects.
         if (string.IsNullOrEmpty(returnUrl))
         {
             returnUrl = pathBase;

@@ -94,13 +94,6 @@ var scalar = builder.AddScalarApiReference(opts =>
         .WithTheme(ScalarTheme.Purple);
 });
 
-var consumer = builder.AddProject<RestoRate_MessageConsumer>("message-consumer")
-    .WithReference(rabbitmq);
-
-scalar.WithApiReference(consumer, options =>
-{
-    options.AddDocument("v1", "Consumer API");
-});
 #endregion
 
 #region Migrations

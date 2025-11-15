@@ -1,4 +1,4 @@
-namespace RestoRate.ServiceDefaults;
+namespace RestoRate.Auth.Authentication;
 
 public class KeycloakSettingsOptions
 {

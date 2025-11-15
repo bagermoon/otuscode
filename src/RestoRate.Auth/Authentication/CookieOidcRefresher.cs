@@ -4,15 +4,19 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 
-namespace RestoRate.BlazorDashboard;
+namespace RestoRate.Auth.Authentication;
 
 // https://github.com/dotnet/aspnetcore/issues/8175
-internal sealed class CookieOidcRefresher(IOptionsMonitor<OpenIdConnectOptions> oidcOptionsMonitor)
+internal sealed class CookieOidcRefresher(
+    IOptionsMonitor<OpenIdConnectOptions> oidcOptionsMonitor,
+    LinkGenerator linkGenerator
+)
 {
     private readonly OpenIdConnectProtocolValidator oidcTokenValidator = new()
     {
@@ -21,11 +25,12 @@ internal sealed class CookieOidcRefresher(IOptionsMonitor<OpenIdConnectOptions> 
         RequireNonce = false,
     };
 
-    public async Task ValidateOrRefreshCookieAsync(CookieValidatePrincipalContext validateContext, string oidcScheme)
+    public async Task ValidateOrRefreshCookieAsync(CookieValidatePrincipalContext validateContext, string oidcScheme, Func<LinkGenerator, string> logoutPathFactory)
     {
         // Skip refresh on logout to keep tokens available for id_token_hint
         var path = validateContext.HttpContext.Request.Path.Value;
-        if (string.Equals(path, "/authentication/logout", StringComparison.OrdinalIgnoreCase))
+        var logoutPath = logoutPathFactory(linkGenerator);
+        if (string.Equals(path, logoutPath, StringComparison.OrdinalIgnoreCase))
         {
             return;
         }
@@ -140,6 +145,7 @@ internal sealed class CookieOidcRefresher(IOptionsMonitor<OpenIdConnectOptions> 
 
     private void ValidateOidcProtocolResponse(OpenIdConnectOptions options, OpenIdConnectMessage message, TokenValidationResult validationResult)
     {
+        
         var validatedIdToken = JwtSecurityTokenConverter.Convert(validationResult.SecurityToken as JsonWebToken);
         // Nonce is not used in refresh_token flow
         validatedIdToken.Payload["nonce"] = null;

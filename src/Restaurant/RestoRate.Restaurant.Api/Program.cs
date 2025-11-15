@@ -1,3 +1,4 @@
+using RestoRate.Auth.Authorization;
 using RestoRate.Restaurant.Api.Endpoints.Restaurants;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +20,7 @@ if (!app.Environment.IsDevelopment())
 app.MapDefaultEndpoints();
 
 app.MapRestaurantsEndpoints("restaurants")
+    .AllowAnonymous()
     .WithTags("Restaurants");
 
 // Configure the HTTP request pipeline.
@@ -44,6 +46,7 @@ app.MapGet("/weatherforecast", () =>
         .ToArray();
     return forecast;
 })
+.RequireAuthorization(PolicyNames.RequireAdminRole)
 .WithName("GetWeatherForecast");
 
 app.Run();

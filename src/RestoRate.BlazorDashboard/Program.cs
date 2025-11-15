@@ -1,10 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-
-using RestoRate.BlazorDashboard;
+using RestoRate.Auth.Authentication;
 using RestoRate.BlazorDashboard.Components;
 using RestoRate.ServiceDefaults;
 
@@ -16,46 +12,13 @@ builder.AddServiceDefaults();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-var keycloakSettings = new KeycloakSettingsOptions();
-builder.Configuration.GetSection(KeycloakSettingsOptions.SectionName).Bind(keycloakSettings);
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-})
-.AddCookie()
-.AddKeycloakOpenIdConnect(
-    serviceName: AppHostProjects.Keycloak,
-    realm: keycloakSettings.Realm!,
-    options =>
-    {
-        options.RequireHttpsMetadata = false; // dev with http Keycloak
-
-        options.ClientId = keycloakSettings.ClientId;
-        options.ClientSecret = keycloakSettings.ClientSecret;
-
-        options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-        options.ResponseType = OpenIdConnectResponseType.Code;
-
-        options.SaveTokens = true;
-        options.GetClaimsFromUserInfoEndpoint = true;
-
-        options.MapInboundClaims = false;
-        options.TokenValidationParameters.NameClaimType = JwtRegisteredClaimNames.Name;
-        options.TokenValidationParameters.RoleClaimType = "roles";
-    }
-);
-
-builder.Services.ConfigureCookieOidc(
-    CookieAuthenticationDefaults.AuthenticationScheme,
-    OpenIdConnectDefaults.AuthenticationScheme
-);
+builder.AddCookieOidcAuthentication(AppHostProjects.Keycloak);
 builder.Services.AddAuthorizationBuilder();
+
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddAntiforgery();
-
 builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddScoped<TokenHandler>();
 
 builder.Services.AddHttpClient(AppHostProjects.Gateway,
@@ -83,5 +46,7 @@ app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
-app.MapGroup("/authentication").MapLoginAndLogout();
+app.MapGroup("/authentication")
+    .MapCookieOidcAuthEndpoints();
+
 app.Run();

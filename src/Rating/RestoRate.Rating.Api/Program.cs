@@ -1,9 +1,10 @@
 using RestoRate.ServiceDefaults;
+using RestoRate.Auth.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
-builder.AddKeycloakJwtAuthentication(AppHostProjects.Keycloak);
+builder.AddJwtAuthentication(AppHostProjects.Keycloak);
 
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy("AdminGroup", policy =>
