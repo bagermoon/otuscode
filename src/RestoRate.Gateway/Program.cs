@@ -1,8 +1,7 @@
-
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-
 using RestoRate.ServiceDefaults;
 using RestoRate.Gateway;
+using RestoRate.Auth.Authentication;
+using RestoRate.Auth.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,19 +14,7 @@ builder.Services.AddOpenApi();
 var keycloakSettings = new KeycloakSettingsOptions();
 builder.Configuration.GetSection(KeycloakSettingsOptions.SectionName).Bind(keycloakSettings);
 
-builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddKeycloakJwtBearer(
-        serviceName: AppHostProjects.Keycloak,
-        realm: keycloakSettings.Realm!,
-        options =>
-        {
-            options.RequireHttpsMetadata = false; // dev with http Keycloak
-
-            options.Audience = keycloakSettings.Audience;
-            options.TokenValidationParameters.ValidateIssuer = false; // for service to service calls we don't validate the issuer
-        }
-    );
+builder.AddGatewayJwtAuthentication(AppHostProjects.Keycloak);
 
 builder.Services
     .AddServiceDiscovery()
@@ -36,7 +23,7 @@ builder.Services
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
 builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("authenticated", policy => policy.RequireAuthenticatedUser());
+    .AddDefaultAuthenticationPolicy();
 
 var app = builder.Build();
 
@@ -62,6 +49,6 @@ if (app.Environment.IsDevelopment())
 
 // Enforce the policy on proxied routes
 app.MapReverseProxy()
-    .RequireAuthorization("authenticated");
+    .RequireAuthorization();
 
 app.Run();
