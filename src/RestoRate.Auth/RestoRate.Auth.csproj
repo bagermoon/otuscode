@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.Extensions.Configuration.Binder.SourceGeneration</InterceptorsNamespaces>
@@ -8,11 +8,17 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Ardalis.GuardClauses" />
     <PackageReference Include="Aspire.Keycloak.Authentication" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" />
   </ItemGroup>
   
   <ItemGroup>
     <Folder Include="Authentication\" />
     <Folder Include="Authorization\" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\RestoRate.ServiceDefaults\RestoRate.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>

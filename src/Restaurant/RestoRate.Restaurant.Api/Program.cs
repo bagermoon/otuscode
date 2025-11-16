@@ -1,10 +1,11 @@
 using RestoRate.Auth.Authorization;
+using RestoRate.Auth.OpenApi;
 using RestoRate.Restaurant.Api.Endpoints.Restaurants;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(opts => opts.AddDocumentTransformer<KeycloakScalarSecurityTransformer>());
 builder.AddRestaurantApi();
 
 var app = builder.Build();
@@ -20,7 +21,7 @@ if (!app.Environment.IsDevelopment())
 app.MapDefaultEndpoints();
 
 app.MapRestaurantsEndpoints("restaurants")
-    .AllowAnonymous()
+    .RequireAuthorization()
     .WithTags("Restaurants");
 
 // Configure the HTTP request pipeline.

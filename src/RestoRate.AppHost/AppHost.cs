@@ -1,12 +1,17 @@
-using RestoRate.ServiceDefaults;
+using Aspire.Hosting;
 
-using Scalar.Aspire;
-using Projects;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+
+using Projects;
+using RestoRate.ServiceDefaults;
+using Scalar.Aspire;
 
 // https://fiodar.substack.com/p/a-guide-to-securing-net-aspire-apps
 // https://www.youtube.com/watch?v=_aCuwWiKncY
 var builder = DistributedApplication.CreateBuilder(args);
+
+var parameters = builder.Configuration.GetRequiredSection("Parameters");
 
 #region PostgreSql
 
@@ -58,17 +63,20 @@ var RestaurantsDb = builder.AddConnectionString("RestaurantsDb", RestaurantsDbCo
 #endregion
 
 #region keycloak
+var keycloakHostname = parameters["keycloak-hostname"];
+
 var keycloakUsername = builder.AddParameter("keycloak-username", "admin");
 var keycloakPassword = builder.AddParameter("keycloak-password", "admin", secret: true);
 var keycloakRealm = builder.AddParameter("keycloak-realm", "restorate");
 
 var keycloak = builder.AddKeycloak(AppHostProjects.Keycloak,
-    port: 8080,
+    port: (keycloakHostname is not null) ? new Uri(keycloakHostname).Port : default,
     adminUsername: keycloakUsername,
     adminPassword: keycloakPassword
 )
 .WithRealmImport("restorate-realm.json")
 .WithDataVolume("restorate-keycloak")
+.WithEnvironment("KC_HOSTNAME", keycloakHostname)
 .WithExternalHttpEndpoints()
 .WithLifetime(ContainerLifetime.Persistent);
 
@@ -88,11 +96,30 @@ var rabbitmq = builder.AddRabbitMQ(AppHostProjects.RabbitMQ, userName: rabbitUse
 
 #region Scalar
 
+var apiClientSecret = parameters["api-client-secret"];
+var apiClientId = parameters["api-client-id"];
+
 var scalar = builder.AddScalarApiReference(opts =>
 {
     opts
         .WithTheme(ScalarTheme.Purple);
-});
+
+    opts
+        .AddPreferredSecuritySchemes("OAuth2")
+        .AddAuthorizationCodeFlow("OAuth2", flow =>
+        {
+            flow
+                .WithClientId(apiClientId)
+                .WithClientSecret(apiClientSecret);
+        })
+        .AddClientCredentialsFlow("OAuth2", flow =>
+        {
+            flow
+                .WithClientId(apiClientId)
+                .WithClientSecret(apiClientSecret);
+        });
+})
+.WithReference(keycloak);
 
 #endregion
 

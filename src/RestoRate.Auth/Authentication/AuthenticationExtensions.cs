@@ -23,6 +23,7 @@ public static class AuthenticationExtensions
 
         Guard.Against.Null(settings, nameof(settings));
         builder.Services
+            .AddServiceDiscovery()
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddKeycloakJwtBearer(
                 serviceName: keycloakServiceName,
@@ -50,6 +51,7 @@ public static class AuthenticationExtensions
 
         Guard.Against.Null(settings, nameof(settings));
         builder.Services
+            .AddServiceDiscovery()
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddKeycloakJwtBearer(
                 serviceName: keycloakServiceName,
@@ -79,33 +81,35 @@ public static class AuthenticationExtensions
 
         Guard.Against.Null(settings, nameof(settings));
 
-        builder.Services.AddAuthentication(options =>
-        {
-            options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-        })
-        .AddCookie()
-        .AddKeycloakOpenIdConnect(
-            serviceName: keycloakServiceName,
-            realm: settings.Realm!,
-            options =>
+        builder.Services
+            .AddServiceDiscovery()
+            .AddAuthentication(options =>
             {
-                options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+            })
+            .AddCookie()
+            .AddKeycloakOpenIdConnect(
+                serviceName: keycloakServiceName,
+                realm: settings.Realm!,
+                options =>
+                {
+                    options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
 
-                options.ClientId = settings.ClientId;
-                options.ClientSecret = settings.ClientSecret;
+                    options.ClientId = settings.ClientId;
+                    options.ClientSecret = settings.ClientSecret;
 
-                options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.ResponseType = OpenIdConnectResponseType.Code;
+                    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.ResponseType = OpenIdConnectResponseType.Code;
 
-                options.SaveTokens = true;
-                options.GetClaimsFromUserInfoEndpoint = true;
+                    options.SaveTokens = true;
+                    options.GetClaimsFromUserInfoEndpoint = true;
 
-                options.MapInboundClaims = false;
-                options.TokenValidationParameters.NameClaimType = JwtRegisteredClaimNames.Name;
-                options.TokenValidationParameters.RoleClaimType = "roles";
-            }
-        );
+                    options.MapInboundClaims = false;
+                    options.TokenValidationParameters.NameClaimType = JwtRegisteredClaimNames.Name;
+                    options.TokenValidationParameters.RoleClaimType = "roles";
+                }
+            );
 
         // Configure automatic cookie refresh using shared helper.
         builder.Services.ConfigureCookieOidc(
