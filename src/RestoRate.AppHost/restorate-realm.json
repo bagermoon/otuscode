@@ -324,41 +324,6 @@
         "attributes" : { }
       } ],
       "security-admin-console" : [ ],
-      "restorate-moderation-api" : [ {
-        "id" : "9987bfdc-2594-4306-8fb1-43dabd4d8951",
-        "name" : "service-moderation-api",
-        "description" : "",
-        "composite" : false,
-        "clientRole" : true,
-        "containerId" : "140eb49f-c688-4455-897d-acb5119f2b51",
-        "attributes" : { }
-      }, {
-        "id" : "0ac2e78f-72bd-4b93-89b5-f9189d932837",
-        "name" : "restorate-moderation-api",
-        "description" : "",
-        "composite" : false,
-        "clientRole" : true,
-        "containerId" : "140eb49f-c688-4455-897d-acb5119f2b51",
-        "attributes" : { }
-      } ],
-      "restorate-gateway" : [ {
-        "id" : "aeb831d7-496f-4fbd-84ec-39e097d620c5",
-        "name" : "restorate-gateway",
-        "description" : "",
-        "composite" : false,
-        "clientRole" : true,
-        "containerId" : "ab6e2f0a-c23d-416f-a59a-7b568bf46980",
-        "attributes" : { }
-      }, {
-        "id" : "92e345a5-e4a1-4181-959e-eb7e349ffda5",
-        "name" : "restorate_gateway",
-        "description" : "",
-        "composite" : false,
-        "clientRole" : true,
-        "containerId" : "ab6e2f0a-c23d-416f-a59a-7b568bf46980",
-        "attributes" : { }
-      } ],
-      "admin-cli" : [ ],
       "account-console" : [ ],
       "broker" : [ {
         "id" : "00c32912-fd4e-49ad-939d-f3b0e2845f3b",
@@ -403,6 +368,42 @@
         "containerId" : "16de394b-ef4d-4814-9743-4ba02657ed39",
         "attributes" : { }
       } ],
+      "restorate-api" : [ ],
+      "restorate-moderation-api" : [ {
+        "id" : "9987bfdc-2594-4306-8fb1-43dabd4d8951",
+        "name" : "service-moderation-api",
+        "description" : "",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "140eb49f-c688-4455-897d-acb5119f2b51",
+        "attributes" : { }
+      }, {
+        "id" : "0ac2e78f-72bd-4b93-89b5-f9189d932837",
+        "name" : "restorate-moderation-api",
+        "description" : "",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "140eb49f-c688-4455-897d-acb5119f2b51",
+        "attributes" : { }
+      } ],
+      "restorate-gateway" : [ {
+        "id" : "aeb831d7-496f-4fbd-84ec-39e097d620c5",
+        "name" : "restorate-gateway",
+        "description" : "",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "ab6e2f0a-c23d-416f-a59a-7b568bf46980",
+        "attributes" : { }
+      }, {
+        "id" : "92e345a5-e4a1-4181-959e-eb7e349ffda5",
+        "name" : "restorate_gateway",
+        "description" : "",
+        "composite" : false,
+        "clientRole" : true,
+        "containerId" : "ab6e2f0a-c23d-416f-a59a-7b568bf46980",
+        "attributes" : { }
+      } ],
+      "admin-cli" : [ ],
       "restorate-rating-api" : [ {
         "id" : "fbf828b3-5b9e-4c00-b5d1-025a8386a4f2",
         "name" : "restorate-rating-api",
@@ -552,12 +553,12 @@
       "id" : "afb1338e-2a37-4e06-8805-bb6f9ce43e89",
       "type" : "password",
       "userLabel" : "My password",
-      "createdDate" : 1763148299047,
-      "secretData" : "{\"value\":\"wyTLWazSEJdF7xGjhV1Pq97RKzC3qktZpLCp96hqIpA=\",\"salt\":\"J+MV2LnsMExGQ0R/LFX9mQ==\",\"additionalParameters\":{}}",
+      "createdDate" : 1763189721745,
+      "secretData" : "{\"value\":\"UULeHjroPqd0rRVv1+sXrKQj2mpAuG8jM3pBpfkr2/M=\",\"salt\":\"tkR/fr/KxvNeFLgfs5lfVw==\",\"additionalParameters\":{}}",
       "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
     } ],
     "disableableCredentialTypes" : [ ],
-    "requiredActions" : [ "UPDATE_PASSWORD" ],
+    "requiredActions" : [ ],
     "realmRoles" : [ "admin", "default-roles-restorate" ],
     "notBefore" : 0,
     "groups" : [ ]
@@ -697,6 +698,20 @@
     "disableableCredentialTypes" : [ ],
     "requiredActions" : [ ],
     "realmRoles" : [ "admin", "default-roles-restorate" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
+    "id" : "b0af0b58-56a8-4532-861d-2437bf04ca5e",
+    "username" : "service-account-restorate-api",
+    "emailVerified" : false,
+    "enabled" : true,
+    "createdTimestamp" : 1763284806458,
+    "totp" : false,
+    "serviceAccountClientId" : "restorate-api",
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-restorate" ],
     "notBefore" : 0,
     "groups" : [ ]
   }, {
@@ -853,6 +868,9 @@
     "groups" : [ ]
   } ],
   "scopeMappings" : [ {
+    "client" : "restorate-api",
+    "roles" : [ "user_roles", "microservices" ]
+  }, {
     "client" : "restorate-dashboard",
     "roles" : [ "user_roles" ]
   }, {
@@ -1032,6 +1050,60 @@
     "defaultClientScopes" : [ "web-origins", "acr", "profile", "roles", "basic", "email" ],
     "optionalClientScopes" : [ "address", "phone", "offline_access", "organization", "microprofile-jwt" ]
   }, {
+    "id" : "a22b1697-fb25-4965-92a5-2ebfa1a43a92",
+    "clientId" : "restorate-api",
+    "name" : "Api Client",
+    "description" : "",
+    "rootUrl" : "",
+    "adminUrl" : "",
+    "baseUrl" : "",
+    "surrogateAuthRequired" : false,
+    "enabled" : true,
+    "alwaysDisplayInConsole" : false,
+    "clientAuthenticatorType" : "client-secret",
+    "secret" : "RJ6AWQsZvVfBODCZsPXroMw7XvQeRbZH",
+    "redirectUris" : [ "*" ],
+    "webOrigins" : [ "*" ],
+    "notBefore" : 0,
+    "bearerOnly" : false,
+    "consentRequired" : false,
+    "standardFlowEnabled" : true,
+    "implicitFlowEnabled" : false,
+    "directAccessGrantsEnabled" : true,
+    "serviceAccountsEnabled" : true,
+    "publicClient" : false,
+    "frontchannelLogout" : true,
+    "protocol" : "openid-connect",
+    "attributes" : {
+      "realm_client" : "false",
+      "oidc.ciba.grant.enabled" : "false",
+      "client.secret.creation.time" : "1763236398",
+      "backchannel.logout.session.required" : "true",
+      "standard.token.exchange.enabled" : "false",
+      "frontchannel.logout.session.required" : "true",
+      "post.logout.redirect.uris" : "*",
+      "oauth2.device.authorization.grant.enabled" : "false",
+      "display.on.consent.screen" : "false",
+      "backchannel.logout.revoke.offline.tokens" : "false"
+    },
+    "authenticationFlowBindingOverrides" : { },
+    "fullScopeAllowed" : false,
+    "nodeReRegistrationTimeout" : -1,
+    "protocolMappers" : [ {
+      "id" : "0e79d787-e8e0-4c1c-83f4-d567ed122dc8",
+      "name" : "Audience Resolve",
+      "protocol" : "openid-connect",
+      "protocolMapper" : "oidc-audience-resolve-mapper",
+      "consentRequired" : false,
+      "config" : {
+        "lightweight.claim" : "false",
+        "access.token.claim" : "true",
+        "introspection.token.claim" : "true"
+      }
+    } ],
+    "defaultClientScopes" : [ "web-origins", "service_account", "realm_roles", "acr", "profile", "basic", "email" ],
+    "optionalClientScopes" : [ "address", "phone", "offline_access", "organization", "roles", "microprofile-jwt" ]
+  }, {
     "id" : "3d8446c3-ff4a-4912-9ee1-c3459ddf71e3",
     "clientId" : "restorate-dashboard",
     "name" : "Dashboard",
@@ -1092,8 +1164,9 @@
         "included.client.audience" : "restorate-dashboard",
         "id.token.claim" : "false",
         "lightweight.claim" : "false",
+        "introspection.token.claim" : "true",
         "access.token.claim" : "true",
-        "introspection.token.claim" : "true"
+        "userinfo.token.claim" : "false"
       }
     } ],
     "defaultClientScopes" : [ "web-origins", "realm_roles", "acr", "profile", "basic", "email" ],
@@ -1159,8 +1232,9 @@
         "included.client.audience" : "restorate-gateway",
         "id.token.claim" : "false",
         "lightweight.claim" : "false",
+        "introspection.token.claim" : "true",
         "access.token.claim" : "true",
-        "introspection.token.claim" : "true"
+        "userinfo.token.claim" : "false"
       }
     } ],
     "defaultClientScopes" : [ "web-origins", "service_account", "realm_roles", "acr", "profile", "basic" ],
@@ -2089,7 +2163,7 @@
       "subType" : "authenticated",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "oidc-sha256-pairwise-sub-mapper", "oidc-full-name-mapper", "oidc-usermodel-property-mapper", "oidc-usermodel-attribute-mapper", "saml-user-property-mapper", "saml-role-list-mapper", "oidc-address-mapper", "saml-user-attribute-mapper" ]
+        "allowed-protocol-mapper-types" : [ "oidc-sha256-pairwise-sub-mapper", "oidc-full-name-mapper", "saml-role-list-mapper", "oidc-address-mapper", "oidc-usermodel-attribute-mapper", "oidc-usermodel-property-mapper", "saml-user-property-mapper", "saml-user-attribute-mapper" ]
       }
     }, {
       "id" : "8b9a0ba6-cf94-40b6-8fc6-c3ceebd17d9b",
@@ -2115,7 +2189,7 @@
       "subType" : "anonymous",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "oidc-address-mapper", "oidc-usermodel-attribute-mapper", "saml-user-property-mapper", "saml-role-list-mapper", "oidc-full-name-mapper", "oidc-usermodel-property-mapper", "oidc-sha256-pairwise-sub-mapper", "saml-user-attribute-mapper" ]
+        "allowed-protocol-mapper-types" : [ "saml-role-list-mapper", "oidc-usermodel-attribute-mapper", "oidc-usermodel-property-mapper", "saml-user-attribute-mapper", "oidc-full-name-mapper", "saml-user-property-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-address-mapper" ]
       }
     } ],
     "org.keycloak.keys.KeyProvider" : [ {
