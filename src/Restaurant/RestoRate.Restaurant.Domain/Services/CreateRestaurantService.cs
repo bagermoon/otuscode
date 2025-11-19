@@ -50,8 +50,6 @@ public class CreateRestaurantService(
         logger.LogInformation(name, restaurant.Id);
 
         return Result<int>.Success(restaurant.Id);
-
-
     }
 
     public async Task<Result> UpdateRestaurant(

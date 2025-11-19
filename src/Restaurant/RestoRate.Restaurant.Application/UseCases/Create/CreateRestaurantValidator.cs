@@ -36,13 +36,13 @@ public class CreateRestaurantValidator : AbstractValidator<CreateRestaurantComma
             .InclusiveBetween(-180, 180).WithMessage("Долгота должна быть между -180 и 180");
 
         RuleFor(x => x.Dto.DayOfWeek)
-            .NotEmpty().WithMessage("Дни недели ресторана обязателен");
+            .NotEmpty().WithMessage("Указать дни недели работы ресторана, обязателено");
 
         RuleFor(x => x.Dto.DayOfWeek)
-            .NotEmpty().WithMessage("Время открытия ресторана обязателен");
+            .NotEmpty().WithMessage("Указать время открытия ресторана, обязателено");
 
         RuleFor(x => x.Dto.DayOfWeek)
-            .NotEmpty().WithMessage("Время закрытия ресторана обязателен");
+            .NotEmpty().WithMessage("Указать время закрытия ресторана, обязателено");
 
         RuleFor(x => x.Dto.CuisineType)
             .NotEmpty().WithMessage("Тип кухни обязателен");
