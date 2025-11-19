@@ -1,20 +1,21 @@
 using Ardalis.Result;
-
 using Mediator;
 
 using Microsoft.Extensions.Logging;
+
+using RestoRate.Restaurant.Application.DTOs;
 using RestoRate.Restaurant.Domain.Interfaces;
 using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
 
 namespace RestoRate.Restaurant.Application.UseCases.Update;
 
-internal class UpdateRestaurantHandler(
-    IUpdateRestaurantService updateService,
+public sealed class UpdateRestaurantHandler(
+    IRestaurantService restaurantService,
     ILogger<UpdateRestaurantHandler> logger)
-    : IRequestHandler<UpdateRestaurantCommand, Result>
+    : ICommandHandler<UpdateRestaurantCommand, Result<UpdateRestaurantDto>>
 {
-    public async ValueTask<Result> Handle(
+    public async ValueTask<Result<UpdateRestaurantDto>> Handle(
         UpdateRestaurantCommand request,
         CancellationToken cancellationToken)
     {
@@ -31,7 +32,7 @@ internal class UpdateRestaurantHandler(
             var averageCheck = new Money(request.Dto.AverageCheckAmount, request.Dto.AverageCheckCurrency);
             var tag = RestaurantTag.FromName(request.Dto.Tag);
 
-            var result = await updateService.UpdateRestaurant(
+            var result = await restaurantService.UpdateRestaurant(
                 request.Dto.RestaurantId,
                 request.Dto.Name,
                 request.Dto.Description,

@@ -10,9 +10,9 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/RestoRate.AppHost/RestoRate.AppHost.csproj" />
+    <Project Path="src/RestoRate.Auth/RestoRate.Auth.csproj" />
     <Project Path="src/RestoRate.BlazorDashboard/RestoRate.BlazorDashboard.csproj" />
     <Project Path="src/RestoRate.Gateway/RestoRate.Gateway.csproj" />
-    <Project Path="src/RestoRate.MessageConsumer/RestoRate.MessageConsumer.csproj" />
     <Project Path="src/RestoRate.Migrations/RestoRate.Migrations.csproj" />
     <Project Path="src/RestoRate.ServiceDefaults/RestoRate.ServiceDefaults.csproj" />
     <Project Path="src/RestoRate.SharedKernel/RestoRate.SharedKernel.csproj" />

@@ -3,4 +3,4 @@ using Mediator;
 
 namespace RestoRate.Restaurant.Application.UseCases.Delete;
 
-public record DeleteRestaurantCommand(int RestaurantId) : IRequest<Result>;
+public record DeleteRestaurantCommand(int RestaurantId) : ICommand<Result>;

@@ -21,7 +21,6 @@
     <ProjectReference Include="..\Restaurant\RestoRate.Restaurant.Api\RestoRate.Restaurant.Api.csproj" />
     <ProjectReference Include="..\RestoRate.BlazorDashboard\RestoRate.BlazorDashboard.csproj" />
     <ProjectReference Include="..\RestoRate.Gateway\RestoRate.Gateway.csproj" />
-    <ProjectReference Include="..\RestoRate.MessageConsumer\RestoRate.MessageConsumer.csproj" />
     <ProjectReference Include="..\RestoRate.Migrations\RestoRate.Migrations.csproj" />
     <ProjectReference Include="..\RestoRate.ServiceDefaults\RestoRate.ServiceDefaults.csproj" IsAspireProjectResource="false" />
     <ProjectReference Include="..\Review\RestoRate.Review.Api\RestoRate.Review.Api.csproj" />

@@ -1,6 +1,6 @@
-using System;
-
 using RestoRate.ServiceDefaults;
+using RestoRate.Auth.Authentication;
+using RestoRate.Auth.Authorization;
 
 namespace RestoRate.Restaurant.Api.Configurations;
 
@@ -8,11 +8,11 @@ internal static class AuthConfigs
 {
     public static IHostApplicationBuilder ConfigureAuthentication(this IHostApplicationBuilder builder)
     {
-        builder.AddKeycloakJwtAuthentication(AppHostProjects.Keycloak);
+        builder.AddJwtAuthentication(AppHostProjects.Keycloak);
 
         builder.Services.AddAuthorizationBuilder()
-            .AddPolicy("AdminGroup", policy =>
-                policy.RequireRole("admin")); // Checks for a "roles" claim with value "admin"
+            .AddDefaultAuthenticationPolicy()
+            .AddAdminPolicies();
 
         return builder;
     }

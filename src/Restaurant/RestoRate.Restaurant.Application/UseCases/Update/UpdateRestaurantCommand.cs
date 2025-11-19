@@ -4,4 +4,4 @@ using RestoRate.Restaurant.Application.DTOs;
 
 namespace RestoRate.Restaurant.Application.UseCases.Update;
 
-public record UpdateRestaurantCommand(UpdateRestaurantDto Dto) : IRequest<Result<UpdateRestaurantDto>>, IRequest<Result>;
+public record UpdateRestaurantCommand(UpdateRestaurantDto Dto) : ICommand<Result<UpdateRestaurantDto>>;

@@ -1,5 +1,3 @@
-using System;
-
 using Ardalis.SharedKernel;
 using Ardalis.Specification.EntityFrameworkCore;
 

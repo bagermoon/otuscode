@@ -1,5 +1,4 @@
 using Ardalis.Result;
-
 using Mediator;
 
 using Microsoft.Extensions.Logging;
@@ -8,10 +7,10 @@ using RestoRate.Restaurant.Domain.Interfaces;
 
 namespace RestoRate.Restaurant.Application.UseCases.Delete;
 
-internal class DeleteRestaurantHandler(
-    IDeleteRestaurantService deleteService,
+public sealed class DeleteRestaurantHandler(
+    IRestaurantService restaurantService,
     ILogger<DeleteRestaurantHandler> logger)
-    : IRequestHandler<DeleteRestaurantCommand, Result>
+    : ICommandHandler<DeleteRestaurantCommand, Result>
 {
     public async ValueTask<Result> Handle(
         DeleteRestaurantCommand request,
@@ -21,7 +20,7 @@ internal class DeleteRestaurantHandler(
 
         try
         {
-            var result = await deleteService.DeleteRestaurant(request.RestaurantId);
+            var result = await restaurantService.DeleteRestaurant(request.RestaurantId);
 
             if (result.Status != ResultStatus.Ok)
             {
