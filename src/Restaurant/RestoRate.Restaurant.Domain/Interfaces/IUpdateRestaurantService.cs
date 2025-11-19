@@ -5,21 +5,9 @@ using RestoRate.SharedKernel.ValueObjects;
 
 namespace RestoRate.Restaurant.Domain.Interfaces;
 
-public interface IRestaurantService
+public interface IUpdateRestaurantService
 {
-    Task<Result<int>> CreateRestaurant(
-        string name,
-        string description,
-        PhoneNumber phoneNumber,
-        Email email,
-        Address address,
-        Location location,
-        OpenHours openHours,
-        CuisineType cuisineType,
-        Money averageCheck,
-        RestaurantTag tag);
-
-    Task<Result> UpdateRestaurant(
+    public Task<Result> UpdateRestaurant(
         int restaurantId,
         string name,
         string description,
@@ -31,6 +19,4 @@ public interface IRestaurantService
         CuisineType cuisineType,
         Money averageCheck,
         RestaurantTag tag);
-
-    Task<Result> DeleteRestaurant(int restaurantId);
 }

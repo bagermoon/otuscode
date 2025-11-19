@@ -1,6 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
+      <Compile Remove="Interfaces\**" />
+      <EmbeddedResource Remove="Interfaces\**" />
+      <None Remove="Interfaces\**" />
+    </ItemGroup>
+
+    <ItemGroup>
       <PackageReference Include="Ardalis.GuardClauses" />
       <PackageReference Include="Ardalis.Result" />
       <PackageReference Include="Ardalis.SharedKernel" />
@@ -9,10 +15,6 @@
       <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" />
       <PackageReference Include="FluentValidation" />
       <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Interfaces\" />
     </ItemGroup>
 
 </Project>

@@ -27,7 +27,10 @@ public sealed class CreateRestaurantHandler(
         {
             var phoneNumber = new PhoneNumber("+7", request.Dto.PhoneNumber);
             var email = new Email(request.Dto.Email);
+            var address = new Address(request.Dto.FullAddress, request.Dto.House);
             var location = new Location(request.Dto.Latitude, request.Dto.Longitude);
+            var openHours = new OpenHours(request.Dto.DayOfWeek, request.Dto.OpenTime, request.Dto.CloseTime);
+            var cuisine = CuisineType.FromName(request.Dto.CuisineType);
             var averageCheck = new Money(request.Dto.AverageCheckAmount, request.Dto.AverageCheckCurrency);
             var tag = RestaurantTag.FromName(request.Dto.Tag);
 
@@ -36,7 +39,10 @@ public sealed class CreateRestaurantHandler(
                 request.Dto.Description,
                 phoneNumber,
                 email,
+                address,
                 location,
+                openHours,
+                cuisine,
                 averageCheck,
                 tag);
 
@@ -58,8 +64,14 @@ public sealed class CreateRestaurantHandler(
                 request.Dto.Description,
                 phoneNumber.ToString(),
                 email.Address,
+                address.FullAddress,
+                address.House,
                 location.Latitude,
                 location.Longitude,
+                openHours.DayOfWeek,
+                openHours.OpenTime,
+                openHours.CloseTime,
+                cuisine.Name,
                 averageCheck.Amount,
                 averageCheck.Currency,
                 tag.Name);

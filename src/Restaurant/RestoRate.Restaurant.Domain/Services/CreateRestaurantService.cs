@@ -9,10 +9,10 @@ using RestaurantEntity = RestoRate.Restaurant.Domain.RestaurantAggregate.Restaur
 
 namespace RestoRate.Restaurant.Domain.Services;
 
-public class RestaurantService(
+public class CreateRestaurantService(
     IRepository<RestaurantEntity> repository,
     IMediator mediator,
-    ILogger<RestaurantService> logger) : IRestaurantService
+    ILogger<CreateRestaurantService> logger) : IRestaurantService
 {
     public async Task<Result<int>> CreateRestaurant(
         string name,
@@ -26,19 +26,19 @@ public class RestaurantService(
         Money averageCheck,
         RestaurantTag tag)
     {
-        logger.LogCreateRestaurantStart(name);
+        logger.LogInformation(name);
 
-        var restaurant = new RestaurantEntity(
-            name,
-            description,
-            phoneNumber,
-            email,
-            address,
-            location,
-            openHours,
-            cuisineType,
-            averageCheck,
-            tag);
+        var restaurant = new RestaurantAggregate.Restaurant(
+             name,
+             description,
+             phoneNumber,
+             email,
+             address,
+             location,
+             openHours,
+             cuisineType,
+             averageCheck,
+             tag);
 
         await repository.AddAsync(restaurant);
 
@@ -47,7 +47,8 @@ public class RestaurantService(
 
         restaurant.ClearDomainEvents();
 
-        logger.LogCreateRestaurantCompleted(name, restaurant.Id);
+        logger.LogInformation(name, restaurant.Id);
+
         return Result<int>.Success(restaurant.Id);
     }
 

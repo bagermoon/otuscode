@@ -23,11 +23,29 @@ public class CreateRestaurantValidator : AbstractValidator<CreateRestaurantComma
             .NotEmpty().WithMessage("Email обязателен")
             .EmailAddress().WithMessage("Неверный формат email");
 
+        RuleFor(x => x.Dto.FullAddress)
+            .NotEmpty().WithMessage("Адрес ресторана обязателен");
+
+        RuleFor(x => x.Dto.House)
+            .NotEmpty().WithMessage("Адресный дом ресторана обязателен");
+
         RuleFor(x => x.Dto.Latitude)
             .InclusiveBetween(-90, 90).WithMessage("Широта должна быть между -90 и 90");
 
         RuleFor(x => x.Dto.Longitude)
             .InclusiveBetween(-180, 180).WithMessage("Долгота должна быть между -180 и 180");
+
+        RuleFor(x => x.Dto.DayOfWeek)
+            .NotEmpty().WithMessage("Указать дни недели работы ресторана, обязателено");
+
+        RuleFor(x => x.Dto.DayOfWeek)
+            .NotEmpty().WithMessage("Указать время открытия ресторана, обязателено");
+
+        RuleFor(x => x.Dto.DayOfWeek)
+            .NotEmpty().WithMessage("Указать время закрытия ресторана, обязателено");
+
+        RuleFor(x => x.Dto.CuisineType)
+            .NotEmpty().WithMessage("Тип кухни обязателен");
 
         RuleFor(x => x.Dto.AverageCheckAmount)
             .GreaterThan(0).WithMessage("Средний чек должен быть больше 0");
