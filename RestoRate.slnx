@@ -9,16 +9,16 @@
     <File Path="Directory.Packages.props" />
   </Folder>
   <Folder Name="/src/">
+    <Project Path="src/RestoRate.Abstractions/RestoRate.Abstractions.csproj" />
     <Project Path="src/RestoRate.AppHost/RestoRate.AppHost.csproj" />
     <Project Path="src/RestoRate.Auth/RestoRate.Auth.csproj" />
     <Project Path="src/RestoRate.BlazorDashboard/RestoRate.BlazorDashboard.csproj" />
+    <Project Path="src/RestoRate.BuildingBlocks/RestoRate.BuildingBlocks.csproj" />
+    <Project Path="src/RestoRate.Contracts/RestoRate.Contracts.csproj" />
     <Project Path="src/RestoRate.Gateway/RestoRate.Gateway.csproj" />
     <Project Path="src/RestoRate.Migrations/RestoRate.Migrations.csproj" />
     <Project Path="src/RestoRate.ServiceDefaults/RestoRate.ServiceDefaults.csproj" />
     <Project Path="src/RestoRate.SharedKernel/RestoRate.SharedKernel.csproj" />
-    <Project Path="src/RestoRate.Contracts/RestoRate.Contracts.csproj" />
-    <Project Path="src/RestoRate.Abstractions/RestoRate.Abstractions.csproj" />
-    <Project Path="src/RestoRate.BuildingBlocks/RestoRate.BuildingBlocks.csproj" />
   </Folder>
   <Folder Name="/src/Moderation/">
     <Project Path="src/Moderation/RestoRate.Moderation.Api/RestoRate.Moderation.Api.csproj" />
@@ -34,5 +34,12 @@
   </Folder>
   <Folder Name="/src/Review/">
     <Project Path="src/Review/RestoRate.Review.Api/RestoRate.Review.Api.csproj" />
+    <Project Path="src/Review/RestoRate.Review.Application/RestoRate.Review.Application.csproj" Id="cdc6cca6-ffc6-4567-bd13-44bb830607b9" />
+    <Project Path="src/Review/RestoRate.Review.Domain/RestoRate.Review.Domain.csproj" Id="7de4ec26-b5b4-4fa6-9b53-d15e99d2b39b" />
+    <Project Path="src/Review/RestoRate.Review.Infrastructure/RestoRate.Review.Infrastructure.csproj" Id="66ad9b0f-75b5-4aa5-af9e-aea62586f8a2" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/Restaurant/">
+    <Project Path="tests/Restaurant/RestoRate.Restaurant.IntegrationTests/RestoRate.Restaurant.IntegrationTests.csproj" Id="54ec265a-9851-473a-9d69-9732332ad8c9" />
   </Folder>
 </Solution>
