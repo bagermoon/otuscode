@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
+using Ardalis.GuardClauses;
 using Ardalis.SharedKernel;
 
 using Aspire.Npgsql.EntityFrameworkCore.PostgreSQL;
@@ -9,6 +10,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+
+using MongoDB.Driver;
+using MongoDB.Driver.Core.Configuration;
+using MongoDB.EntityFrameworkCore.Extensions;
+using MongoDB.EntityFrameworkCore.Infrastructure;
 
 using RestoRate.BuildingBlocks.Data.Interceptors;
 using RestoRate.SharedKernel;
@@ -40,6 +46,42 @@ public static class DbContextExtensions
         builder.Services.TryAddSingleton<EventDispatchInterceptor>();
         builder.Services.TryAddScoped<IDomainEventDispatcher, NoOpDomainEventDispatcher>();
         builder.EnrichNpgsqlDbContext<TContext>(configureSettings);
+
+        return builder;
+    }
+
+    public static IHostApplicationBuilder AddMongoDbContext<[DynamicallyAccessedMembers(RequiredByEF)] TContext>(
+        this IHostApplicationBuilder builder,
+        string connectionName,
+        string? databaseName = null,
+        Action<MongoClientSettings>? configureSettings = null,
+        Action<IServiceProvider, MongoDbContextOptionsBuilder>? configureDbContextOptions = null
+    ) where TContext : DbContext
+    {
+        builder.AddMongoDBClient(connectionName);
+        builder.Services.AddDbContext<TContext>((sp, options) =>
+        {
+            var client = sp.GetRequiredService<IMongoClient>();
+            var configuration = sp.GetRequiredService<IConfiguration>();
+
+            if (databaseName is null)
+            {
+                // Get the database name from the client's settings
+                var connectionString = configuration.GetConnectionString(connectionName);
+                var mongoUrl = new MongoUrl(connectionString);
+                databaseName = mongoUrl.DatabaseName;
+
+                Guard.Against.NullOrWhiteSpace(databaseName, nameof(databaseName));
+            }
+            options.UseMongoDB(
+                mongoClient: client,
+                databaseName: databaseName,
+                builder => configureDbContextOptions?.Invoke(sp, builder)
+            );
+        });
+
+        builder.Services.TryAddSingleton<EventDispatchInterceptor>();
+        builder.Services.TryAddScoped<IDomainEventDispatcher, NoOpDomainEventDispatcher>();
 
         return builder;
     }

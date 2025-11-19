@@ -62,6 +62,30 @@ var RestaurantsDb = builder.AddConnectionString("RestaurantsDb", RestaurantsDbCo
 
 #endregion
 
+# region mongodb
+var mongoUsername = builder.AddParameter("mongo-username");
+var mongoPassword = builder.AddParameter("mongo-password", secret: true);
+var mongo = builder.AddMongoDB(
+        name: "mongo",
+        userName: mongoUsername,
+        password: mongoPassword
+    )
+    .WithImageTag("8.2")
+    .WithDataVolume()
+    .WithMongoExpress(res => res.WithHostPort(27017))
+    .WithLifetime(ContainerLifetime.Persistent);
+#endregion
+
+# region redis
+var redisCache = builder.AddRedis(AppHostProjects.RedisCache,
+    port: builder.Environment.IsDevelopment() ? 6380 : null)
+    .WithImageTag("8.2")
+    .WithDataVolume()
+    .WithRedisInsight(res => res.WithHostPort(8001))
+    .WithLifetime(ContainerLifetime.Persistent);
+
+# endregion
+
 #region keycloak
 var keycloakHostname = parameters["keycloak-hostname"];
 
@@ -153,6 +177,11 @@ var moderationApi = builder.AddProject<RestoRate_Moderation_Api>(AppHostProjects
     .WaitFor(keycloak).WaitFor(migrations)
     .WithEnvironment("KeycloakSettings__Audience", moderationApiBearerAudience)
     .WithEnvironment("KeycloakSettings__Realm", keycloakRealm);
+
+scalar.WithApiReference(moderationApi, options =>
+{
+    options.AddDocument("v1", "Moderation API");
+});
 #endregion
 
 #region ServiceRatingApi
@@ -160,17 +189,26 @@ var ratingApiBearerAudience = builder.AddParameter("rating-api-bearer-audience",
 var ratingApi = builder.AddProject<RestoRate_Rating_Api>(AppHostProjects.ServiceRatingApi)
     .WithReference(keycloak)
     .WithReference(rabbitmq)
-    .WaitFor(keycloak).WaitFor(migrations)
+    .WithReference(redisCache)
+    .WaitFor(keycloak).WaitFor(redisCache)
     .WithEnvironment("KeycloakSettings__Audience", ratingApiBearerAudience)
     .WithEnvironment("KeycloakSettings__Realm", keycloakRealm);
+
+scalar.WithApiReference(ratingApi, options =>
+{
+    options.AddDocument("v1", "Rating API");
+});
 #endregion
 
 #region ServiceReviewApi
+var reviewdb = mongo.AddDatabase(AppHostProjects.ReviewDb, "reviewdb");
+
 var reviewApiBearerAudience = builder.AddParameter("review-api-bearer-audience", secret: false);
 var reviewApi = builder.AddProject<RestoRate_Review_Api>(AppHostProjects.ServiceReviewApi)
     .WithReference(keycloak)
     .WithReference(rabbitmq)
-    .WaitFor(keycloak).WaitFor(migrations)
+    .WithReference(reviewdb)
+    .WaitFor(keycloak).WaitFor(reviewdb)
     .WithEnvironment("KeycloakSettings__Audience", reviewApiBearerAudience)
     .WithEnvironment("KeycloakSettings__Realm", keycloakRealm);
 

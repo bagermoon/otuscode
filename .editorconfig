@@ -83,6 +83,9 @@ trim_trailing_whitespace = true
 [*.cs]
 indent_size = 4
 
+# Use file-scoped namespaces
+csharp_style_namespace_declarations = file_scoped:suggestion
+
 # Prefer 'var' when obvious
 csharp_style_var_for_built_in_types = true:suggestion
 csharp_style_var_when_type_is_apparent = true:suggestion

@@ -12,16 +12,19 @@ public static class MassTransitExtensions
     public static IHostApplicationBuilder AddMassTransitEventBus(
         this IHostApplicationBuilder builder,
         string connectionName,
-        Action<IBusRegistrationConfigurator>? addConsumers = null)
+        Action<IBusRegistrationConfigurator>? configure = null)
     {
         builder.Services.AddMassTransit(x =>
         {
             x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter(includeNamespace: true));
-            addConsumers?.Invoke(x);
 
+            configure?.Invoke(x);
+            
             x.UsingRabbitMq((context, cfg) =>
             {
                 cfg.Host(new Uri(builder.Configuration.GetConnectionString(connectionName)!));
+                cfg.UseMessageRetry(r => r.Intervals(500, 1000));
+                cfg.UseInMemoryOutbox(context);
 
                 cfg.ConfigureEndpoints(context);
             });

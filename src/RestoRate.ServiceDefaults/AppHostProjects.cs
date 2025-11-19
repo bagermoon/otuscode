@@ -2,6 +2,8 @@ namespace RestoRate.ServiceDefaults;
 
 public class AppHostProjects
 {
+    public const string RedisCache = nameof(RedisCache);
+    public const string ReviewDb = nameof(ReviewDb);
     public const string RestaurantDb = nameof(RestaurantDb);
     public const string RabbitMQ = nameof(RabbitMQ);
     public const string Keycloak = nameof(Keycloak);
