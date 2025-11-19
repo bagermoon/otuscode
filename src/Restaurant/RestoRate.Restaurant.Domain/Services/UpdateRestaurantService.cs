@@ -22,7 +22,10 @@ public class UpdateRestaurantService(
         string description,
         PhoneNumber phoneNumber,
         Email email,
+        Address address,
         Location location,
+        OpenHours openHours,
+        CuisineType cuisineType,
         Money averageCheck,
         RestaurantTag tag)
     {
@@ -39,7 +42,10 @@ public class UpdateRestaurantService(
         restaurant.UpdateDescription(description);
         restaurant.UpdatePhoneNumber(phoneNumber);
         restaurant.UpdateEmail(email);
+        restaurant.UpdateAddress(address);
         restaurant.UpdateLocation(location);
+        restaurant.UpdateOpenHours(openHours);
+        restaurant.UpdateCuisineType(cuisineType);
         restaurant.UpdateAverageCheck(averageCheck);
         restaurant.UpdateTag(tag);
 

@@ -13,7 +13,10 @@ public interface IUpdateRestaurantService
         string description,
         PhoneNumber phoneNumber,
         Email email,
+        Address address,
         Location location,
+        OpenHours openHours,
+        CuisineType cuisineType,
         Money averageCheck,
         RestaurantTag tag);
 }

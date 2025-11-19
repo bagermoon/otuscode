@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
 using RestoRate.SharedKernel.Enums;
 using RestaurantEntity = RestoRate.Restaurant.Domain.RestaurantAggregate.Restaurant;
 
@@ -32,11 +31,32 @@ public class RestaurantConfiguration : IEntityTypeConfiguration<Domain.Restauran
             e.Property(em => em.Address);
         });
 
+        builder.OwnsOne(r => r.Address, e =>
+        {
+            e.Property(em => em.FullAddress);
+            e.Property(em => em.House);
+        });
+
         builder.OwnsOne(r => r.Location, l =>
         {
             l.Property(loc => loc.Latitude);
             l.Property(loc => loc.Longitude);
         });
+
+        builder.OwnsOne(r => r.OpenHours, l =>
+        {
+            l.Property(loc => loc.DayOfWeek);
+            l.Property(loc => loc.OpenTime);
+            l.Property(loc => loc.CloseTime);
+            l.Property(loc => loc.IsClosed);
+        });
+
+        builder
+            .Property(r => r.CuisineType)
+            .HasConversion(
+                r => r.Value,
+                value => CuisineType.FromValue(value)
+            );
 
         builder.OwnsOne(r => r.AverageCheck, ac =>
         {

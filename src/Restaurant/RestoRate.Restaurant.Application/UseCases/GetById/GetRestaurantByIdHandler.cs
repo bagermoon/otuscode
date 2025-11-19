@@ -34,11 +34,17 @@ internal class GetRestaurantByIdHandler(
             var dto = new RestaurantDto(
                 restaurant.Id,
                 restaurant.Name,
-                restaurant.Description,
+                restaurant.Description ?? string.Empty,
                 restaurant.PhoneNumber.ToString(),
                 restaurant.Email.Address,
+                restaurant.Address.FullAddress,
+                restaurant.Address.House,
                 restaurant.Location.Latitude,
                 restaurant.Location.Longitude,
+                restaurant.OpenHours.DayOfWeek,
+                restaurant.OpenHours.OpenTime,
+                restaurant.OpenHours.CloseTime,
+                restaurant.CuisineType.ToString(),
                 restaurant.AverageCheck.Amount,
                 restaurant.AverageCheck.Currency,
                 restaurant.Tag.Name);

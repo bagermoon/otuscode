@@ -19,20 +19,26 @@ public class CreateRestaurantService(
         string description,
         PhoneNumber phoneNumber,
         Email email,
+        Address address,
         Location location,
+        OpenHours openHours,
+        CuisineType cuisineType,
         Money averageCheck,
         RestaurantTag tag)
     {
         logger.LogInformation("Создание ресторана {RestaurantName}", name);
 
         var restaurant = new RestaurantAggregate.Restaurant(
-            name,
-            description,
-            phoneNumber,
-            email,
-            location,
-            averageCheck,
-            tag);
+             name,
+             description,
+             phoneNumber,
+             email,
+             address,
+             location,
+             openHours,
+             cuisineType,
+             averageCheck,
+             tag);
 
         await repository.AddAsync(restaurant);
 

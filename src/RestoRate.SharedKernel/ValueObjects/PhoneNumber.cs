@@ -25,7 +25,7 @@ public class PhoneNumber : ValueObject
         var pattern = @"^\+?(\d{1,3})?[-.\s]?(\(?)(\d{3})(\)?)[-.\s]?(\d{3})[-.\s]?(\d{2})[-.\s]?(\d{2})$";
 
         if (!Regex.IsMatch(cleaned, pattern))
-            throw new ArgumentException("Неверный формат тел. номера. Верный формат: +7(911) 344-55-33", nameof(number));
+            throw new ArgumentException("Неверный формат тел. номера. Верный формат: +7(XXX) XXX-XX-XX", nameof(number));
 
         return cleaned;
     }
