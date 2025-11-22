@@ -28,7 +28,7 @@ builder.Services.AddHttpClient(AppHostProjects.Gateway,
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsProduction())
 {
     app.UseHttpsRedirection();
     app.UseExceptionHandler("/Error", createScopeForErrors: true);

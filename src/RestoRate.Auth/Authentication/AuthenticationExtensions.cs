@@ -31,7 +31,7 @@ public static class AuthenticationExtensions
                 options =>
                 {
                     // In development we often run Keycloak over HTTP; enable HTTPS metadata outside of dev
-                    options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+                    options.RequireHttpsMetadata = builder.Environment.IsProduction();
 
                     options.Audience = settings.Audience;
                     // for service to service calls we don't validate the issuer
@@ -59,7 +59,7 @@ public static class AuthenticationExtensions
                 options =>
                 {
                     // In development we often run Keycloak over HTTP; enable HTTPS metadata outside of dev
-                    options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+                    options.RequireHttpsMetadata = builder.Environment.IsProduction();
 
                     options.Audience = settings.Audience;
                     options.MapInboundClaims = false;
@@ -94,7 +94,7 @@ public static class AuthenticationExtensions
                 realm: settings.Realm!,
                 options =>
                 {
-                    options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+                    options.RequireHttpsMetadata = builder.Environment.IsProduction();
 
                     options.ClientId = settings.ClientId;
                     options.ClientSecret = settings.ClientSecret;

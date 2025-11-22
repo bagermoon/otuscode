@@ -13,7 +13,7 @@ var app = builder.Build();
 app.UseAuthentication();
 app.UseAuthorization();
 
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsProduction())
 {
     app.UseHttpsRedirection();
 }
@@ -26,7 +26,7 @@ app.MapReviewsEndpoints("reviews")
     .WithTags("Reviews");
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (!app.Environment.IsProduction())
 {
     app.MapOpenApi();
 }

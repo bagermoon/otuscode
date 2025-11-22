@@ -13,7 +13,7 @@ var app = builder.Build();
 app.UseAuthentication();
 app.UseAuthorization();
 
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsProduction())
 {
     app.UseHttpsRedirection();
 }
@@ -25,7 +25,7 @@ app.MapRestaurantsEndpoints("restaurants")
     .WithTags("Restaurants");
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (!app.Environment.IsProduction())
 {
     app.MapOpenApi();
 }
