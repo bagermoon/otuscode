@@ -30,7 +30,7 @@ var redisCache = builder.AddRedisResource(appHostConfig.Redis, useVolumes, useDe
 
 // Keycloak resource setup via extension method
 var keycloakRealm = builder.AddParameter("keycloak-realm", value: "restorate", publishValueAsDefault: true);
-var keycloak = builder.AddKeycloakResource(appHostConfig.Keycloak, useVolumes);
+var keycloak = builder.AddKeycloakResource(appHostConfig.Keycloak, useVolumes, useDedicatedPorts);
 
 // RabbitMQ resource setup via extension method
 var rabbitmq = builder.AddRabbitResource(appHostConfig.Rabbit, useVolumes);

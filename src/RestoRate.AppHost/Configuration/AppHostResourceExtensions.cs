@@ -81,17 +81,16 @@ public static class AppHostResourceExtensions
     }
 
     public static IResourceBuilder<KeycloakResource> AddKeycloakResource(
-        this IDistributedApplicationBuilder builder, KeycloakConfig config, bool useVolumes)
+        this IDistributedApplicationBuilder builder, KeycloakConfig config, bool useVolumes, bool useDedicatedPorts)
     {
-        var keycloakHostname = builder.AddParameter("keycloak-hostname");
         var keycloak = builder.AddKeycloak("keycloak",
-            port: config.LocalPort ?? 8080,
-            adminUsername: builder.AddParameter("keycloak-username", value: "admin", publishValueAsDefault: true),
-            adminPassword: builder.AddParameter("keycloak-password", secret: true)
+            port: useDedicatedPorts ? (config.LocalPort ?? 8080) : default,
+            adminUsername: builder.AddParameter("kc-username", value: "admin", publishValueAsDefault: true),
+            adminPassword: builder.AddParameter("kc-password", secret: true)
         )
         .WithImageTag(config.ImageTag)
         .WithRealmImport("restorate-realm.json")
-        .WithEnvironment("KC_HOSTNAME", keycloakHostname)
+        
         .WithExternalHttpEndpoints()
         .WithLifetime(config.LifetimePersistent ? ContainerLifetime.Persistent : ContainerLifetime.Session);
 
@@ -99,6 +98,12 @@ public static class AppHostResourceExtensions
         {
             keycloak.WithDataVolume("restorate-keycloak");
         }
+
+        if (config.UseKCHostname)
+        {
+            keycloak.WithEnvironment("KC_HOSTNAME", builder.AddParameter("kc-hostname"));
+        }
+
         return keycloak;
     }
 

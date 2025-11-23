@@ -38,6 +38,8 @@ public class KeycloakConfig
     public int? LocalPort { get; set; }
     public string ImageTag { get; set; } = "";
     public bool LifetimePersistent { get; set; }
+
+    public bool UseKCHostname { get; set; }
 }
 
 public class RabbitConfig
