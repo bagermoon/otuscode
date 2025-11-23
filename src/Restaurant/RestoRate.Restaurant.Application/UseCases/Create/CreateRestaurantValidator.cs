@@ -55,6 +55,18 @@ public class CreateRestaurantValidator : AbstractValidator<CreateRestaurantComma
             .NotEmpty().WithMessage("Тег ресторана обязателен");
 
         RuleFor(x => x.Dto.Images)
-            .NotEmpty().WithMessage("Изображения ресторана обязателены");
+           .Must(images => images == null || images.Count <= 10)
+           .WithMessage("Максимум 10 изображений");
+
+
+        RuleForEach(x => x.Dto.Images)
+            .ChildRules(image =>
+            {
+                image.RuleFor(x => x.Url)
+                    .NotEmpty().WithMessage("URL изображения обязателен")
+                    .Must(url => Uri.TryCreate(url, UriKind.Absolute, out _))
+                    .WithMessage("Неверный формат URL изображения");
+            })
+            .When(x => x.Dto.Images != null);
     }
 }
