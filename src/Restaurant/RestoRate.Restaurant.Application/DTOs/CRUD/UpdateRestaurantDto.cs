@@ -1,9 +1,9 @@
-namespace RestoRate.Restaurant.Application.DTOs;
+namespace RestoRate.Restaurant.Application.DTOs.CRUD;
 
-public record RestaurantDto(
+public record UpdateRestaurantDto(
     Guid RestaurantId,
     string Name,
-    string? Description,
+    string Description,
     string PhoneNumber,
     string Email,
     AddressDto Address,
@@ -11,5 +11,4 @@ public record RestaurantDto(
     OpenHoursDto OpenHours,
     MoneyDto AverageCheck,
     IReadOnlyCollection<string> CuisineTypes,
-    IReadOnlyCollection<string> Tags,
-    IReadOnlyCollection<RestaurantImageDto> Images);
+    IReadOnlyCollection<string> Tags);

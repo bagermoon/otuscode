@@ -1,9 +1,7 @@
 using Ardalis.Result;
 using Ardalis.SharedKernel;
-
 using Mediator;
 using Microsoft.Extensions.Logging;
-
 using RestoRate.Restaurant.Application.DTOs;
 using RestoRate.Restaurant.Domain.RestaurantAggregate.Specifications;
 using RestaurantEntity = RestoRate.Restaurant.Domain.RestaurantAggregate.Restaurant;
@@ -35,20 +33,23 @@ public sealed class GetRestaurantByIdHandler(
             var dto = new RestaurantDto(
                 restaurant.Id,
                 restaurant.Name,
-                restaurant.Description ?? string.Empty,
+                restaurant.Description,
                 restaurant.PhoneNumber.ToString(),
                 restaurant.Email.Address,
-                restaurant.Address.FullAddress,
-                restaurant.Address.House,
-                restaurant.Location.Latitude,
-                restaurant.Location.Longitude,
-                restaurant.OpenHours.DayOfWeek,
-                restaurant.OpenHours.OpenTime,
-                restaurant.OpenHours.CloseTime,
-                restaurant.CuisineType.ToString(),
-                restaurant.AverageCheck.Amount,
-                restaurant.AverageCheck.Currency,
-                restaurant.Tag.Name);
+                new AddressDto(restaurant.Address.FullAddress, restaurant.Address.House),
+                new LocationDto(restaurant.Location.Latitude, restaurant.Location.Longitude),
+                new OpenHoursDto(restaurant.OpenHours.DayOfWeek, restaurant.OpenHours.OpenTime, restaurant.OpenHours.CloseTime),
+                new MoneyDto(restaurant.AverageCheck.Amount, restaurant.AverageCheck.Currency),
+                restaurant.CuisineTypes.Select(ct => ct.CuisineType.Name).ToList(),
+                restaurant.Tags.Select(t => t.Tag.Name).ToList(),
+                restaurant.Images.Select(img => new RestaurantImageDto(
+                    img.Id,
+                    img.Url,
+                    img.AltText,
+                    img.DisplayOrder,
+                    img.IsPrimary
+                )).ToList()
+            );
 
             logger.LogInformation("Ресторан найден успешно: ID {RestaurantId}", request.RestaurantId);
             return Result<RestaurantDto>.Success(dto);

@@ -1,8 +1,7 @@
 using Ardalis.Result;
-
 using Mediator;
-
 using RestoRate.Restaurant.Application.DTOs;
+using RestoRate.Restaurant.Application.DTOs.CRUD;
 using RestoRate.Restaurant.Application.UseCases.Create;
 
 namespace RestoRate.Restaurant.Api.Endpoints.Restaurants;
@@ -16,7 +15,7 @@ internal static class CreateRestaurantEndpoint
             var result = await sender.Send(new CreateRestaurantCommand(dto), ct);
             return result.Status switch
             {
-                ResultStatus.Ok => Results.CreatedAtRoute("GetRestaurantById", new { id = result.Value.Id }, result.Value),
+                ResultStatus.Ok => Results.CreatedAtRoute("GetRestaurantById", new { id = result.Value.RestaurantId }, result.Value),
                 ResultStatus.Invalid => Results.BadRequest(result.Errors),
                 ResultStatus.NotFound => Results.NotFound(),
                 _ => Results.Problem(string.Join(";", result.Errors))
