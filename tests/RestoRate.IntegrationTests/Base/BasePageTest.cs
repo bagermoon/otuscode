@@ -1,10 +1,39 @@
+using Microsoft.Playwright;
 using Microsoft.Playwright.Xunit.v3;
+using RestoRate.IntegrationTests.Auth;
 
-using RestoRate.Restaurant.IntegrationTests.Tests;
+namespace RestoRate.Restaurant.IntegrationTests.Base;
 
+[Collection("AspireAppHost collection")]
 [WithTestName]
-public abstract class BasePageTest : PageTest
+public abstract class BasePageTest(AspireAppHost appHost) : PageTest
 {
+    protected virtual TestUser User
+    {
+        get
+        {
+            // Try to get UserAttribute from class or method
+            var attr = GetType().GetCustomAttributes(typeof(UserAttribute), true)
+                .OfType<UserAttribute>().FirstOrDefault();
+            return attr?.Name ?? TestUser.Anonymous; // Default to Anonymous
+        }
+    }
+
+    protected AspireAppHost AppHost { get; } = appHost;
+
+    public override BrowserNewContextOptions ContextOptions()
+    {
+        var options = base.ContextOptions();
+
+        if (User != TestUser.Anonymous)
+        {
+            options.StorageStatePath = PlaywrightAuthHelper.GetAuthStatePath(User);
+        }
+        options.BaseURL = AppHost.DashboardUrl;
+
+        return options;
+    }
+
     public override async ValueTask InitializeAsync()
     {
         await base.InitializeAsync().ConfigureAwait(false);

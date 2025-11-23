@@ -1,24 +1,18 @@
 using Aspire.Hosting;
-
 using Microsoft.Extensions.Hosting;
-
-using RestoRate.IntegrationTests;
+using RestoRate.IntegrationTests.Auth;
 using RestoRate.ServiceDefaults;
 
-namespace RestoRate.Restaurant.IntegrationTests;
+namespace RestoRate.Restaurant.IntegrationTests.Base;
 
 public class AspireAppHost() : DistributedApplicationFactory(typeof(Projects.RestoRate_AppHost)), IAsyncLifetime
 {
     public async ValueTask InitializeAsync()
     {
-        
         await StartAsync();
-        var dashboardUrl = GetEndpoint(AppHostProjects.BlazorDashboard, "https").ToString();
-        await Task.WhenAll(
-            PlaywrightAuthHelper.SaveAuthStateAsync(dashboardUrl, "admin", "admin"),
-            PlaywrightAuthHelper.SaveAuthStateAsync(dashboardUrl, "user", "user")
-        );
+        await PlaywrightAuthHelper.SaveAllAuthStatesAsync(DashboardUrl);
     }
+    public string DashboardUrl { get => GetEndpoint(AppHostProjects.BlazorDashboard).ToString(); }
 
     protected override void OnBuilderCreating(
         DistributedApplicationOptions applicationOptions,
