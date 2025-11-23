@@ -23,38 +23,38 @@ public class CreateRestaurantValidator : AbstractValidator<CreateRestaurantComma
             .NotEmpty().WithMessage("Email обязателен")
             .EmailAddress().WithMessage("Неверный формат email");
 
-        RuleFor(x => x.Dto.FullAddress)
+        RuleFor(x => x.Dto.Address)
             .NotEmpty().WithMessage("Адрес ресторана обязателен");
 
-        RuleFor(x => x.Dto.House)
-            .NotEmpty().WithMessage("Адресный дом ресторана обязателен");
-
-        RuleFor(x => x.Dto.Latitude)
+        RuleFor(x => x.Dto.Location.Latitude)
             .InclusiveBetween(-90, 90).WithMessage("Широта должна быть между -90 и 90");
 
-        RuleFor(x => x.Dto.Longitude)
+        RuleFor(x => x.Dto.Location.Longitude)
             .InclusiveBetween(-180, 180).WithMessage("Долгота должна быть между -180 и 180");
 
-        RuleFor(x => x.Dto.DayOfWeek)
+        RuleFor(x => x.Dto.OpenHours.DayOfWeek)
             .NotEmpty().WithMessage("Указать дни недели работы ресторана, обязателено");
 
-        RuleFor(x => x.Dto.DayOfWeek)
+        RuleFor(x => x.Dto.OpenHours.DayOfWeek)
             .NotEmpty().WithMessage("Указать время открытия ресторана, обязателено");
 
-        RuleFor(x => x.Dto.DayOfWeek)
+        RuleFor(x => x.Dto.OpenHours.DayOfWeek)
             .NotEmpty().WithMessage("Указать время закрытия ресторана, обязателено");
 
-        RuleFor(x => x.Dto.CuisineType)
-            .NotEmpty().WithMessage("Тип кухни обязателен");
-
-        RuleFor(x => x.Dto.AverageCheckAmount)
+        RuleFor(x => x.Dto.AverageCheck.Amount)
             .GreaterThan(0).WithMessage("Средний чек должен быть больше 0");
 
-        RuleFor(x => x.Dto.AverageCheckCurrency)
+        RuleFor(x => x.Dto.AverageCheck.Currency)
             .NotEmpty().WithMessage("Валюта обязательна")
             .Length(3).WithMessage("Код валюты должен быть 3 символа");
 
-        RuleFor(x => x.Dto.Tag)
-            .NotEmpty().WithMessage("Тип ресторана обязателен");
+        RuleFor(x => x.Dto.CuisineTypes)
+            .NotEmpty().WithMessage("Тип кухни обязателен");
+
+        RuleFor(x => x.Dto.Tags)
+            .NotEmpty().WithMessage("Тег ресторана обязателен");
+
+        RuleFor(x => x.Dto.Images)
+            .NotEmpty().WithMessage("Изображения ресторана обязателены");
     }
 }

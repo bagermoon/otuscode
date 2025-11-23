@@ -14,7 +14,7 @@ public class RestaurantService(
     IMediator mediator,
     ILogger<RestaurantService> logger) : IRestaurantService
 {
-    public async Task<Result<int>> CreateRestaurant(
+    public async Task<Result<Guid>> CreateRestaurant(
         string name,
         string description,
         PhoneNumber phoneNumber,
@@ -22,9 +22,10 @@ public class RestaurantService(
         Address address,
         Location location,
         OpenHours openHours,
-        CuisineType cuisineType,
         Money averageCheck,
-        RestaurantTag tag)
+        IEnumerable<CuisineType> cuisineTypes,
+        IEnumerable<Tag> tags,
+        IEnumerable<(string Url, string? AltText, bool IsPrimary)>? images = null)
     {
         logger.LogCreateRestaurantStart(name);
 
@@ -36,23 +37,29 @@ public class RestaurantService(
             address,
             location,
             openHours,
-            cuisineType,
-            averageCheck,
-            tag);
+            averageCheck);
+
+        foreach (var cuisineType in cuisineTypes)
+            restaurant.AddCuisineType(cuisineType);
+
+        foreach (var tag in tags)
+            restaurant.AddTag(tag);
+
+        if (images != null)
+        {
+            int displayOrder = 0;
+            foreach (var (url, altText, isPrimary) in images)
+                restaurant.AddImage(url, altText, displayOrder++, isPrimary);
+        }
 
         await repository.AddAsync(restaurant);
 
-        foreach (var domainEvent in restaurant.DomainEvents)
-            await mediator.Publish(domainEvent);
-
-        restaurant.ClearDomainEvents();
-
         logger.LogCreateRestaurantCompleted(name, restaurant.Id);
-        return Result<int>.Success(restaurant.Id);
+        return Result<Guid>.Success(restaurant.Id);
     }
 
     public async Task<Result> UpdateRestaurant(
-        int restaurantId,
+        Guid restaurantId,
         string name,
         string description,
         PhoneNumber phoneNumber,
@@ -60,16 +67,16 @@ public class RestaurantService(
         Address address,
         Location location,
         OpenHours openHours,
-        CuisineType cuisineType,
         Money averageCheck,
-        RestaurantTag tag)
+        IEnumerable<CuisineType> cuisineTypes,
+        IEnumerable<Tag> tags)
     {
-        logger.LogUpdateRestaurantStart(restaurantId);
+        logger.LogInformation("Обновление ресторана {RestaurantId}", restaurantId);
 
         var restaurant = await repository.GetByIdAsync(restaurantId);
         if (restaurant == null)
         {
-            logger.LogRestaurantNotFound(restaurantId);
+            logger.LogWarning("Ресторан {RestaurantId} не найден", restaurantId);
             return Result.NotFound();
         }
 
@@ -80,22 +87,17 @@ public class RestaurantService(
         restaurant.UpdateAddress(address);
         restaurant.UpdateLocation(location);
         restaurant.UpdateOpenHours(openHours);
-        restaurant.UpdateCuisineType(cuisineType);
         restaurant.UpdateAverageCheck(averageCheck);
-        restaurant.UpdateTag(tag);
+        restaurant.UpdateCuisineTypes(cuisineTypes);
+        restaurant.UpdateTags(tags);
 
         await repository.UpdateAsync(restaurant);
 
-        foreach (var domainEvent in restaurant.DomainEvents)
-            await mediator.Publish(domainEvent);
-
-        restaurant.ClearDomainEvents();
-
-        logger.LogUpdateRestaurantCompleted(restaurantId);
+        logger.LogInformation("Ресторан {RestaurantId} обновлен", restaurantId);
         return Result.Success();
     }
 
-    public async Task<Result> DeleteRestaurant(int restaurantId)
+    public async Task<Result> DeleteRestaurant(Guid restaurantId)
     {
         logger.LogDeleteRestaurantStart(restaurantId);
 
@@ -116,6 +118,46 @@ public class RestaurantService(
         restaurant.ClearDomainEvents();
 
         logger.LogDeleteRestaurantCompleted(restaurantId);
+        return Result.Success();
+    }
+
+    public async Task<Result> AddRestaurantImage(
+        Guid restaurantId,
+        string url,
+        string? altText = null,
+        bool isPrimary = false)
+    {
+        var restaurant = await repository.GetByIdAsync(restaurantId);
+        if (restaurant == null)
+            return Result.NotFound();
+
+        restaurant.AddImage(url, altText, isPrimary: isPrimary);
+        await repository.UpdateAsync(restaurant);
+
+        return Result.Success();
+    }
+
+    public async Task<Result> RemoveRestaurantImage(Guid restaurantId, Guid imageId)
+    {
+        var restaurant = await repository.GetByIdAsync(restaurantId);
+        if (restaurant == null)
+            return Result.NotFound();
+
+        restaurant.RemoveImage(imageId);
+        await repository.UpdateAsync(restaurant);
+
+        return Result.Success();
+    }
+
+    public async Task<Result> SetPrimaryImage(Guid restaurantId, Guid imageId)
+    {
+        var restaurant = await repository.GetByIdAsync(restaurantId);
+        if (restaurant == null)
+            return Result.NotFound();
+
+        restaurant.SetPrimaryImage(imageId);
+        await repository.UpdateAsync(restaurant);
+
         return Result.Success();
     }
 }

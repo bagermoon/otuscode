@@ -10,7 +10,7 @@ internal static class DeleteRestaurantEndpoint
 {
     public static RouteGroupBuilder MapDeleteRestaurant(this RouteGroupBuilder group)
     {
-        group.MapDelete("/{id:int}", async (int id, ISender sender, CancellationToken ct) =>
+        group.MapDelete("/{id:Guid}", async (Guid id, ISender sender, CancellationToken ct) =>
         {
             var result = await sender.Send(new DeleteRestaurantCommand(id), ct);
             return result.Status switch

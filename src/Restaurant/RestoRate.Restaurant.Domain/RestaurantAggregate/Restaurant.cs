@@ -6,7 +6,7 @@ using RestoRate.Restaurant.Domain.RestaurantAggregate.Events;
 
 namespace RestoRate.Restaurant.Domain.RestaurantAggregate;
 
-public class Restaurant : EntityBase, IAggregateRoot
+public class Restaurant : EntityBase<Guid>, IAggregateRoot
 {
     public string Name { get; private set; } = default!;
     public string? Description { get; private set; }
@@ -15,9 +15,15 @@ public class Restaurant : EntityBase, IAggregateRoot
     public Address Address { get; private set; } = default!;
     public Location Location { get; private set; } = default!;
     public OpenHours OpenHours { get; private set; } = default!;
-    public CuisineType CuisineType { get; private set; } = default!;
     public Money AverageCheck { get; private set; } = default!;
-    public RestaurantTag Tag { get; private set; } = default!;
+
+    private readonly List<RestaurantImage> _images = new();
+    private readonly List<RestaurantCuisineType> _cuisineTypes = new();
+    private readonly List<RestaurantTag> _tags = new();
+
+    public IReadOnlyCollection<RestaurantImage> Images => _images.AsReadOnly();
+    public IReadOnlyCollection<RestaurantCuisineType> CuisineTypes => _cuisineTypes.AsReadOnly();
+    public IReadOnlyCollection<RestaurantTag> Tags => _tags.AsReadOnly();
 
     private bool _updatedEventQueued;
     private bool _deletedEventQueued;
@@ -31,9 +37,7 @@ public class Restaurant : EntityBase, IAggregateRoot
         Address address,
         Location location,
         OpenHours openHours,
-        CuisineType cuisineType,
-        Money averageCheck,
-        RestaurantTag tag)
+        Money averageCheck)
     {
         Name = Guard.Against.NullOrEmpty(name, nameof(name));
         Description = Guard.Against.NullOrEmpty(description, nameof(description));
@@ -42,12 +46,86 @@ public class Restaurant : EntityBase, IAggregateRoot
         Address = Guard.Against.Null(address, nameof(address));
         Location = Guard.Against.Null(location, nameof(location));
         OpenHours = Guard.Against.Null(openHours, nameof(openHours));
-        CuisineType = Guard.Against.Null(cuisineType, nameof(cuisineType));
         AverageCheck = Guard.Against.Null(averageCheck, nameof(averageCheck));
-        Tag = Guard.Against.Null(tag, nameof(tag));
 
         RegisterDomainEvent(new RestaurantCreatedEvent(this));
     }
+
+    public void SetPrimaryImage(Guid imageId)
+    {
+        var targetImage = _images.FirstOrDefault(i => i.Id == imageId);
+        Guard.Against.Null(targetImage, nameof(imageId));
+
+        foreach (var img in _images)
+            img.UnmarkAsPrimary();
+
+        targetImage.MarkAsPrimary();
+        QueueUpdatedEvent();
+    }
+
+    public void AddImage(string url, string? altText = null, int displayOrder = 0, bool isPrimary = false)
+    {
+        if (isPrimary)
+            foreach (var img in _images)
+                img.UnmarkAsPrimary();
+
+        var image = new RestaurantImage(Id, url, altText, displayOrder, isPrimary);
+        _images.Add(image);
+        QueueUpdatedEvent();
+    }
+
+    public void AddCuisineType(CuisineType cuisineType)
+    {
+        Guard.Against.Null(cuisineType, nameof(cuisineType));
+
+        if (_cuisineTypes.Any(ct => ct.CuisineType.Equals(cuisineType)))
+            return;
+
+        _cuisineTypes.Add(new RestaurantCuisineType(Id, cuisineType));
+        QueueUpdatedEvent();
+    }
+
+    public void AddTag(SharedKernel.Enums.Tag tag)
+    {
+        Guard.Against.Null(tag, nameof(tag));
+
+        if (_tags.Any(t => t.Tag.Equals(tag)))
+            return;
+
+        _tags.Add(new RestaurantTag(Id, tag));
+        QueueUpdatedEvent();
+    }
+
+    public void RemoveImage(Guid imageId)
+    {
+        var image = _images.FirstOrDefault(i => i.Id == imageId);
+        if (image != null)
+        {
+            _images.Remove(image);
+            QueueUpdatedEvent();
+        }
+    }
+
+    public void RemoveCuisineType(Guid cuisineTypeId)
+    {
+        var cuisineType = _cuisineTypes.FirstOrDefault(ct => ct.Id == cuisineTypeId);
+        if (cuisineType != null)
+        {
+            _cuisineTypes.Remove(cuisineType);
+            QueueUpdatedEvent();
+        }
+    }
+
+    public void RemoveTag(Guid tagId)
+    {
+        var tag = _tags.FirstOrDefault(t => t.Id == tagId);
+        if (tag != null)
+        {
+            _tags.Remove(tag);
+            QueueUpdatedEvent();
+        }
+    }
+
     public void UpdateName(string name)
     {
         Name = Guard.Against.NullOrEmpty(name, nameof(name));
@@ -90,21 +168,27 @@ public class Restaurant : EntityBase, IAggregateRoot
         QueueUpdatedEvent();
     }
 
-    public void UpdateCuisineType(CuisineType cuisineType)
-    {
-        CuisineType = Guard.Against.Null(cuisineType, nameof(cuisineType));
-        QueueUpdatedEvent();
-    }
-
     public void UpdateAverageCheck(Money averageCheck)
     {
         AverageCheck = Guard.Against.Null(averageCheck, nameof(averageCheck));
         QueueUpdatedEvent();
     }
 
-    public void UpdateTag(RestaurantTag tag)
+    public void UpdateCuisineTypes(IEnumerable<CuisineType> cuisineTypes)
     {
-        Tag = Guard.Against.Null(tag, nameof(tag));
+        _cuisineTypes.Clear();
+        foreach (var ct in cuisineTypes)
+            _cuisineTypes.Add(new RestaurantCuisineType(Id, ct));
+
+        QueueUpdatedEvent();
+    }
+
+    public void UpdateTags(IEnumerable<SharedKernel.Enums.Tag> tags)
+    {
+        _tags.Clear();
+        foreach (var tag in tags)
+            _tags.Add(new RestaurantTag(Id, tag));
+
         QueueUpdatedEvent();
     }
 

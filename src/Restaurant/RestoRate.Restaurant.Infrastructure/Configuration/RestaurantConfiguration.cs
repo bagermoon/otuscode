@@ -50,25 +50,26 @@ public class RestaurantConfiguration : IEntityTypeConfiguration<Domain.Restauran
             l.Property(loc => loc.IsClosed);
         });
 
-        builder
-            .Property(r => r.CuisineType)
-            .HasConversion(
-                r => r.Value,
-                value => CuisineType.FromValue(value)
-            );
-
         builder.OwnsOne(r => r.AverageCheck, ac =>
         {
             ac.Property(m => m.Amount);
             ac.Property(m => m.Currency);
         });
 
-        builder
-            .Property(r => r.Tag)
-            .HasConversion(
-                r => r.Value,
-                value => RestaurantTag.FromValue(value)
-            );
+        builder.HasMany(r => r.CuisineTypes)
+            .WithOne()
+            .HasForeignKey(ct => ct.RestaurantId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(r => r.Tags)
+            .WithOne()
+            .HasForeignKey(t => t.RestaurantId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(r => r.Images)
+            .WithOne()
+            .HasForeignKey(i => i.RestaurantId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.ToTable("restaurants");
     }
