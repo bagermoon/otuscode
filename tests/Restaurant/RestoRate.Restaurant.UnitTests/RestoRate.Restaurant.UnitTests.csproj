@@ -1,24 +1,31 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
-    <IsTestProject>true</IsTestProject>
-    <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
-    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.Testing" />
-    <PackageReference Include="coverlet.collector" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="xunit.runner.visualstudio" />
     <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+
+    <PackageReference Include="NSubstitute" />
     <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="AutoFixture" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\RestoRate.AppHost\RestoRate.AppHost.csproj" />
-    <ProjectReference Include="..\..\..\src\RestoRate.ServiceDefaults\RestoRate.ServiceDefaults.csproj" />
+    <Using Include="Xunit" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,14 +34,6 @@
     <ProjectReference Include="..\..\..\src\RestoRate.SharedKernel\RestoRate.SharedKernel.csproj" />
     <ProjectReference Include="..\..\..\src\RestoRate.Abstractions\RestoRate.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\src\RestoRate.Contracts\RestoRate.Contracts.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Using Include="System.Net" />
-    <Using Include="Microsoft.Extensions.DependencyInjection" />
-    <Using Include="Aspire.Hosting.ApplicationModel" />
-    <Using Include="Aspire.Hosting.Testing" />
-    <Using Include="Xunit" />
   </ItemGroup>
 
 </Project>

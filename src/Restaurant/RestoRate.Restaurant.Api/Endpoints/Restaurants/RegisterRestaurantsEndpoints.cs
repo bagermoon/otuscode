@@ -8,7 +8,8 @@ public static class RegisterRestaurantsEndpoints
 
 		group.MapCreateRestaurant();
 		group.MapGetRestaurantById();
-		group.MapUpdateRestaurant();
+        group.MapGetAllRestaurants();
+        group.MapUpdateRestaurant();
 		group.MapDeleteRestaurant();
 
 		return group;
