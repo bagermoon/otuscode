@@ -1,65 +1,42 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace RestoRate.Restaurant.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class AddMissingRestaurantFields : Migration
+    public partial class restaurant : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "tag",
-                table: "restaurants",
-                newName: "open_hours_day_of_week");
-
-            migrationBuilder.AlterColumn<Guid>(
-                name: "id",
-                table: "restaurants",
-                type: "uuid",
-                nullable: false,
-                oldClrType: typeof(int),
-                oldType: "integer")
-                .OldAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-            migrationBuilder.AddColumn<string>(
-                name: "address_full_address",
-                table: "restaurants",
-                type: "text",
-                nullable: false,
-                defaultValue: "");
-
-            migrationBuilder.AddColumn<string>(
-                name: "address_house",
-                table: "restaurants",
-                type: "text",
-                nullable: false,
-                defaultValue: "");
-
-            migrationBuilder.AddColumn<TimeOnly>(
-                name: "open_hours_close_time",
-                table: "restaurants",
-                type: "time without time zone",
-                nullable: false,
-                defaultValue: new TimeOnly(0, 0, 0));
-
-            migrationBuilder.AddColumn<bool>(
-                name: "open_hours_is_closed",
-                table: "restaurants",
-                type: "boolean",
-                nullable: false,
-                defaultValue: false);
-
-            migrationBuilder.AddColumn<TimeOnly>(
-                name: "open_hours_open_time",
-                table: "restaurants",
-                type: "time without time zone",
-                nullable: false,
-                defaultValue: new TimeOnly(0, 0, 0));
+            migrationBuilder.CreateTable(
+                name: "restaurants",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                    phone_number_operator_code = table.Column<string>(type: "text", nullable: false),
+                    phone_number_number = table.Column<string>(type: "text", nullable: false),
+                    phone_number_extension = table.Column<string>(type: "text", nullable: true),
+                    email_address = table.Column<string>(type: "text", nullable: false),
+                    address_full_address = table.Column<string>(type: "text", nullable: false),
+                    address_house = table.Column<string>(type: "text", nullable: false),
+                    location_latitude = table.Column<double>(type: "double precision", nullable: false),
+                    location_longitude = table.Column<double>(type: "double precision", nullable: false),
+                    open_hours_day_of_week = table.Column<int>(type: "integer", nullable: false),
+                    open_hours_open_time = table.Column<TimeOnly>(type: "time without time zone", nullable: false),
+                    open_hours_close_time = table.Column<TimeOnly>(type: "time without time zone", nullable: false),
+                    open_hours_is_closed = table.Column<bool>(type: "boolean", nullable: false),
+                    average_check_amount = table.Column<decimal>(type: "numeric", nullable: false),
+                    average_check_currency = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_restaurants", x => x.id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "restaurant_cuisinetype",
@@ -149,39 +126,8 @@ namespace RestoRate.Restaurant.Infrastructure.Migrations
             migrationBuilder.DropTable(
                 name: "restaurant_tags");
 
-            migrationBuilder.DropColumn(
-                name: "address_full_address",
-                table: "restaurants");
-
-            migrationBuilder.DropColumn(
-                name: "address_house",
-                table: "restaurants");
-
-            migrationBuilder.DropColumn(
-                name: "open_hours_close_time",
-                table: "restaurants");
-
-            migrationBuilder.DropColumn(
-                name: "open_hours_is_closed",
-                table: "restaurants");
-
-            migrationBuilder.DropColumn(
-                name: "open_hours_open_time",
-                table: "restaurants");
-
-            migrationBuilder.RenameColumn(
-                name: "open_hours_day_of_week",
-                table: "restaurants",
-                newName: "tag");
-
-            migrationBuilder.AlterColumn<int>(
-                name: "id",
-                table: "restaurants",
-                type: "integer",
-                nullable: false,
-                oldClrType: typeof(Guid),
-                oldType: "uuid")
-                .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+            migrationBuilder.DropTable(
+                name: "restaurants");
         }
     }
 }

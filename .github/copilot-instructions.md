@@ -62,7 +62,7 @@ Goal: Make AI agents productive immediately in this .NET 9 + Aspire microservice
 - Service defaults: `src/RestoRate.ServiceDefaults/Extensions.cs`
 - Gateway: `src/RestoRate.Gateway/Program.cs`, `TokenExchangeMiddleware.cs`
 - Restaurant API example endpoint: `src/Restaurant/RestoRate.Restaurant.Api/Endpoints/Restaurants/CreateRestaurantEndpoint.cs`
-- Architecture index: `docs/ARCHITECTURE.md`; Layout rules: `docs/layout.md`; Diagrams: `docs/diagrams.md`
+Architecture index: `docs/ARCHITECTURE.md`; Layout rules: `docs/layout.md`; Diagrams: `docs/diagrams.md`; Testing: `docs/testing.md`
 
 ## When updating architecture
 - Keep `docs/diagrams.md` and `docs/layout.md` in sync with changes (Keycloak above Gateway; token exchange in C4). Register new services in `AppHost` and expose external endpoints where needed.

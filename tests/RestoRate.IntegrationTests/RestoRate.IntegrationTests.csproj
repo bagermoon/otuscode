@@ -18,17 +18,11 @@
     <PackageReference Include="Microsoft.Playwright.Xunit.v3" />
     <PackageReference Include="xunit.runner.visualstudio" />
     <PackageReference Include="xunit.v3" />
-    <PackageReference Include="FluentAssertions" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\RestoRate.AppHost\RestoRate.AppHost.csproj" />
-    <ProjectReference Include="..\..\..\src\RestoRate.ServiceDefaults\RestoRate.ServiceDefaults.csproj" />
-    <ProjectReference Include="..\..\..\src\Restaurant\RestoRate.Restaurant.Application\RestoRate.Restaurant.Application.csproj" />
-    <ProjectReference Include="..\..\..\src\Restaurant\RestoRate.Restaurant.Domain\RestoRate.Restaurant.Domain.csproj" />
-    <ProjectReference Include="..\..\..\src\RestoRate.SharedKernel\RestoRate.SharedKernel.csproj" />
-    <ProjectReference Include="..\..\..\src\RestoRate.Abstractions\RestoRate.Abstractions.csproj" />
-    <ProjectReference Include="..\..\..\src\RestoRate.Contracts\RestoRate.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\RestoRate.AppHost\RestoRate.AppHost.csproj" />
+    <ProjectReference Include="..\..\src\RestoRate.ServiceDefaults\RestoRate.ServiceDefaults.csproj" />
   </ItemGroup>
   
   <ItemGroup>

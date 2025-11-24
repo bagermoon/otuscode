@@ -1,151 +1,45 @@
-using Aspire.Hosting;
-
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 using Projects;
 using RestoRate.ServiceDefaults;
 using Scalar.Aspire;
+using RestoRate.AppHost.Configuration;
 
 // https://fiodar.substack.com/p/a-guide-to-securing-net-aspire-apps
 // https://www.youtube.com/watch?v=_aCuwWiKncY
 var builder = DistributedApplication.CreateBuilder(args);
 
-var parameters = builder.Configuration.GetRequiredSection("Parameters");
 
-#region PostgreSql
+var isProduction = builder.Environment.IsProduction();
+var appHostConfig = builder.Configuration.GetSection("AppHostConfiguration").Get<AppHostConfiguration>()
+    ?? throw new InvalidOperationException("AppHostConfiguration section is missing or invalid in appsettings.json");
+var useVolumes = appHostConfig.UseVolumes;
+var useDedicatedPorts = appHostConfig.UseDedicatedPorts && !isProduction;
 
-var postgresPassword = builder.AddParameter("postgres-password", secret: true);
-var postgres = builder.AddPostgres("postgres",
-        password: postgresPassword,
-        port: builder.Environment.IsDevelopment() ? 55432 : null
-     )
-    .WithPgWeb()
-    .WithImageTag("17.6")
-    .WithDataVolume()
-    .WithLifetime(ContainerLifetime.Persistent);
-
+#region Resources
+// Postgres resource setup via extension method
+var postgres = builder.AddPostgresResource(appHostConfig.Postgres, useVolumes, useDedicatedPorts);
 var restaurantDb = postgres.AddDatabase(AppHostProjects.RestaurantDb, "Restaurants");
 
+// Mongo resource setup via extension method
+var mongo = builder.AddMongoResource(appHostConfig.Mongo, useVolumes, useDedicatedPorts);
 
-/**
+// Redis resource setup via extension method
+var redisCache = builder.AddRedisResource(appHostConfig.Redis, useVolumes, useDedicatedPorts);
 
-int portPostgreSql = 46819;
-Regex re = new Regex(@"^(.*[/\\]otuscode)[/\\]{0,1}.*$");
-var r = re.Matches(Environment.CurrentDirectory);
-string root_directory = r.Count > 0 ? r[0].Groups[1].Value + "/src/DataBase" : null;
-string data_directory = root_directory + "/restaurants";
+// Keycloak resource setup via extension method
+var keycloakRealm = builder.AddParameter("keycloak-realm", value: "restorate", publishValueAsDefault: true);
+var keycloak = builder.AddKeycloakResource(appHostConfig.Keycloak, useVolumes, useDedicatedPorts);
 
-var initDirs = builder.AddContainer("create-structure", "alpine:latest")
-.WithArgs("sh", "-c", $"""
-                       mkdir -p /var/lib/postgresql/restaurants_tbs
-                       chown -R 999:1000 /var/lib/postgresql/restaurants_tbs
-                       """)
-.WithBindMount(data_directory, "/var/lib/postgresql");
+// RabbitMQ resource setup via extension method
+var rabbitmq = builder.AddRabbitResource(appHostConfig.Rabbit, useVolumes);
 
-var postgres = builder.AddPostgres("postgres", port: portPostgreSql)
-.WithDataBindMount(data_directory + "/data")
-.WithBindMount(data_directory + "/restaurants_tbs","/var/lib/postgresql/restaurants_tbs")
-.WithInitFiles(root_directory + "/init-scripts");
-
-var RestaurantsDbConnectionString = new NpgsqlConnectionStringBuilder()
-{
-    Host = "localhost",
-    Port = portPostgreSql,
-    Database = "Restaurants",
-    Username = "master",
-    Password = "master"
-}.ToString();
-
-var RestaurantsDb = builder.AddConnectionString("RestaurantsDb", RestaurantsDbConnectionString);
-*/
-
+// Scalar resource setup via extension method
+var scalar = builder.AddScalarApiReferenceResource(appHostConfig.Scalar)
+    .WithReference(keycloak);
 #endregion
 
-# region mongodb
-var mongoUsername = builder.AddParameter("mongo-username");
-var mongoPassword = builder.AddParameter("mongo-password", secret: true);
-var mongo = builder.AddMongoDB(
-        name: "mongo",
-        userName: mongoUsername,
-        password: mongoPassword
-    )
-    .WithImageTag("8.2")
-    .WithDataVolume()
-    .WithMongoExpress(res => res.WithHostPort(27017))
-    .WithLifetime(ContainerLifetime.Persistent);
-#endregion
-
-# region redis
-var redisCache = builder.AddRedis(AppHostProjects.RedisCache,
-    port: builder.Environment.IsDevelopment() ? 6380 : null)
-    .WithImageTag("8.2")
-    .WithDataVolume()
-    .WithRedisInsight(res => res.WithHostPort(8001))
-    .WithLifetime(ContainerLifetime.Persistent);
-
-# endregion
-
-#region keycloak
-var keycloakHostname = parameters["keycloak-hostname"];
-
-var keycloakUsername = builder.AddParameter("keycloak-username", "admin");
-var keycloakPassword = builder.AddParameter("keycloak-password", "admin", secret: true);
-var keycloakRealm = builder.AddParameter("keycloak-realm", "restorate");
-
-var keycloak = builder.AddKeycloak(AppHostProjects.Keycloak,
-    port: (keycloakHostname is not null) ? new Uri(keycloakHostname).Port : default,
-    adminUsername: keycloakUsername,
-    adminPassword: keycloakPassword
-)
-.WithRealmImport("restorate-realm.json")
-.WithDataVolume("restorate-keycloak")
-.WithEnvironment("KC_HOSTNAME", keycloakHostname)
-.WithExternalHttpEndpoints()
-.WithLifetime(ContainerLifetime.Persistent);
-
-#endregion
-
-#region RabbitMQ
-var rabbitUsername = builder.AddParameter("rabbitmq-username", "admin", secret: true);
-var rabbitPassword = builder.AddParameter("rabbitmq-password", "admin", secret: true);
-
-var rabbitmq = builder.AddRabbitMQ(AppHostProjects.RabbitMQ, userName: rabbitUsername, password: rabbitPassword)
-    .WithImageTag("4.1")
-    .WithDataVolume(isReadOnly: false)
-    .WithManagementPlugin()
-    .WithLifetime(ContainerLifetime.Persistent);
-
-#endregion
-
-#region Scalar
-
-var apiClientSecret = parameters["api-client-secret"];
-var apiClientId = parameters["api-client-id"];
-
-var scalar = builder.AddScalarApiReference(opts =>
-{
-    opts
-        .WithTheme(ScalarTheme.Purple);
-
-    opts
-        .AddPreferredSecuritySchemes("OAuth2")
-        .AddAuthorizationCodeFlow("OAuth2", flow =>
-        {
-            flow
-                .WithClientId(apiClientId)
-                .WithClientSecret(apiClientSecret);
-        })
-        .AddClientCredentialsFlow("OAuth2", flow =>
-        {
-            flow
-                .WithClientId(apiClientId)
-                .WithClientSecret(apiClientSecret);
-        });
-})
-.WithReference(keycloak);
-
-#endregion
 
 #region Migrations
 var migrations = builder.AddProject<RestoRate_Migrations>("migrations")
@@ -153,8 +47,9 @@ var migrations = builder.AddProject<RestoRate_Migrations>("migrations")
     .WaitFor(restaurantDb);
 #endregion
 
+
 #region ServiceRestaurantApi
-var restaurantApiBearerAudience = builder.AddParameter("restaurant-api-bearer-audience", secret: false);
+var restaurantApiBearerAudience = builder.AddParameter("restaurant-api-bearer-audience", value: "restorate-restaurant-api", publishValueAsDefault: true);
 var restaurantApi = builder.AddProject<RestoRate_Restaurant_Api>(AppHostProjects.ServiceRestaurantApi)
     .WithReference(keycloak)
     .WithReference(restaurantDb)
@@ -169,8 +64,9 @@ scalar.WithApiReference(restaurantApi, options =>
 });
 #endregion
 
+
 #region ServiceModerationApi
-var moderationApiBearerAudience = builder.AddParameter("moderation-api-bearer-audience", secret: false);
+var moderationApiBearerAudience = builder.AddParameter("moderation-api-bearer-audience", value: "restorate-moderation-api", publishValueAsDefault: true);
 var moderationApi = builder.AddProject<RestoRate_Moderation_Api>(AppHostProjects.ServiceModerationApi)
     .WithReference(keycloak)
     .WithReference(rabbitmq)
@@ -184,8 +80,9 @@ scalar.WithApiReference(moderationApi, options =>
 });
 #endregion
 
+
 #region ServiceRatingApi
-var ratingApiBearerAudience = builder.AddParameter("rating-api-bearer-audience", secret: false);
+var ratingApiBearerAudience = builder.AddParameter("rating-api-bearer-audience", value: "restorate-rating-api", publishValueAsDefault: true);
 var ratingApi = builder.AddProject<RestoRate_Rating_Api>(AppHostProjects.ServiceRatingApi)
     .WithReference(keycloak)
     .WithReference(rabbitmq)
@@ -200,10 +97,11 @@ scalar.WithApiReference(ratingApi, options =>
 });
 #endregion
 
+
 #region ServiceReviewApi
 var reviewdb = mongo.AddDatabase(AppHostProjects.ReviewDb, "reviewdb");
 
-var reviewApiBearerAudience = builder.AddParameter("review-api-bearer-audience", secret: false);
+var reviewApiBearerAudience = builder.AddParameter("review-api-bearer-audience", value: "restorate-review-api", publishValueAsDefault: true);
 var reviewApi = builder.AddProject<RestoRate_Review_Api>(AppHostProjects.ServiceReviewApi)
     .WithReference(keycloak)
     .WithReference(rabbitmq)
@@ -218,10 +116,11 @@ scalar.WithApiReference(reviewApi, options =>
 });
 #endregion
 
+
 #region gateway
 var gatewayClientSecret = builder.AddParameter("gateway-client-secret", secret: true);
-var gatewayClientId = builder.AddParameter("gateway-client-id");
-var gatewayAudience = builder.AddParameter("gateway-bearer-audience", secret: false);
+var gatewayClientId = builder.AddParameter("gateway-client-id", value: "restorate-gateway", publishValueAsDefault: true);
+var gatewayAudience = builder.AddParameter("gateway-bearer-audience", value: "restorate-gateway", publishValueAsDefault: true);
 
 var gateway = builder.AddProject<RestoRate_Gateway>(AppHostProjects.Gateway)
     .WithReference(keycloak)
@@ -236,9 +135,10 @@ var gateway = builder.AddProject<RestoRate_Gateway>(AppHostProjects.Gateway)
     .WithEnvironment("KeycloakSettings__ClientSecret", gatewayClientSecret);
 #endregion
 
+
 #region blazordashboard
 var blazordashboardClientSecret = builder.AddParameter("blazordashboard-client-secret", secret: true);
-var blazordashboardClientId = builder.AddParameter("blazordashboard-client-id");
+var blazordashboardClientId = builder.AddParameter("blazordashboard-client-id", value: "restorate-dashboard", publishValueAsDefault: true);
 
 builder.AddProject<RestoRate_BlazorDashboard>(AppHostProjects.BlazorDashboard)
     .WithReference(gateway)
