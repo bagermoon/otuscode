@@ -51,6 +51,19 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
         RegisterDomainEvent(new RestaurantCreatedEvent(this));
     }
 
+    public RestaurantImage AddImage(string url, string? altText = null, int displayOrder = 0, bool isPrimary = false)
+    {
+        if (isPrimary)
+            foreach (var img in _images)
+                img.UnmarkAsPrimary();
+
+        var image = new RestaurantImage(Id, url, altText, displayOrder, isPrimary);
+        _images.Add(image);
+        QueueUpdatedEvent();
+
+        return image;
+    }
+
     public void SetPrimaryImage(Guid imageId)
     {
         var targetImage = _images.FirstOrDefault(i => i.Id == imageId);
@@ -60,17 +73,6 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
             img.UnmarkAsPrimary();
 
         targetImage.MarkAsPrimary();
-        QueueUpdatedEvent();
-    }
-
-    public void AddImage(string url, string? altText = null, int displayOrder = 0, bool isPrimary = false)
-    {
-        if (isPrimary)
-            foreach (var img in _images)
-                img.UnmarkAsPrimary();
-
-        var image = new RestaurantImage(Id, url, altText, displayOrder, isPrimary);
-        _images.Add(image);
         QueueUpdatedEvent();
     }
 

@@ -30,14 +30,9 @@ public sealed class AddRestaurantImageHandler(
             }
 
             var displayOrder = restaurant.Images.Count;
-
-            restaurant.AddImage(request.Url, request.AltText, displayOrder, request.IsPrimary);
+            var addedImage = restaurant.AddImage(request.Url, request.AltText, displayOrder, request.IsPrimary);
 
             await repository.UpdateAsync(restaurant, cancellationToken);
-
-            var addedImage = restaurant.Images
-                .OrderByDescending(img => img.DisplayOrder)
-                .First();
 
             logger.LogInformation(
                 "Изображение {ImageId} добавлено к ресторану {RestaurantId}",

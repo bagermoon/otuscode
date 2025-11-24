@@ -50,6 +50,12 @@ public sealed class UpdateRestaurantHandler(
                 cuisineTypes,
                 tags);
 
+            if (result.Status == ResultStatus.NotFound)
+            {
+                logger.LogWarning("Ресторан не найден: ID {RestaurantId}", request.Dto.RestaurantId);
+                return Result.NotFound();
+            }
+
             if (result.Status != ResultStatus.Ok)
             {
                 logger.LogWarning("Не удалось обновить ресторан");

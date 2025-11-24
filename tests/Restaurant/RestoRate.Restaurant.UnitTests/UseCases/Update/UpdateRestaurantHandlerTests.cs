@@ -95,14 +95,14 @@ public class UpdateRestaurantHandlerTests
                 Arg.Any<Money>(),
                 Arg.Any<IEnumerable<CuisineType>>(),
                 Arg.Any<IEnumerable<Tag>>())
-            .Returns(Task.FromResult(Result.Error()));
+            .Returns(Task.FromResult(Result.NotFound()));
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
         result.IsSuccess.Should().BeFalse();
-        result.Status.Should().Be(ResultStatus.Error);
+        result.Status.Should().Be(ResultStatus.NotFound);
     }
 
     [Fact]
