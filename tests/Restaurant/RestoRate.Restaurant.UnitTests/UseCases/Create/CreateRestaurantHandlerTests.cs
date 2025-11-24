@@ -64,13 +64,7 @@ namespace RestoRate.Restaurant.UnitTests.UseCases.Create
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Assert
-            if (!result.IsSuccess)
-            {
-                _output.WriteLine($"Test failed with status: {result.Status}");
-                _output.WriteLine($"Errors: {string.Join(", ", result.Errors)}");
-            }
-
-            result.IsSuccess.Should().BeTrue($"Expected success but got: {string.Join(", ", result.Errors)}");
+            result.IsSuccess.Should().BeTrue($"Ожидал успеха, но получил: {string.Join(", ", result.Errors)}");
             result.Value.Should().NotBeNull();
             result.Value.RestaurantId.Should().Be(restaurantId);
             result.Value.Name.Should().Be(dto.Name);
@@ -222,7 +216,7 @@ namespace RestoRate.Restaurant.UnitTests.UseCases.Create
             // Arrange
             var dto = TestDataBuilder.CreateValidRestaurantDto();
             var command = new CreateRestaurantCommand(dto);
-            var errorMessage = "Database connection failed";
+            var errorMessage = "Не удалось подключиться к базе данных";
 
             _restaurantService
                 .CreateRestaurant(
