@@ -7,12 +7,13 @@ namespace RestoRate.Restaurant.IntegrationTests.Base;
 
 public class AspireAppHost() : DistributedApplicationFactory(typeof(Projects.RestoRate_AppHost)), IAsyncLifetime
 {
+    public const string EndpointName = "http";
     public async ValueTask InitializeAsync()
     {
         await StartAsync();
         await PlaywrightAuthHelper.SaveAllAuthStatesAsync(DashboardUrl);
     }
-    public string DashboardUrl { get => GetEndpoint(AppHostProjects.BlazorDashboard).ToString(); }
+    public string DashboardUrl { get => GetEndpoint(AppHostProjects.BlazorDashboard, EndpointName).ToString(); }
 
     protected override void OnBuilderCreating(
         DistributedApplicationOptions applicationOptions,
