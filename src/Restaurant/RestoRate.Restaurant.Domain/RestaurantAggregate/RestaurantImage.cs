@@ -28,6 +28,7 @@ public class RestaurantImage : EntityBase<Guid>
         int displayOrder = 0,
         bool isPrimary = false)
     {
+        Id = Guid.NewGuid();
         RestaurantId = restaurantId;
         Url = Guard.Against.NullOrEmpty(url, nameof(url));
         AltText = altText;

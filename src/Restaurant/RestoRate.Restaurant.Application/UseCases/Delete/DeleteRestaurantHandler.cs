@@ -22,6 +22,12 @@ public sealed class DeleteRestaurantHandler(
         {
             var result = await restaurantService.DeleteRestaurant(request.RestaurantId);
 
+            if (result.Status == ResultStatus.NotFound)
+            {
+                logger.LogWarning("Ресторан не найден: ID {RestaurantId}", request.RestaurantId);
+                return Result.NotFound();
+            }
+
             if (result.Status != ResultStatus.Ok)
             {
                 logger.LogWarning("Не удалось удалить ресторан");
