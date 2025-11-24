@@ -1,18 +1,15 @@
 namespace RestoRate.Restaurant.Application.DTOs;
 
-public record RestaurantDto(int Id,
+public record RestaurantDto(
+    Guid RestaurantId,
     string Name,
     string? Description,
     string PhoneNumber,
     string Email,
-    string FullAddress,
-    string House,
-    double Latitude,
-    double Longitude,
-    DayOfWeek DayOfWeek,
-    TimeOnly OpenTime,
-    TimeOnly CloseTime,
-    string CuisineType,
-    decimal AverageCheckAmount,
-    string AverageCheckCurrency,
-    string Tag);
+    AddressDto Address,
+    LocationDto Location,
+    OpenHoursDto OpenHours,
+    MoneyDto AverageCheck,
+    IReadOnlyCollection<string> CuisineTypes,
+    IReadOnlyCollection<string> Tags,
+    IReadOnlyCollection<RestaurantImageDto> Images);

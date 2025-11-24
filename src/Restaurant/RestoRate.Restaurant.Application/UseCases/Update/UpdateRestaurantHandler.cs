@@ -1,9 +1,8 @@
 using Ardalis.Result;
 using Mediator;
-
 using Microsoft.Extensions.Logging;
-
 using RestoRate.Restaurant.Application.DTOs;
+using RestoRate.Restaurant.Application.DTOs.CRUD;
 using RestoRate.Restaurant.Domain.Interfaces;
 using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
@@ -13,9 +12,9 @@ namespace RestoRate.Restaurant.Application.UseCases.Update;
 public sealed class UpdateRestaurantHandler(
     IRestaurantService restaurantService,
     ILogger<UpdateRestaurantHandler> logger)
-    : ICommandHandler<UpdateRestaurantCommand, Result<UpdateRestaurantDto>>
+    : ICommandHandler<UpdateRestaurantCommand, Result>
 {
-    public async ValueTask<Result<UpdateRestaurantDto>> Handle(
+    public async ValueTask<Result> Handle(
         UpdateRestaurantCommand request,
         CancellationToken cancellationToken)
     {
@@ -25,12 +24,18 @@ public sealed class UpdateRestaurantHandler(
         {
             var phoneNumber = new PhoneNumber("+7", request.Dto.PhoneNumber);
             var email = new Email(request.Dto.Email);
-            var address = new Address(request.Dto.FullAddress, request.Dto.House);
-            var location = new Location(request.Dto.Latitude, request.Dto.Longitude);
-            var openHours = new OpenHours(request.Dto.DayOfWeek, request.Dto.OpenTime, request.Dto.CloseTime);
-            var cuisine = CuisineType.FromName(request.Dto.CuisineType);
-            var averageCheck = new Money(request.Dto.AverageCheckAmount, request.Dto.AverageCheckCurrency);
-            var tag = RestaurantTag.FromName(request.Dto.Tag);
+            var address = new Address(request.Dto.Address.FullAddress, request.Dto.Address.House);
+            var location = new Location(request.Dto.Location.Latitude, request.Dto.Location.Longitude);
+            var openHours = new OpenHours(request.Dto.OpenHours.DayOfWeek, request.Dto.OpenHours.OpenTime, request.Dto.OpenHours.CloseTime);
+            var averageCheck = new Money(request.Dto.AverageCheck.Amount, request.Dto.AverageCheck.Currency);
+
+            var cuisineTypes = request.Dto.CuisineTypes
+                .Select(ct => CuisineType.FromName(ct))
+                .ToList();
+
+            var tags = request.Dto.Tags
+                .Select(t => Tag.FromName(t))
+                .ToList();
 
             var result = await restaurantService.UpdateRestaurant(
                 request.Dto.RestaurantId,
@@ -41,9 +46,15 @@ public sealed class UpdateRestaurantHandler(
                 address,
                 location,
                 openHours,
-                cuisine,
                 averageCheck,
-                tag);
+                cuisineTypes,
+                tags);
+
+            if (result.Status == ResultStatus.NotFound)
+            {
+                logger.LogWarning("Ресторан не найден: ID {RestaurantId}", request.Dto.RestaurantId);
+                return Result.NotFound();
+            }
 
             if (result.Status != ResultStatus.Ok)
             {
@@ -52,7 +63,7 @@ public sealed class UpdateRestaurantHandler(
             }
 
             logger.LogInformation("Ресторан обновлен успешно: ID {RestaurantId}", request.Dto.RestaurantId);
-            return result;
+            return Result.Success();
         }
         catch (Exception ex)
         {

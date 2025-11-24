@@ -1,5 +1,5 @@
 using Ardalis.Result;
-
+using RestoRate.Restaurant.Domain.RestaurantAggregate;
 using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
 
@@ -7,7 +7,7 @@ namespace RestoRate.Restaurant.Domain.Interfaces;
 
 public interface IRestaurantService
 {
-    Task<Result<int>> CreateRestaurant(
+    Task<Result<Guid>> CreateRestaurant(
         string name,
         string description,
         PhoneNumber phoneNumber,
@@ -15,12 +15,13 @@ public interface IRestaurantService
         Address address,
         Location location,
         OpenHours openHours,
-        CuisineType cuisineType,
         Money averageCheck,
-        RestaurantTag tag);
+        IEnumerable<CuisineType> cuisineTypes,
+        IEnumerable<Tag> tags,
+        IEnumerable<(string Url, string? AltText, bool IsPrimary)>? images = null);
 
     Task<Result> UpdateRestaurant(
-        int restaurantId,
+        Guid restaurantId,
         string name,
         string description,
         PhoneNumber phoneNumber,
@@ -28,9 +29,13 @@ public interface IRestaurantService
         Address address,
         Location location,
         OpenHours openHours,
-        CuisineType cuisineType,
         Money averageCheck,
-        RestaurantTag tag);
+        IEnumerable<CuisineType> cuisineTypes,
+        IEnumerable<Tag> tags);
 
-    Task<Result> DeleteRestaurant(int restaurantId);
+    Task<Result> DeleteRestaurant(Guid restaurantId);
+
+    Task<Result> AddRestaurantImage(Guid restaurantId, string url, string? altText = null, bool isPrimary = false);
+    Task<Result> RemoveRestaurantImage(Guid restaurantId, Guid imageId);
+    Task<Result> SetPrimaryImage(Guid restaurantId, Guid imageId);
 }

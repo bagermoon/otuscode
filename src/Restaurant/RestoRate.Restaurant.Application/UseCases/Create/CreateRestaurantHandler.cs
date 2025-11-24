@@ -1,11 +1,12 @@
 using Ardalis.Result;
+using Ardalis.SharedKernel;
 using Mediator;
 using Microsoft.Extensions.Logging;
-
 using RestoRate.Abstractions.Messaging;
 using RestoRate.Contracts.Restaurant.Events;
 using RestoRate.Restaurant.Application.DTOs;
 using RestoRate.Restaurant.Domain.Interfaces;
+using RestoRate.Restaurant.Domain.RestaurantAggregate;
 using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
 
@@ -27,12 +28,21 @@ public sealed class CreateRestaurantHandler(
         {
             var phoneNumber = new PhoneNumber("+7", request.Dto.PhoneNumber);
             var email = new Email(request.Dto.Email);
-            var address = new Address(request.Dto.FullAddress, request.Dto.House);
-            var location = new Location(request.Dto.Latitude, request.Dto.Longitude);
-            var openHours = new OpenHours(request.Dto.DayOfWeek, request.Dto.OpenTime, request.Dto.CloseTime);
-            var cuisine = CuisineType.FromName(request.Dto.CuisineType);
-            var averageCheck = new Money(request.Dto.AverageCheckAmount, request.Dto.AverageCheckCurrency);
-            var tag = RestaurantTag.FromName(request.Dto.Tag);
+            var address = new Address(request.Dto.Address.FullAddress, request.Dto.Address.House);
+            var location = new Location(request.Dto.Location.Latitude, request.Dto.Location.Longitude);
+            var openHours = new OpenHours(request.Dto.OpenHours.DayOfWeek, request.Dto.OpenHours.OpenTime, request.Dto.OpenHours.CloseTime);
+            var averageCheck = new Money(request.Dto.AverageCheck.Amount, request.Dto.AverageCheck.Currency);
+
+            var cuisineTypes = request.Dto.CuisineTypes
+                .Select(ct => CuisineType.FromName(ct))
+                .ToList();
+
+            var tags = request.Dto.Tags
+                .Select(t => Tag.FromName(t))
+                .ToList();
+
+            var images = request.Dto.Images?
+                .Select(img => (img.Url, img.AltText, img.IsPrimary));
 
             var result = await restaurantService.CreateRestaurant(
                 request.Dto.Name,
@@ -42,9 +52,10 @@ public sealed class CreateRestaurantHandler(
                 address,
                 location,
                 openHours,
-                cuisine,
                 averageCheck,
-                tag);
+                cuisineTypes,
+                tags,
+                images);
 
             if (result.Status != ResultStatus.Ok)
             {
@@ -52,29 +63,32 @@ public sealed class CreateRestaurantHandler(
                 return Result<RestaurantDto>.Error(result.Errors.FirstOrDefault() ?? "Неизвестная ошибка");
             }
 
+            Guid restaurantId = result.Value;
+
             await integrationEventBus.PublishAsync(new RestaurantCreatedEvent
                 (
-                    RestaurantId: result.Value,
+                    RestaurantId: restaurantId,
                     Name: request.Dto.Name
-                ), cancellationToken);
+                ),
+                cancellationToken);
 
             var dto = new RestaurantDto(
-                result.Value,
+                restaurantId,
                 request.Dto.Name,
                 request.Dto.Description,
                 phoneNumber.ToString(),
                 email.Address,
-                address.FullAddress,
-                address.House,
-                location.Latitude,
-                location.Longitude,
-                openHours.DayOfWeek,
-                openHours.OpenTime,
-                openHours.CloseTime,
-                cuisine.Name,
-                averageCheck.Amount,
-                averageCheck.Currency,
-                tag.Name);
+                new AddressDto(address.FullAddress, address.House),
+                new LocationDto(location.Latitude, location.Longitude),
+                new OpenHoursDto(
+                    openHours.DayOfWeek,
+                    openHours.OpenTime,
+                    openHours.CloseTime),
+                new MoneyDto(averageCheck.Amount, averageCheck.Currency),
+                cuisineTypes.Select(ct => ct.Name).ToList(),
+                tags.Select(t => t.Name).ToList(),
+                Array.Empty<RestaurantImageDto>() // изображения тут по сути не нужны
+            );
 
             logger.LogInformation("Ресторан создан успешно: ID {RestaurantId}", result.Value);
             return Result<RestaurantDto>.Success(dto);

@@ -11,7 +11,7 @@ internal static class GetRestaurantByIdEndpoint
 {
     public static RouteGroupBuilder MapGetRestaurantById(this RouteGroupBuilder group)
     {
-        group.MapGet("/{id:int}", async (int id, ISender sender, CancellationToken ct) =>
+        group.MapGet("/{id:Guid}", async (Guid id, ISender sender, CancellationToken ct) =>
         {
             var result = await sender.Send(new GetRestaurantByIdQuery(id), ct);
             return result.Status switch

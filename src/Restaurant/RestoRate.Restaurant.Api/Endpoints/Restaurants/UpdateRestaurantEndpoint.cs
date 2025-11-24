@@ -1,8 +1,7 @@
 using Ardalis.Result;
-
 using Mediator;
-
 using RestoRate.Restaurant.Application.DTOs;
+using RestoRate.Restaurant.Application.DTOs.CRUD;
 using RestoRate.Restaurant.Application.UseCases.Update;
 
 namespace RestoRate.Restaurant.Api.Endpoints.Restaurants;
@@ -11,7 +10,7 @@ internal static class UpdateRestaurantEndpoint
 {
     public static RouteGroupBuilder MapUpdateRestaurant(this RouteGroupBuilder group)
     {
-        group.MapPut("/{id:int}", async (int id, UpdateRestaurantDto body, ISender sender, CancellationToken ct) =>
+        group.MapPut("/{id:guid}", async (Guid id, UpdateRestaurantDto body, ISender sender, CancellationToken ct) =>
         {
             // Ensure path ID is authoritative
             var dto = body with { RestaurantId = id };
