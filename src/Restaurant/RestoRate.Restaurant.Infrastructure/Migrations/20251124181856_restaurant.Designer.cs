@@ -12,8 +12,8 @@ using RestoRate.Restaurant.Infrastructure.Data;
 namespace RestoRate.Restaurant.Infrastructure.Migrations
 {
     [DbContext(typeof(RestaurantDbContext))]
-    [Migration("20251123194402_AddMissingRestaurantFields")]
-    partial class AddMissingRestaurantFields
+    [Migration("20251124181856_restaurant")]
+    partial class restaurant
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
