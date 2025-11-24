@@ -14,11 +14,11 @@ public static class RestaurantTestData
 {
     public static CreateRestaurantDto CreateValidRestaurantRequest(string? name = null)
     {
-        var uniqueName = name ?? $"Test Restaurant {Guid.NewGuid().ToString()[..8]}";
+        var uniqueName = name ?? $"Закусочная \"Тесткейк\" {Guid.NewGuid().ToString()[..8]}";
 
         return new CreateRestaurantDto(
             Name: uniqueName,
-            Description: "Integration test restaurant",
+            Description: "Тестирование...",
             PhoneNumber: "1234567890",
             Email: $"test{Guid.NewGuid().ToString()[..8]}@example.com",
             Address: new AddressDto("ул. Тестовая", "д. 1"),
@@ -49,8 +49,8 @@ public static class RestaurantTestData
     {
         return new UpdateRestaurantDto(
             RestaurantId: restaurantId,
-            Name: name ?? "Updated Restaurant",
-            Description: "Updated description",
+            Name: name ?? "Ресторан \"Обновлень\"",
+            Description: "Обновление...",
             PhoneNumber: "9876543210",
             Email: "updated@example.com",
             Address: new AddressDto("ул. Обновленная", "д. 2"),

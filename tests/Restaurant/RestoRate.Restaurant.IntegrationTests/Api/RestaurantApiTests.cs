@@ -45,15 +45,11 @@ public class RestaurantApiTests : IAsyncLifetime
     public async Task CreateRestaurant_ValidData_ReturnsCreatedRestaurant()
     {
         // Arrange
-        var request = RestaurantTestData.CreateValidRestaurantRequest("Integration Test Restaurant");
+        var request = RestaurantTestData.CreateValidRestaurantRequest("Ресторан для тестирования интеграции");
 
         // Act
         var response = await _client.PostAsJsonAsync("/restaurants", request);
-
-        // ✅ Выводим что вернул сервер
         var content = await response.Content.ReadAsStringAsync();
-        _output.WriteLine($"Status: {response.StatusCode}");
-        _output.WriteLine($"Response Content: {content}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created,
@@ -65,7 +61,7 @@ public class RestaurantApiTests : IAsyncLifetime
         restaurant.Name.Should().Be(request.Name);
 
         _createdRestaurantIds.Add(restaurant.RestaurantId);
-        _output.WriteLine($"Created restaurant with ID: {restaurant.RestaurantId}");
+        _output.WriteLine($"Созданный ресторан с ID: {restaurant.RestaurantId}");
     }
 
     [Fact]
@@ -106,14 +102,14 @@ public class RestaurantApiTests : IAsyncLifetime
     public async Task UpdateRestaurant_ValidData_ReturnsNoContent()
     {
         // Arrange - создаем ресторан
-        var createRequest = RestaurantTestData.CreateValidRestaurantRequest("Original Name");
+        var createRequest = RestaurantTestData.CreateValidRestaurantRequest("Гурман Бар");
         var createResponse = await _client.PostAsJsonAsync("/restaurants", createRequest);
         var createdRestaurant = await createResponse.Content.ReadFromJsonAsync<RestaurantDto>();
         _createdRestaurantIds.Add(createdRestaurant!.RestaurantId);
 
         var updateRequest = RestaurantTestData.CreateValidUpdateRequest(
             createdRestaurant.RestaurantId,
-            "Updated Name");
+            "Муссон");
 
         // Act
         var response = await _client.PutAsJsonAsync(
@@ -128,8 +124,8 @@ public class RestaurantApiTests : IAsyncLifetime
         var updatedRestaurant = await getResponse.Content.ReadFromJsonAsync<RestaurantDto>();
 
         updatedRestaurant.Should().NotBeNull();
-        updatedRestaurant!.Name.Should().Be("Updated Name");
-        updatedRestaurant.Description.Should().Be("Updated description");
+        updatedRestaurant!.Name.Should().Be("Муссон");
+        updatedRestaurant.Description.Should().Be("Муссон обновился");
     }
 
     [Fact]
@@ -138,14 +134,6 @@ public class RestaurantApiTests : IAsyncLifetime
         // Arrange
         var createRequest = RestaurantTestData.CreateValidRestaurantRequest();
         var createResponse = await _client.PostAsJsonAsync("/restaurants", createRequest);
-
-        // ✅ Отладка
-        if (!createResponse.IsSuccessStatusCode)
-        {
-            var errorContent = await createResponse.Content.ReadAsStringAsync();
-            _output.WriteLine($"Create failed: {createResponse.StatusCode}");
-            _output.WriteLine($"Error: {errorContent}");
-        }
 
         createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
