@@ -1,5 +1,3 @@
-using RestoRate.E2ETests.Auth;
-
 namespace RestoRate.E2ETests.Base;
 
 [Collection("AspireAppHost collection")]

@@ -1,6 +1,3 @@
-using RestoRate.E2ETests.Auth;
-using RestoRate.E2ETests.Base;
-
 namespace RestoRate.E2ETests;
 
 [User(TestUser.Admin)]
