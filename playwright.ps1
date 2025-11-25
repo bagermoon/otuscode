@@ -4,7 +4,7 @@ param(
 )
 
 $solutionRoot = $PSScriptRoot
-$targetDir = Join-Path $solutionRoot "artifacts/bin/RestoRate.IntegrationTests/debug"
+$targetDir = Join-Path $solutionRoot "artifacts/bin/RestoRate.E2ETests/debug"
 $scriptPath = Join-Path $targetDir "playwright.ps1"
 
 if (-Not (Test-Path $scriptPath)) {

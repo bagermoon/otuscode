@@ -1,8 +1,4 @@
-using Microsoft.Playwright;
-using Microsoft.Playwright.Xunit.v3;
-using RestoRate.IntegrationTests.Auth;
-
-namespace RestoRate.Restaurant.IntegrationTests.Base;
+namespace RestoRate.E2ETests.Base;
 
 [Collection("AspireAppHost collection")]
 [WithTestName]

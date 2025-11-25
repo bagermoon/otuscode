@@ -1,8 +1,4 @@
-using System;
-
-using Microsoft.Playwright;
-
-namespace RestoRate.IntegrationTests.Auth;
+namespace RestoRate.E2ETests.Auth;
 
 public static class PlaywrightAuthHelper
 {

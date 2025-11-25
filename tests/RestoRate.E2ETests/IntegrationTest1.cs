@@ -1,9 +1,4 @@
-using Microsoft.Playwright;
-
-using RestoRate.IntegrationTests.Auth;
-using RestoRate.Restaurant.IntegrationTests.Base;
-
-namespace RestoRate.Restaurant.IntegrationTests;
+namespace RestoRate.E2ETests;
 
 [User(TestUser.Admin)]
 public class IntegrationTest1(AspireAppHost appHost) : BasePageTest(appHost)

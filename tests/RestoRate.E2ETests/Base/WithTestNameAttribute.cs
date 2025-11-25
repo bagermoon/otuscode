@@ -1,7 +1,7 @@
 using System.Reflection;
 using Xunit.v3;
 
-namespace RestoRate.Restaurant.IntegrationTests.Base;
+namespace RestoRate.E2ETests.Base;
 
 public class WithTestNameAttribute : BeforeAfterTestAttribute
 {
