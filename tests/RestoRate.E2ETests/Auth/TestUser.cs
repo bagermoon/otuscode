@@ -1,4 +1,4 @@
-namespace RestoRate.IntegrationTests.Auth;
+namespace RestoRate.E2ETests.Auth;
 
 public enum TestUser
 {

@@ -1,9 +1,6 @@
-using Aspire.Hosting;
-using Microsoft.Extensions.Hosting;
-using RestoRate.IntegrationTests.Auth;
-using RestoRate.ServiceDefaults;
+using RestoRate.E2ETests.Auth;
 
-namespace RestoRate.Restaurant.IntegrationTests.Base;
+namespace RestoRate.E2ETests.Base;
 
 public class AspireAppHost() : DistributedApplicationFactory(typeof(Projects.RestoRate_AppHost)), IAsyncLifetime
 {
