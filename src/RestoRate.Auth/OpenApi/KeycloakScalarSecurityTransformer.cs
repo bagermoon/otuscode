@@ -1,5 +1,3 @@
-using System.Threading;
-
 using Ardalis.GuardClauses;
 
 using Microsoft.AspNetCore.Authentication;

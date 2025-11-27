@@ -1,27 +1,20 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <IsPackable>false</IsPackable>
-    <IsTestProject>true</IsTestProject>
-    <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
-    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
-  </PropertyGroup>
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
-    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.Testing" />
     <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="Microsoft.Playwright.Xunit.v3" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="Testcontainers.PostgreSql" />
     <PackageReference Include="xunit.runner.visualstudio" />
     <PackageReference Include="xunit.v3" />
     <PackageReference Include="FluentAssertions" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Restaurant\RestoRate.Restaurant.Api\RestoRate.Restaurant.Api.csproj" />
+    <ProjectReference Include="..\..\..\src\Restaurant\RestoRate.Restaurant.Infrastructure\RestoRate.Restaurant.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\src\RestoRate.AppHost\RestoRate.AppHost.csproj" />
     <ProjectReference Include="..\..\..\src\RestoRate.ServiceDefaults\RestoRate.ServiceDefaults.csproj" />
     <ProjectReference Include="..\..\..\src\Restaurant\RestoRate.Restaurant.Application\RestoRate.Restaurant.Application.csproj" />
@@ -29,14 +22,17 @@
     <ProjectReference Include="..\..\..\src\RestoRate.SharedKernel\RestoRate.SharedKernel.csproj" />
     <ProjectReference Include="..\..\..\src\RestoRate.Abstractions\RestoRate.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\src\RestoRate.Contracts\RestoRate.Contracts.csproj" />
+    <ProjectReference Include="..\..\RestoRate.Testing.Common\RestoRate.Testing.Common.csproj" />
   </ItemGroup>
   
   <ItemGroup>
     <Using Include="System.Net" />
     <Using Include="Microsoft.Extensions.DependencyInjection" />
-    <Using Include="Aspire.Hosting.ApplicationModel" />
-    <Using Include="Aspire.Hosting.Testing" />
     <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="AspireAppHost.cs" />
   </ItemGroup>
 
 </Project>

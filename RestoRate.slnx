@@ -39,7 +39,9 @@
     <Project Path="src/Review/RestoRate.Review.Infrastructure/RestoRate.Review.Infrastructure.csproj" Id="66ad9b0f-75b5-4aa5-af9e-aea62586f8a2" />
   </Folder>
   <Folder Name="/tests/">
+    <File Path="tests/Directory.Build.props" />
     <Project Path="tests/RestoRate.E2ETests/RestoRate.E2ETests.csproj" Id="54ec265a-9851-473a-9d69-9732332ad8c8" />
+    <Project Path="tests/RestoRate.Testing.Common/RestoRate.Testing.Common.csproj" />
   </Folder>
   <Folder Name="/tests/Restaurant/">
     <Project Path="tests/Restaurant/RestoRate.Restaurant.IntegrationTests/RestoRate.Restaurant.IntegrationTests.csproj" Id="54ec265a-9851-473a-9d69-9732332ad8c9" />
