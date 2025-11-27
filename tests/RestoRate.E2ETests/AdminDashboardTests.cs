@@ -1,10 +1,10 @@
 namespace RestoRate.E2ETests;
 
 [User(TestUser.Admin)]
-public class IntegrationTest1(AspireAppHost appHost) : BasePageTest(appHost)
+public class AdminDashboardTests(AspireAppHost appHost) : BasePageTest(appHost)
 {
     [Fact]
-    public async Task DashboardIsLoaded()
+    public async Task AuthorizedUser_SeesLogoutButton()
     {
         await Page.GotoAsync("/");
         // Assert: Logout button is visible by form action URL

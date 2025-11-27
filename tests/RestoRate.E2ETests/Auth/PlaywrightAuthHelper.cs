@@ -11,8 +11,11 @@ public static class PlaywrightAuthHelper
 
     public static async Task SaveAuthStateAsync(string dashboardUrl, TestUser user)
     {
-        if (!Users.TryGetValue(user, out var creds))
-            throw new ArgumentException($"User '{user}' not found.");
+        var username = TestUsers.Get(user).Name;
+        var password = TestUsers.Get(user).Password;
+
+        if (password == null)
+            return;
 
         using var playwright = await Playwright.CreateAsync();
         var browser = await playwright.Chromium.LaunchAsync(new() { Headless = true });
@@ -21,8 +24,8 @@ public static class PlaywrightAuthHelper
 
         await page.GotoAsync(dashboardUrl);
         await page.GetByRole(AriaRole.Link, new() { Name = "Login" }).ClickAsync();
-        await page.GetByRole(AriaRole.Textbox, new() { Name = "Username or email" }).FillAsync(creds.Username);
-        await page.GetByRole(AriaRole.Textbox, new() { Name = "Password" }).FillAsync(creds.Password);
+        await page.GetByRole(AriaRole.Textbox, new() { Name = "Username or email" }).FillAsync(username);
+        await page.GetByRole(AriaRole.Textbox, new() { Name = "Password" }).FillAsync(password);
         await page.GetByRole(AriaRole.Button, new() { Name = "Sign In" }).ClickAsync();
         await page.GetByRole(AriaRole.Button, new() { Name = "Logout" }).IsVisibleAsync();
 

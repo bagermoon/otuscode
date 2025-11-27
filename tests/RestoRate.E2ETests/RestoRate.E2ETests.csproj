@@ -1,16 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <IsPackable>false</IsPackable>
-    <IsTestProject>true</IsTestProject>
-    <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
-    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.Testing" />
     <PackageReference Include="coverlet.collector" />
@@ -23,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\RestoRate.AppHost\RestoRate.AppHost.csproj" />
     <ProjectReference Include="..\..\src\RestoRate.ServiceDefaults\RestoRate.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\RestoRate.Testing.Common\RestoRate.Testing.Common.csproj" />
   </ItemGroup>
   
   <ItemGroup>

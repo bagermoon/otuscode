@@ -12,8 +12,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
 using MongoDB.Driver;
-using MongoDB.Driver.Core.Configuration;
-using MongoDB.EntityFrameworkCore.Extensions;
 using MongoDB.EntityFrameworkCore.Infrastructure;
 
 using RestoRate.BuildingBlocks.Data.Interceptors;
