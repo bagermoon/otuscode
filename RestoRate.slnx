@@ -47,4 +47,7 @@
     <Project Path="tests/Restaurant/RestoRate.Restaurant.IntegrationTests/RestoRate.Restaurant.IntegrationTests.csproj" Id="54ec265a-9851-473a-9d69-9732332ad8c9" />
     <Project Path="tests/Restaurant/RestoRate.Restaurant.UnitTests/RestoRate.Restaurant.UnitTests.csproj" Id="95acd291-b54a-4700-8ac6-e2b7ae8e49e2" />
   </Folder>
+  <Folder Name="/tests/Review/">
+    <Project Path="tests/Review/RestoRate.Review.IntegrationTests/RestoRate.Review.IntegrationTests.csproj" Id="157f74ad-95d4-4108-895f-6dbe7527ac10" />
+  </Folder>
 </Solution>

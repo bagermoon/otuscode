@@ -1,14 +1,9 @@
-using System.Data.Common;
-
 using MassTransit;
-
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.EntityFrameworkCore;
-
-using RestoRate.BuildingBlocks.Data.Interceptors;
 using RestoRate.BuildingBlocks.Data.Migrations;
 using RestoRate.Restaurant.Infrastructure.Data;
+using RestoRate.ServiceDefaults;
 using Testcontainers.PostgreSql;
 
 namespace RestoRate.Restaurant.IntegrationTests;
@@ -26,31 +21,6 @@ public class RestaurantWebApplicationFactory
     {
         builder.ConfigureTestServices(services =>
         {
-            var dbContextDescriptor = services.SingleOrDefault(
-                    d => d.ServiceType == 
-                        typeof(DbContextOptions<RestaurantDbContext>));
-
-            if (dbContextDescriptor != null)
-            {
-                services.Remove(dbContextDescriptor);
-            }
-
-            var dbConnectionDescriptor = services.SingleOrDefault(
-                d => d.ServiceType == typeof(DbConnection));
-
-            if (dbConnectionDescriptor != null)
-            {
-                services.Remove(dbConnectionDescriptor);
-            }
-
-            services.AddDbContext<RestaurantDbContext>((sp, options) =>
-            {
-                options
-                    .UseNpgsql(_postgreSqlContainer.GetConnectionString())
-                    .AddInterceptors(sp.GetRequiredService<EventDispatchInterceptor>())
-                ;
-            }, ServiceLifetime.Singleton);
-
             // Add MassTransit In-Memory Test Harness
             services.AddMassTransitTestHarness(cfg =>
             {
@@ -63,6 +33,11 @@ public class RestaurantWebApplicationFactory
     public async ValueTask InitializeAsync()
     {
         await _postgreSqlContainer.StartAsync();
+        // Set environment variable before host is built
+        Environment.SetEnvironmentVariable($"ConnectionStrings__{AppHostProjects.RestaurantDb}", _postgreSqlContainer.GetConnectionString());
+        Environment.SetEnvironmentVariable("Aspire__Npgsql__EntityFrameworkCore__PostgreSQL__DisableHealthChecks", "true");
+        Environment.SetEnvironmentVariable("Aspire__Npgsql__EntityFrameworkCore__PostgreSQL__DisableTracing", "true");
+        Environment.SetEnvironmentVariable("Aspire__Npgsql__EntityFrameworkCore__PostgreSQL__DisableMetrics", "true");
         // Apply EF Core migrations
         await DbMigrationRunner.RunAsync<RestaurantDbContext>(Services);
     }

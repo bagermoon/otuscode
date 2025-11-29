@@ -2,13 +2,6 @@ namespace RestoRate.E2ETests.Auth;
 
 public static class PlaywrightAuthHelper
 {
-    private static readonly Dictionary<TestUser, (string Username, string Password)> Users = new()
-    {
-        [TestUser.Admin] = ("admin", "admin"),
-        [TestUser.User] = ("user", "user")
-        // Add more as needed
-    };
-
     public static async Task SaveAuthStateAsync(string dashboardUrl, TestUser user)
     {
         var username = TestUsers.Get(user).Name;
@@ -42,7 +35,9 @@ public static class PlaywrightAuthHelper
 
     public static async Task SaveAllAuthStatesAsync(string dashboardUrl)
     {
-        var tasks = Users.Keys.Select(user => SaveAuthStateAsync(dashboardUrl, user));
-        await Task.WhenAll(tasks);
+        await Task.WhenAll(
+            Enum.GetValues<TestUser>()
+            .Select(user => SaveAuthStateAsync(dashboardUrl, user))
+        );
     }
 }

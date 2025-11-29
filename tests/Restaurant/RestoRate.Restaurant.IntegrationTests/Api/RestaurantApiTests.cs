@@ -14,7 +14,7 @@ public class RestaurantApiTests : IClassFixture<RestaurantWebApplicationFactory>
     private readonly HttpClient _adminClient;
     private readonly ITestOutputHelper _output;
     private readonly List<Guid> _createdRestaurantIds = new();
-    private CancellationToken CancellationToken { get => _testContextAccessor.Current.CancellationToken; }
+    private CancellationToken CancellationToken => _testContextAccessor.Current.CancellationToken;
 
     public RestaurantApiTests(
         RestaurantWebApplicationFactory factory,
@@ -192,8 +192,8 @@ public class RestaurantApiTests : IClassFixture<RestaurantWebApplicationFactory>
 
         var result = await getAllRestoResponse.Content.ReadFromJsonAsync<PagedResultDto>(CancellationToken);
         result.Should().NotBeNull();
-        result!.Items.Should().HaveCountGreaterOrEqualTo(3);
-        result.TotalCount.Should().BeGreaterOrEqualTo(3);
+        result!.Items.Should().HaveCountGreaterThanOrEqualTo(3);
+        result.TotalCount.Should().BeGreaterThanOrEqualTo(3);
     }
 
     [Fact]
