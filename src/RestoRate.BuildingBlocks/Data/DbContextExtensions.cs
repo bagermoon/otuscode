@@ -75,7 +75,7 @@ public static class DbContextExtensions
                 mongoClient: client,
                 databaseName: databaseName,
                 builder => configureDbContextOptions?.Invoke(sp, builder)
-            );
+            ).AddInterceptors(sp.GetRequiredService<EventDispatchInterceptor>());
         });
 
         builder.Services.TryAddSingleton<EventDispatchInterceptor>();

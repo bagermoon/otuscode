@@ -1,5 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
+  <PropertyGroup>
+    <RootNamespace>RestoRate.Restaurant.IntegrationTests</RootNamespace>
+    <!--
+    This template uses native xUnit.net command line options when using 'dotnet run' and
+    VSTest by default when using 'dotnet test'. For more information on how to enable support
+    for Microsoft Testing Platform, please visit:
+      https://xunit.net/docs/getting-started/v3/microsoft-testing-platform
+    -->
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="coverlet.collector" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
@@ -15,8 +25,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Restaurant\RestoRate.Restaurant.Api\RestoRate.Restaurant.Api.csproj" />
     <ProjectReference Include="..\..\..\src\Restaurant\RestoRate.Restaurant.Infrastructure\RestoRate.Restaurant.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\..\src\RestoRate.AppHost\RestoRate.AppHost.csproj" />
-    <ProjectReference Include="..\..\..\src\RestoRate.ServiceDefaults\RestoRate.ServiceDefaults.csproj" />
     <ProjectReference Include="..\..\..\src\Restaurant\RestoRate.Restaurant.Application\RestoRate.Restaurant.Application.csproj" />
     <ProjectReference Include="..\..\..\src\Restaurant\RestoRate.Restaurant.Domain\RestoRate.Restaurant.Domain.csproj" />
     <ProjectReference Include="..\..\..\src\RestoRate.SharedKernel\RestoRate.SharedKernel.csproj" />
