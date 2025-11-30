@@ -4,15 +4,11 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using RestoRate.Abstractions.Messaging;
 using RestoRate.Contracts.Restaurant.Events;
-using RestoRate.Restaurant.Application.DTOs;
-using RestoRate.Restaurant.Application.DTOs.CRUD;
 using RestoRate.Restaurant.Application.UseCases.Create;
 using RestoRate.Restaurant.Domain.Interfaces;
 using RestoRate.Restaurant.UnitTests.Helpers;
 using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
-
-using Xunit;
 
 namespace RestoRate.Restaurant.UnitTests.UseCases.Create
 {
