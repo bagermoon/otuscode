@@ -1,18 +1,18 @@
 using MassTransit;
-
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-
 using MongoDB.Driver;
 using RestoRate.ServiceDefaults;
 using Testcontainers.MongoDb;
+using DotNet.Testcontainers.Containers;
 
 namespace RestoRate.Review.IntegrationTests;
 
 public class ReviewWebApplicationFactory
-    : WebApplicationFactory<Program>, IAsyncLifetime
+    : BaseWebApplicationFactory<Program>
 {
-    private readonly MongoDbContainer _mongoDbContainer = new MongoDbBuilder().Build();
+    private readonly MongoDbContainer _mongo = new MongoDbBuilder().Build();
+
+    protected override IReadOnlyList<IContainer> Containers => [_mongo];
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureTestServices(services =>
@@ -23,31 +23,21 @@ public class ReviewWebApplicationFactory
             });
         });
     }
-    public async ValueTask InitializeAsync()
+    protected async override Task OnInitializeAsync()
     {
-        await _mongoDbContainer.StartAsync();
+        await _mongo.StartAsync();
 
-        var connectionString = _mongoDbContainer.GetConnectionString();
+        var connectionString = _mongo.GetConnectionString();
         var connectionStringBuilder = new MongoUrlBuilder(connectionString)
         {
-            DatabaseName = "reviewdb",
+            DatabaseName = AppHostProjects.ReviewDb,
             AuthenticationSource = "admin",
         };
 
         // Set environment variable before host is built
-        Environment.SetEnvironmentVariable($"ConnectionStrings__{AppHostProjects.ReviewDb}", connectionStringBuilder.ToString());
-        Environment.SetEnvironmentVariable("Aspire__MongoDB__Driver__DisableHealthChecks", "true");
-        Environment.SetEnvironmentVariable("Aspire__MongoDB__Driver__DisableTracing", "true");
+        ContainerEnvironmentHelpers.SetMongoEnvironmentVariables(
+            connectionString: connectionStringBuilder.ToString(),
+            connectionName: AppHostProjects.ReviewDb
+        );
     }
-
-#pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
-    /// <summary>
-    /// <see cref="https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-disposeasync"/>
-    /// </summary>
-    public override async ValueTask DisposeAsync()
-    {
-        await _mongoDbContainer.DisposeAsync();
-        await base.DisposeAsync();
-    }
-#pragma warning restore CA1816 // Dispose methods should call SuppressFinalize
 }

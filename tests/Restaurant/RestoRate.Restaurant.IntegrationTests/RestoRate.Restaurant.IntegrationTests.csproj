@@ -15,7 +15,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="Testcontainers.PostgreSql" />
     <PackageReference Include="xunit.runner.visualstudio" />
     <PackageReference Include="xunit.v3" />
@@ -24,12 +23,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Restaurant\RestoRate.Restaurant.Api\RestoRate.Restaurant.Api.csproj" />
-    <ProjectReference Include="..\..\..\src\Restaurant\RestoRate.Restaurant.Infrastructure\RestoRate.Restaurant.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\..\src\Restaurant\RestoRate.Restaurant.Application\RestoRate.Restaurant.Application.csproj" />
-    <ProjectReference Include="..\..\..\src\Restaurant\RestoRate.Restaurant.Domain\RestoRate.Restaurant.Domain.csproj" />
-    <ProjectReference Include="..\..\..\src\RestoRate.SharedKernel\RestoRate.SharedKernel.csproj" />
-    <ProjectReference Include="..\..\..\src\RestoRate.Abstractions\RestoRate.Abstractions.csproj" />
-    <ProjectReference Include="..\..\..\src\RestoRate.Contracts\RestoRate.Contracts.csproj" />
     <ProjectReference Include="..\..\RestoRate.Testing.Common\RestoRate.Testing.Common.csproj" />
   </ItemGroup>
   

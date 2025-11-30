@@ -16,6 +16,8 @@
     <PackageVersion Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.5.2" />
     <PackageVersion Include="Aspire.RabbitMQ.Client.v7" Version="9.5.2" />
     <PackageVersion Include="Aspire.StackExchange.Redis" Version="13.0.0" />
+    <PackageVersion Include="AutoFixture.AutoNSubstitute" Version="4.18.1" />
+    <PackageVersion Include="AutoFixture.Xunit3" Version="4.19.0" />
     <PackageVersion Include="EFCore.NamingConventions" Version="9.0.0" />
     <PackageVersion Include="MassTransit" Version="8.5.5" />
     <PackageVersion Include="MassTransit.RabbitMQ" Version="8.5.5" />
@@ -48,8 +50,10 @@
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.10" />
     <PackageVersion Include="Scalar.Aspire" Version="0.7.3" />
     <PackageVersion Include="Aspire.Keycloak.Authentication" Version="9.5.2-preview.1.25522.3" />
+    <PackageVersion Include="TestContainers" Version="4.9.0" />
     <PackageVersion Include="Testcontainers.MongoDb" Version="4.9.0" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.9.0" />
+    <PackageVersion Include="xunit.v3.extensibility.core" Version="3.2.1" />
     <PackageVersion Include="Yarp.ReverseProxy" Version="2.3.0" />
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery.Yarp" Version="10.0.0" />
     <PackageVersion Include="Aspire.Hosting.Testing" Version="9.5.2" />
@@ -65,6 +69,5 @@
     <PackageVersion Include="xunit.v3" Version="3.2.1" />
     <PackageVersion Include="NSubstitute" Version="5.3.0" />
     <PackageVersion Include="FluentAssertions" Version="8.8.0" />
-    <PackageVersion Include="AutoFixture" Version="4.18.1" />
   </ItemGroup>
 </Project>
