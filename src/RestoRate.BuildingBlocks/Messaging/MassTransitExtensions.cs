@@ -14,15 +14,24 @@ public static class MassTransitExtensions
         string connectionName,
         Action<IBusRegistrationConfigurator>? configure = null)
     {
+        var connectionString = builder.Configuration.GetConnectionString(connectionName);
+
         builder.Services.AddMassTransit(x =>
         {
             x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter(includeNamespace: true));
 
             configure?.Invoke(x);
+
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                // // When generate OpenAPI docs locally
+                x.UsingInMemory((context, cfg) => cfg.ConfigureEndpoints(context));
+                return;
+            }
             
             x.UsingRabbitMq((context, cfg) =>
             {
-                cfg.Host(new Uri(builder.Configuration.GetConnectionString(connectionName)!));
+                cfg.Host(new Uri(connectionString));
                 cfg.UseMessageRetry(r => r.Intervals(500, 1000));
                 cfg.UseInMemoryOutbox(context);
 

@@ -1,0 +1,6 @@
+{
+  "appHostPath": "../src/RestoRate.AppHost/RestoRate.AppHost.csproj",
+  "features": {
+    "execCommandEnabled": "true"
+  }
+}

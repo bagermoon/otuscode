@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
-using Ardalis.GuardClauses;
 
 namespace RestoRate.Auth.Authentication;
 
@@ -17,17 +16,17 @@ public static class AuthenticationExtensions
         this TBuilder builder,
         string keycloakServiceName) where TBuilder : IHostApplicationBuilder
     {
-        var settings = builder.Configuration
+        var settings = new KeycloakSettingsOptions();
+        builder.Configuration
             .GetSection(KeycloakSettingsOptions.SectionName)
-            .Get<KeycloakSettingsOptions>();
+            .Bind(settings);
 
-        Guard.Against.Null(settings, nameof(settings));
         builder.Services
             .AddServiceDiscovery()
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddKeycloakJwtBearer(
                 serviceName: keycloakServiceName,
-                realm: settings.Realm!,
+                realm: settings.Realm,
                 options =>
                 {
                     // In development we often run Keycloak over HTTP; enable HTTPS metadata outside of dev
@@ -45,17 +44,17 @@ public static class AuthenticationExtensions
         this TBuilder builder,
         string keycloakServiceName) where TBuilder : IHostApplicationBuilder
     {
-        var settings = builder.Configuration
+        var settings = new KeycloakSettingsOptions();
+        builder.Configuration
             .GetSection(KeycloakSettingsOptions.SectionName)
-            .Get<KeycloakSettingsOptions>();
+            .Bind(settings);
 
-        Guard.Against.Null(settings, nameof(settings));
         builder.Services
             .AddServiceDiscovery()
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddKeycloakJwtBearer(
                 serviceName: keycloakServiceName,
-                realm: settings.Realm!,
+                realm: settings.Realm,
                 options =>
                 {
                     // In development we often run Keycloak over HTTP; enable HTTPS metadata outside of dev
@@ -75,11 +74,10 @@ public static class AuthenticationExtensions
         this TBuilder builder,
         string keycloakServiceName) where TBuilder : IHostApplicationBuilder
     {
-        var settings = builder.Configuration
+        var settings = new KeycloakSettingsOptions();
+        builder.Configuration
             .GetSection(KeycloakSettingsOptions.SectionName)
-            .Get<KeycloakSettingsOptions>();
-
-        Guard.Against.Null(settings, nameof(settings));
+            .Bind(settings);
 
         builder.Services
             .AddServiceDiscovery()
@@ -91,7 +89,7 @@ public static class AuthenticationExtensions
             .AddCookie()
             .AddKeycloakOpenIdConnect(
                 serviceName: keycloakServiceName,
-                realm: settings.Realm!,
+                realm: settings.Realm,
                 options =>
                 {
                     options.RequireHttpsMetadata = builder.Environment.IsProduction();

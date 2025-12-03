@@ -43,15 +43,14 @@ public class KeycloakScalarSecurityTransformer(
             }
         );
 
-        var settings = configuration
+        var settings = new KeycloakSettingsOptions();
+        configuration
             .GetSection(KeycloakSettingsOptions.SectionName)
-            .Get<KeycloakSettingsOptions>();
-
-        Guard.Against.Null(settings, nameof(settings));
-
+            .Bind(settings);
+            
         var keycloakEndpoint = await GetKeycloakHostUri(cancellationToken);
-        var authorizationUrl = new Uri(keycloakEndpoint, $"realms/{settings.Realm}/protocol/openid-connect/auth");
-        var tokenUrl = new Uri($"{keycloakEndpoint.Scheme}://{AppHostProjects.Keycloak.ToLower()}/realms/{settings.Realm}/protocol/openid-connect/token");
+        var authorizationUrl = new Uri(keycloakEndpoint, $"/realms/{settings.Realm}/protocol/openid-connect/auth");
+        var tokenUrl = new Uri(keycloakEndpoint, $"/realms/{settings.Realm}/protocol/openid-connect/token");
 
         var securitySchemeOAuth2 = "OAuth2";
         document.Components.SecuritySchemes.Add(
@@ -108,7 +107,11 @@ public class KeycloakScalarSecurityTransformer(
             $"https+http://{AppHostProjects.Keycloak}", cancellationToken: cancellationToken);
 
         var serviceEndpoint = keycloakEndpoints.Endpoints.Count > 0 ? keycloakEndpoints.Endpoints[0] : null;
-        Guard.Against.Null(serviceEndpoint, nameof(serviceEndpoint));
-        return new Uri(serviceEndpoint.EndPoint.ToString()!);
+        var serviceUri = serviceEndpoint?.EndPoint?.ToString();
+        var isValidUri = !string.IsNullOrWhiteSpace(serviceUri) && serviceUri.Contains("://", StringComparison.Ordinal);
+
+        return isValidUri
+            ? new Uri(serviceUri!)
+            : new Uri($"http://localhost:8080"); // When generate OpenAPI docs locally
     }
 }
