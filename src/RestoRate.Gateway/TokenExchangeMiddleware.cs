@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
@@ -49,6 +50,9 @@ public class TokenExchangeMiddleware
             var realm = _configuration["KeycloakSettings:Realm"]!;
             var clientId = _configuration["KeycloakSettings:ClientId"]!;
             var clientSecret = _configuration["KeycloakSettings:ClientSecret"]!;
+            string[] scopes = [
+                JwtRegisteredClaimNames.Email
+            ];
 
             using var tokenRequest = new HttpRequestMessage(HttpMethod.Post,
                 $"{options.Authority}/protocol/openid-connect/token")
@@ -60,7 +64,8 @@ public class TokenExchangeMiddleware
                     ["subject_token_type"] = "urn:ietf:params:oauth:token-type:access_token",
                     ["requested_token_type"] = "urn:ietf:params:oauth:token-type:access_token",
                     ["client_id"] = clientId,
-                    ["client_secret"] = clientSecret
+                    ["client_secret"] = clientSecret,
+                    ["scope"] = string.Join(" ", scopes)
                 })
             };
 

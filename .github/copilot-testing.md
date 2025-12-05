@@ -61,6 +61,60 @@ dotnet test tests/<Context>/<Context>.IntegrationTests
 dotnet test RestoRate.slnx
 ```
 
+## Authentication in Tests
+
+### Integration Test Authentication
+
+Integration tests use `TestAuthHandler` from `RestoRate.Testing.Common` to simulate authenticated users without requiring a real Keycloak instance.
+
+**Key Components:**
+
+- **`TestAuthHandler`** (`tests/RestoRate.Testing.Common/Auth/TestAuthHandler.cs`): Custom authentication handler that creates claims matching production JWT structure
+  - Uses `"roles"` claim type (not `ClaimTypes.Role`) to match production Keycloak JWTs
+  - Sets `ClaimsIdentity` with `roleType: "roles"` so ASP.NET Core role-based authorization works correctly
+  - Configures `nameType: "preferred_username"` to match Keycloak's username claim
+
+- **`TestUsers`** (`tests/RestoRate.Testing.Common/Auth/TestUsers.cs`): Predefined test identities
+  - `TestUser.Anonymous`: No authentication
+  - `TestUser.User`: Standard user with `["user"]` role
+  - `TestUser.Admin`: Administrator with `["admin"]` role
+
+- **`CreateClientWithUser()`** extension (`tests/RestoRate.Testing.Common/WebApplicationFactoryExtensions.cs`):
+  - Creates an `HttpClient` configured with test authentication
+  - Example: `_client = _factory.CreateClientWithUser(TestUser.Admin);`
+  - Automatically injects `TestAuthHandler` with specified user into the test server
+
+**Usage Example:**
+
+```csharp
+public class MyApiTests : IClassFixture<MyWebApplicationFactory>
+{
+    private readonly HttpClient _client;
+    
+    public MyApiTests(MyWebApplicationFactory factory)
+    {
+        // Create client authenticated as Admin
+        _client = factory.CreateClientWithUser(TestUser.Admin);
+    }
+    
+    [Fact]
+    public async Task AdminEndpoint_WithAdminUser_Returns200()
+    {
+        var response = await _client.GetAsync("/admin/endpoint");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+}
+```
+
+**Important:** The test authentication setup mirrors production behavior:
+- Claims use the same types as Keycloak JWTs (`"roles"`, `"preferred_username"`, etc.)
+- `IUserContext` works identically in tests and production
+- Role-based authorization policies (`[Authorize(Roles = "admin")]`) work without modification
+
+### E2E Test Authentication
+
+E2E tests use real Keycloak authentication with Playwright browser automation. See `docs/testing.md` for details.
+
 ## Service-Specific Testing
 
 ### Restaurant Service

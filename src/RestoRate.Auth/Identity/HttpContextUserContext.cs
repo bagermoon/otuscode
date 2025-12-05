@@ -7,17 +7,24 @@ using RestoRate.Abstractions.Identity;
 
 namespace RestoRate.Auth.Identity;
 
-public class HttpContextUserContext : IUserContext
+public class HttpContextUserContext(IHttpContextAccessor http) : IUserContext
 {
-    private readonly IHttpContextAccessor _http;
+    private readonly ClaimsPrincipal _user = http.HttpContext?.User ?? new ClaimsPrincipal();
+    public Guid UserId => Guid.TryParse(_user.FindFirst(JwtRegisteredClaimNames.Sub)?.Value, out var guid)
+        ? guid
+        : Guid.Empty;
 
-    public HttpContextUserContext(IHttpContextAccessor http) => _http = http;
+    public bool IsAuthenticated => _user.Identity?.IsAuthenticated ?? false;
+    public string Name => _user.Identity?.Name ?? string.Empty;
 
-    public string? UserId =>
-        _http.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
-        ?? _http.HttpContext?.User?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+    public string FullName =>
+        _user.FindFirst(JwtRegisteredClaimNames.Name)?.Value
+        ?? string.Empty;
 
-    public Guid? UserGuid => Guid.TryParse(UserId, out var g) ? g : null;
+    public string Email =>
+        _user.FindFirst(JwtRegisteredClaimNames.Email)?.Value
+        ?? string.Empty;
 
-    public bool IsAuthenticated => _http.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
+    public IReadOnlyCollection<string> Roles =>
+        _user.FindAll("roles").Select(c => c.Value).ToArray();
 }

@@ -1,9 +1,10 @@
 ﻿@page "/weather"
+@using RestoRate.Abstractions.Identity
 @using RestoRate.ServiceDefaults
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
 @inject IHttpClientFactory ClientFactory
-
+@inject IUserContext UserContext;
 <PageTitle>Weather</PageTitle>
 
 <h1>Weather</h1>
@@ -37,6 +38,7 @@ else
             }
         </tbody>
     </table>
+    <p>User: @UserContext.Name (@UserContext.Email)</p>
 }
 
 @code {

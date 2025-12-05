@@ -17,12 +17,20 @@ public class TestAuthHandler : AuthenticationHandler<TestAuthOptions>
     {
         var user = TestUsers.Get(Options.User);
     
-        var claims = new List<Claim> { new Claim(ClaimTypes.Name, user.Name) };
+        List<Claim> claims = [
+            new Claim(ClaimTypes.Name, user.Name),
+            new Claim("preferred_username", user.Name),
+            new Claim(ClaimTypes.Email, user.Email),
+        ];
         foreach (var role in user.Roles)
         {
-            claims.Add(new Claim(ClaimTypes.Role, role));
+            claims.Add(new Claim("roles", role));
         }
-        var identity = new ClaimsIdentity(claims, "Test");
+        var identity = new ClaimsIdentity(
+            claims, "Test",
+            nameType: "preferred_username",
+            roleType: "roles"
+        );
         var principal = new ClaimsPrincipal(identity);
         var ticket = new AuthenticationTicket(principal, "TestScheme");
 

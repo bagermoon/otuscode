@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Mvc;
+
+using RestoRate.Abstractions.Identity;
 using RestoRate.Auth.Authorization;
 using RestoRate.Auth.OpenApi;
 using RestoRate.Restaurant.Api.Endpoints.Restaurants;
@@ -35,7 +38,7 @@ var summaries = new[]
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 
-app.MapGet("/weatherforecast", () =>
+app.MapGet("/weatherforecast", ([FromServices] IUserContext userContext) =>
 {
     var forecast =  Enumerable.Range(1, 5).Select(index =>
         new WeatherForecast
