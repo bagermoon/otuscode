@@ -69,7 +69,7 @@ dotnet test RestoRate.slnx
 - **Database:** PostgreSQL (via Aspire or standalone)
 
 ### Review Service
-- **API Project:** `src/RestoRate.Review.Api`
+- **API Project:** `src/RestoRate.ReviewService.Api`
 - **Database:** MongoDB (planned)
 
 ### Rating Service

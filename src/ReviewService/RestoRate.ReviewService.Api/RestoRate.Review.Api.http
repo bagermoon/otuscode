@@ -1,0 +1,6 @@
+@RestoRate_ReviewService_Api_HostAddress = http://localhost:5161
+
+GET {{RestoRate_ReviewService_Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

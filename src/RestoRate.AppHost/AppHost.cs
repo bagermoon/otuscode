@@ -102,7 +102,7 @@ scalar.WithApiReference(ratingApi, options =>
 var reviewdb = mongo.AddDatabase(AppHostProjects.ReviewDb, "reviewdb");
 
 var reviewApiBearerAudience = builder.AddParameter("review-api-bearer-audience", value: "restorate-review-api", publishValueAsDefault: true);
-var reviewApi = builder.AddProject<RestoRate_Review_Api>(AppHostProjects.ServiceReviewApi)
+var reviewApi = builder.AddProject<RestoRate_ReviewService_Api>(AppHostProjects.ServiceReviewApi)
     .WithReference(keycloak)
     .WithReference(rabbitmq)
     .WithReference(reviewdb)
