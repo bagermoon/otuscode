@@ -1,11 +1,13 @@
 using Ardalis.SharedKernel;
 
+using Mediator;
+
 using Microsoft.Extensions.DependencyInjection;
 
 using RestoRate.Abstractions.Mediation.Behaviors;
-using RestoRate.Restaurant.Domain.Interfaces;
+using RestoRate.ReviewService.Domain.ReviewAggregate;
 
-namespace RestoRate.Restaurant.Application.Configurations;
+namespace RestoRate.ReviewService.Application.Configurations;
 
 internal static class MediatorConfigs
 {
@@ -14,10 +16,10 @@ internal static class MediatorConfigs
         // Root behaviors from registry; ModuleInitializer contributors have already populated it.
         services.AddMediator(options =>
         {
-            options.Namespace = "RestoRate.Restaurant.Application";
+            options.Namespace = "RestoRate.ReviewService.Application";
             options.ServiceLifetime = ServiceLifetime.Scoped;
             options.Assemblies = [
-                typeof(IRestaurantService),
+                typeof(Review),
                 typeof(ApplicationServiceExtensions)
             ];
             options.PipelineBehaviors = [
