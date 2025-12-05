@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 
 using RestoRate.Auth.Authentication;
+using RestoRate.Auth.Identity;
 using RestoRate.BlazorDashboard.Components;
 using RestoRate.ServiceDefaults;
 
@@ -18,6 +19,7 @@ builder.Services.AddAuthorizationBuilder();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddAntiforgery();
 builder.Services.AddHttpContextAccessor();
+builder.AddItentityServices();
 
 builder.Services.AddScoped<TokenHandler>();
 

@@ -104,7 +104,7 @@ public static class AuthenticationExtensions
                     options.GetClaimsFromUserInfoEndpoint = true;
 
                     options.MapInboundClaims = false;
-                    options.TokenValidationParameters.NameClaimType = JwtRegisteredClaimNames.Name;
+                    options.TokenValidationParameters.NameClaimType = "preferred_username";
                     options.TokenValidationParameters.RoleClaimType = "roles";
                 }
             );

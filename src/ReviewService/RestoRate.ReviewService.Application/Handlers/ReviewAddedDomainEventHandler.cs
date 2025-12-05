@@ -22,7 +22,7 @@ public class ReviewAddedDomainEventHandler(
         var integrationEvent = new ReviewAddedEvent(
             ReviewId: notification.Review.Id,
             RestaurantId: notification.Review.RestaurantId,
-            AuthorId: userContext.UserGuid ?? Guid.Empty,
+            AuthorId: userContext.UserId,
             Rating: notification.Review.Rating,
             Text: notification.Review.Comment ?? string.Empty,
             Tags: Array.Empty<string>());
