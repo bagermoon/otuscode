@@ -3,7 +3,7 @@
 ## Review
 
 ```csharp
-namespace RestoRate.Review.Domain;
+namespace RestoRate.ReviewService.Domain;
 
 public sealed class Review : AggregateRoot<ReviewId>
 {
@@ -24,7 +24,7 @@ public sealed class Review : AggregateRoot<ReviewId>
         RestaurantId = restaurantId;
         AuthorId = authorId;
         Rating = rating;
-        Text = text;
+        Comment = text;
         Tags = tags.ToArray();
         SuggestedAverageCheck = suggestedAverageCheck;
         Status = ReviewStatus.Pending;
@@ -46,7 +46,7 @@ public sealed class Review : AggregateRoot<ReviewId>
     public RestaurantId RestaurantId { get; private set; }
     public UserId AuthorId { get; private set; }
     public int Rating { get; private set; }
-    public string Text { get; private set; } = string.Empty;
+    public string Comment { get; private set; } = string.Empty;
     public string[] Tags { get; private set; } = Array.Empty<string>();
     public Money? SuggestedAverageCheck { get; private set; }
     public ReviewStatus Status { get; private set; }
@@ -57,7 +57,7 @@ public sealed class Review : AggregateRoot<ReviewId>
     public void UpdateContent(int rating, string text, IEnumerable<string> tags, Money? suggestedAverageCheck)
     {
         Rating = rating;
-        Text = text;
+        Comment = text;
         Tags = tags.ToArray();
         SuggestedAverageCheck = suggestedAverageCheck;
         AddDomainEvent(new ReviewUpdatedDomainEvent(Id, RestaurantId, rating));

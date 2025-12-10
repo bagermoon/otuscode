@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Mvc;
+
+using RestoRate.Abstractions.Identity;
 using RestoRate.Auth.Authorization;
 using RestoRate.Auth.OpenApi;
 using RestoRate.Restaurant.Api.Endpoints.Restaurants;
@@ -13,7 +16,7 @@ var app = builder.Build();
 app.UseAuthentication();
 app.UseAuthorization();
 
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsProduction())
 {
     app.UseHttpsRedirection();
 }
@@ -25,7 +28,7 @@ app.MapRestaurantsEndpoints("restaurants")
     .WithTags("Restaurants");
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (!app.Environment.IsProduction())
 {
     app.MapOpenApi();
 }
@@ -35,7 +38,7 @@ var summaries = new[]
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 
-app.MapGet("/weatherforecast", () =>
+app.MapGet("/weatherforecast", ([FromServices] IUserContext userContext) =>
 {
     var forecast =  Enumerable.Range(1, 5).Select(index =>
         new WeatherForecast
@@ -56,3 +59,5 @@ record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 }
+
+public partial class Program { }

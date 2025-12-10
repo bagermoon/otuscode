@@ -1,6 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <Sdk Name="Aspire.AppHost.Sdk" Version="9.3.1" />
+﻿<Project Sdk="Aspire.AppHost.Sdk/13.0.2">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -8,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.AppHost" />
     <PackageReference Include="Aspire.Hosting.Keycloak" />
     <PackageReference Include="Aspire.Hosting.MongoDB" />
     <PackageReference Include="Aspire.Hosting.RabbitMQ" />
@@ -25,7 +22,7 @@
     <ProjectReference Include="..\RestoRate.Gateway\RestoRate.Gateway.csproj" />
     <ProjectReference Include="..\RestoRate.Migrations\RestoRate.Migrations.csproj" />
     <ProjectReference Include="..\RestoRate.ServiceDefaults\RestoRate.ServiceDefaults.csproj" IsAspireProjectResource="false" />
-    <ProjectReference Include="..\Review\RestoRate.Review.Api\RestoRate.Review.Api.csproj" />
+    <ProjectReference Include="..\ReviewService\RestoRate.ReviewService.Api\RestoRate.ReviewService.Api.csproj" />
   </ItemGroup>
 
 </Project>

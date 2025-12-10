@@ -32,15 +32,23 @@
     <Project Path="src/Restaurant/RestoRate.Restaurant.Domain/RestoRate.Restaurant.Domain.csproj" />
     <Project Path="src/Restaurant/RestoRate.Restaurant.Infrastructure/RestoRate.Restaurant.Infrastructure.csproj" />
   </Folder>
-  <Folder Name="/src/Review/">
-    <Project Path="src/Review/RestoRate.Review.Api/RestoRate.Review.Api.csproj" />
-    <Project Path="src/Review/RestoRate.Review.Application/RestoRate.Review.Application.csproj" Id="cdc6cca6-ffc6-4567-bd13-44bb830607b9" />
-    <Project Path="src/Review/RestoRate.Review.Domain/RestoRate.Review.Domain.csproj" Id="7de4ec26-b5b4-4fa6-9b53-d15e99d2b39b" />
-    <Project Path="src/Review/RestoRate.Review.Infrastructure/RestoRate.Review.Infrastructure.csproj" Id="66ad9b0f-75b5-4aa5-af9e-aea62586f8a2" />
+  <Folder Name="/src/ReviewService/">
+    <Project Path="src/ReviewService/RestoRate.ReviewService.Api/RestoRate.ReviewService.Api.csproj" />
+    <Project Path="src/ReviewService/RestoRate.ReviewService.Application/RestoRate.ReviewService.Application.csproj" Id="cdc6cca6-ffc6-4567-bd13-44bb830607b9" />
+    <Project Path="src/ReviewService/RestoRate.ReviewService.Domain/RestoRate.ReviewService.Domain.csproj" Id="7de4ec26-b5b4-4fa6-9b53-d15e99d2b39b" />
+    <Project Path="src/ReviewService/RestoRate.ReviewService.Infrastructure/RestoRate.ReviewService.Infrastructure.csproj" Id="66ad9b0f-75b5-4aa5-af9e-aea62586f8a2" />
   </Folder>
-  <Folder Name="/tests/" />
+  <Folder Name="/tests/">
+    <File Path="tests/Directory.Build.props" />
+    <Project Path="tests/RestoRate.E2ETests/RestoRate.E2ETests.csproj" Id="54ec265a-9851-473a-9d69-9732332ad8c8" />
+    <Project Path="tests/RestoRate.Testing.Common/RestoRate.Testing.Common.csproj" />
+  </Folder>
   <Folder Name="/tests/Restaurant/">
     <Project Path="tests/Restaurant/RestoRate.Restaurant.IntegrationTests/RestoRate.Restaurant.IntegrationTests.csproj" Id="54ec265a-9851-473a-9d69-9732332ad8c9" />
     <Project Path="tests/Restaurant/RestoRate.Restaurant.UnitTests/RestoRate.Restaurant.UnitTests.csproj" Id="95acd291-b54a-4700-8ac6-e2b7ae8e49e2" />
+  </Folder>
+  <Folder Name="/tests/ReviewService/">
+    <Project Path="tests/ReviewService/RestoRate.ReviewService.IntegrationTests/RestoRate.ReviewService.IntegrationTests.csproj" Id="157f74ad-95d4-4108-895f-6dbe7527ac10" />
+    <Project Path="tests/ReviewService/RestoRate.ReviewService.UnitTests/RestoRate.ReviewService.UnitTests.csproj" />
   </Folder>
 </Solution>

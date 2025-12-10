@@ -8,4 +8,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\RestoRate.SharedKernel\RestoRate.SharedKernel.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Identity\" />
+	</ItemGroup>
 </Project>
