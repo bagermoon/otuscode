@@ -28,7 +28,7 @@ public static class RestaurantTestData
                 new TimeOnly(9, 0),
                 new TimeOnly(22, 0)
             ),
-            AverageCheck: new MoneyDto(1500, "RUB"),
+            AverageCheck: new MoneyDto(1500, "RUB"),          
             CuisineTypes: new List<string>
             {
                 CuisineType.Italian.Name,

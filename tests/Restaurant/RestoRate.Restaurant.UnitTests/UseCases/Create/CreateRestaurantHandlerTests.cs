@@ -77,6 +77,7 @@ namespace RestoRate.Restaurant.UnitTests.UseCases.Create
             result.Value.Should().NotBeNull();
             result.Value.RestaurantId.Should().Be(restaurantId);
             result.Value.Name.Should().Be(dto.Name);
+            result.Value.RestaurantStatus.Should().Be(Status.Draft.Name);
 
             await _integrationEventBus
                 .Received(1)

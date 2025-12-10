@@ -107,6 +107,7 @@ public sealed class CreateRestaurantHandler(
                     openHours.OpenTime,
                     openHours.CloseTime),
                 new MoneyDto(averageCheck.Amount, averageCheck.Currency),
+                RestaurantStatus: Status.Draft.Name,
                 cuisineTypes.Select(ct => ct.Name).ToList(),
                 restaurantTags.Select(t => t.Name).ToList(),
                 Array.Empty<RestaurantImageDto>() // изображения тут по сути не нужны

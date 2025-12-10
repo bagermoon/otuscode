@@ -21,8 +21,6 @@ public sealed class UpdateRestaurantHandler(
     ILogger<UpdateRestaurantHandler> logger)
     : ICommandHandler<UpdateRestaurantCommand, Result>
 {
-    private readonly IRepository<Tag>? _tagRepository;
-
     public async ValueTask<Result> Handle(
         UpdateRestaurantCommand request,
         CancellationToken cancellationToken)

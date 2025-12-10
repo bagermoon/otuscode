@@ -17,6 +17,7 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
     public Location Location { get; private set; } = default!;
     public OpenHours OpenHours { get; private set; } = default!;
     public Money AverageCheck { get; private set; } = default!;
+    public Status RestaurantStatus { get; private set; } = Status.Draft;
 
     private readonly List<RestaurantImage> _images = new();
     private readonly List<RestaurantCuisineType> _cuisineTypes = new();
@@ -48,6 +49,7 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
         Location = Guard.Against.Null(location, nameof(location));
         OpenHours = Guard.Against.Null(openHours, nameof(openHours));
         AverageCheck = Guard.Against.Null(averageCheck, nameof(averageCheck));
+        RestaurantStatus = Status.Draft;
 
         RegisterDomainEvent(new RestaurantCreatedEvent(this));
     }
@@ -183,15 +185,54 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
                 _tags.Add(new RestaurantTag(Id, newTag.Id));
     }
 
+    public void SendToModeration()
+    {
+        if (RestaurantStatus != Status.Draft && RestaurantStatus != Status.Rejected)
+            return;
+
+        RestaurantStatus = Status.OnModeration;
+        RegisterDomainEvent(new RestaurantUpdatedEvent(this));
+    }
+
+    public void Publish()
+    {
+        if (RestaurantStatus != Status.OnModeration)
+            return;
+
+        RestaurantStatus = Status.Published;
+        RegisterDomainEvent(new RestaurantUpdatedEvent(this));
+    }
+
+    public void Reject()
+    {
+        if (RestaurantStatus != Status.OnModeration)
+            return;
+
+        RestaurantStatus = Status.Rejected;
+        RegisterDomainEvent(new RestaurantUpdatedEvent(this));
+    }
+
     public void MarkDeleted()
     {
-        if (_deletedEventQueued)
-        {
+        if (RestaurantStatus == Status.Archived)
             return;
-        }
 
-        RegisterDomainEvent(new RestaurantDeletedEvent(this));
-        _deletedEventQueued = true;
+        RestaurantStatus = Status.Archived;
+
+        if (!_deletedEventQueued)
+        {
+            RegisterDomainEvent(new RestaurantDeletedEvent(this));
+            _deletedEventQueued = true;
+        }
+    }
+
+    public void Restore()
+    {
+        if (RestaurantStatus != Status.Archived)
+            return;
+
+        RestaurantStatus = Status.Draft;
+        RegisterDomainEvent(new RestaurantUpdatedEvent(this));
     }
 
     public new void ClearDomainEvents()

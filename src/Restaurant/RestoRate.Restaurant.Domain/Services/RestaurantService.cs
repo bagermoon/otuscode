@@ -111,7 +111,7 @@ public class RestaurantService(
 
         restaurant.MarkDeleted();
 
-        await repository.DeleteAsync(restaurant);
+        await repository.UpdateAsync(restaurant);
 
         foreach (var domainEvent in restaurant.DomainEvents)
             await mediator.Publish(domainEvent);

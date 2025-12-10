@@ -1,9 +1,14 @@
 using Ardalis.Result;
 using Ardalis.SharedKernel;
+
 using Mediator;
+
 using Microsoft.Extensions.Logging;
+
 using RestoRate.Restaurant.Application.DTOs;
 using RestoRate.Restaurant.Domain.RestaurantAggregate.Specifications;
+using RestoRate.SharedKernel.Enums;
+
 using RestaurantEntity = RestoRate.Restaurant.Domain.RestaurantAggregate.Restaurant;
 
 namespace RestoRate.Restaurant.Application.UseCases.GetById;
@@ -40,6 +45,7 @@ public sealed class GetRestaurantByIdHandler(
                 new LocationDto(restaurant.Location.Latitude, restaurant.Location.Longitude),
                 new OpenHoursDto(restaurant.OpenHours.DayOfWeek, restaurant.OpenHours.OpenTime, restaurant.OpenHours.CloseTime),
                 new MoneyDto(restaurant.AverageCheck.Amount, restaurant.AverageCheck.Currency),
+                restaurant.RestaurantStatus.Name,
                 restaurant.CuisineTypes.Select(ct => ct.CuisineType.Name).ToList(),
                 restaurant.Tags.Select(t => t.Tag.Name).ToList(),
                 restaurant.Images.Select(img => new RestaurantImageDto(

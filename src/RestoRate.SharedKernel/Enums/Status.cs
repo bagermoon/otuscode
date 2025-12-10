@@ -34,4 +34,7 @@ public sealed class Status : SmartEnum<Status>
 
     /// <summary> Виден ли ресторан в публичном поиске </summary>
     public bool IsVisiblePublicly() => this == Published;
+
+    /// <summary> Мягкое удаление </summary>
+    public bool IsDeleted() => this == Archived;
 }

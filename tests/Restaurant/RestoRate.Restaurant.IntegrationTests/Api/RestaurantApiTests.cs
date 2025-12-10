@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using RestoRate.Restaurant.Application.DTOs;
 using RestoRate.Restaurant.IntegrationTests.Helpers;
+using RestoRate.SharedKernel.Enums;
 
 namespace RestoRate.Restaurant.IntegrationTests.Api;
 
@@ -59,6 +60,7 @@ public class RestaurantApiTests : IAsyncLifetime
         restaurant.Should().NotBeNull();
         restaurant!.RestaurantId.Should().NotBeEmpty();
         restaurant.Name.Should().Be(request.Name);
+        restaurant.RestaurantStatus.Should().Be(Status.Draft.Name);
 
         _createdRestaurantIds.Add(restaurant.RestaurantId);
         _output.WriteLine($"Созданный ресторан с ID: {restaurant.RestaurantId}");
@@ -83,6 +85,7 @@ public class RestaurantApiTests : IAsyncLifetime
         restaurant.Should().NotBeNull();
         restaurant!.RestaurantId.Should().Be(createdRestaurant.RestaurantId);
         restaurant.Name.Should().Be(createRequest.Name);
+        restaurant.RestaurantStatus.Should().Be(createdRestaurant.RestaurantStatus);
     }
 
     [Fact]
@@ -134,21 +137,23 @@ public class RestaurantApiTests : IAsyncLifetime
         // Arrange
         var createRequest = RestaurantTestData.CreateValidRestaurantRequest();
         var createResponse = await _client.PostAsJsonAsync("/restaurants", createRequest);
-
-        createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
-
         var createdRestaurant = await createResponse.Content.ReadFromJsonAsync<RestaurantDto>();
-        createdRestaurant.Should().NotBeNull();
+        _createdRestaurantIds.Add(createdRestaurant!.RestaurantId);
 
-        // Act
-        var deleteResponse = await _client.DeleteAsync($"/restaurants/{createdRestaurant!.RestaurantId}");
+        // Act - Удаляем (Soft Delete)
+        var deleteResponse = await _client.DeleteAsync($"/restaurants/{createdRestaurant.RestaurantId}");
 
         // Assert
         deleteResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
-        // Проверяем удаление
+        // Act
         var getResponse = await _client.GetAsync($"/restaurants/{createdRestaurant.RestaurantId}");
-        getResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
+
+        getResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var archivedRestaurant = await getResponse.Content.ReadFromJsonAsync<RestaurantDto>();
+        archivedRestaurant.Should().NotBeNull();
+        archivedRestaurant!.RestaurantStatus.Should().Be(Status.Archived.Name);
     }
 
     [Fact]
