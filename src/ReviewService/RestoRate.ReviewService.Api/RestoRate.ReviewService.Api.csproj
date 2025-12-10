@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\RestoRate.Auth\RestoRate.Auth.csproj" />
+    <ProjectReference Include="..\..\RestoRate.Contracts\RestoRate.Contracts.csproj" />
+    <ProjectReference Include="..\..\RestoRate.ServiceDefaults\RestoRate.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\RestoRate.ReviewService.Application\RestoRate.ReviewService.Application.csproj" />
+    <ProjectReference Include="..\RestoRate.ReviewService.Infrastructure\RestoRate.ReviewService.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

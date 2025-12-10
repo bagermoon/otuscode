@@ -7,6 +7,7 @@
 - Cross-service contracts (integration events & DTOs): `RestoRate.Contracts`
 - Reusable infrastructure & technical helpers (messaging, migrations, seeding, MassTransit, EF helpers): `RestoRate.BuildingBlocks`
 - Application‑level abstractions and pipeline behaviors: `RestoRate.Abstractions` (may depend on `SharedKernel`; contains Mediation behaviors and app‑level contracts; no transports/ORM/web frameworks). `SharedKernel` remains framework‑free and independent of higher layers.
+- Testing and integration tests: [docs/testing.md](./testing.md)
 
 Diagnostics
 - Diagnostic constants live in `RestoRate.SharedKernel.Diagnostics`:

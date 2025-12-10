@@ -2,8 +2,8 @@ using Ardalis.SharedKernel;
 
 using Microsoft.Extensions.DependencyInjection;
 
-using RestoRate.Abstractions.Mediation;
 using RestoRate.Abstractions.Mediation.Behaviors;
+using RestoRate.Restaurant.Domain.Interfaces;
 
 namespace RestoRate.Restaurant.Application.Configurations;
 
@@ -17,6 +17,7 @@ internal static class MediatorConfigs
             options.Namespace = "RestoRate.Restaurant.Application";
             options.ServiceLifetime = ServiceLifetime.Scoped;
             options.Assemblies = [
+                typeof(IRestaurantService),
                 typeof(ApplicationServiceExtensions)
             ];
             options.PipelineBehaviors = [

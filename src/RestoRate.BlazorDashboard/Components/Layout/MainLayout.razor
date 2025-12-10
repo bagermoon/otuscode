@@ -1,6 +1,8 @@
-﻿@inherits LayoutComponentBase
+﻿@using RestoRate.Abstractions.Identity
+@inherits LayoutComponentBase
 @implements IDisposable
 @inject NavigationManager Navigation
+@inject IUserContext UserContext;
 
 <div class="page">
     <div class="sidebar">
@@ -11,7 +13,7 @@
         <nav class="top-row px-4">
             <AuthorizeView>
                 <Authorized>
-                    <strong>@context.User.Identity?.Name</strong>
+                    <strong>@UserContext.FullName</strong>
                     <form action="authentication/logout" method="post">
                         <AntiforgeryToken />
                         <input type="hidden" name="ReturnUrl" value="/" />

@@ -27,6 +27,15 @@ Goal: Make AI agents productive immediately in this .NET 9 + Aspire microservice
 - Reference: `src/RestoRate.Gateway/TokenExchangeMiddleware.cs` and `Program.cs`.
 - Services trust Gateway JWTs; do not call Keycloak from microservices.
 
+### User Identity (`IUserContext`)
+- Access current user info via `RestoRate.Abstractions.Identity.IUserContext`:
+  - `UserId` (from JWT `sub` claim), `Name`, `FullName`, `Email`, `IsAuthenticated`
+  - `Roles` (from JWT `"roles"` claim array)
+- Register in services: `builder.AddItentityServices();` (part of auth setup in each API's `ConfigureAuthentication`)
+- Implementation: `RestoRate.Auth.Identity.HttpContextUserContext` reads claims from `HttpContext.User`
+- JWT configuration sets `RoleClaimType = "roles"` so ASP.NET Core recognizes the `"roles"` claim for `[Authorize(Roles = "...")]` and policy checks
+- Inject `IUserContext` into Application handlers or API endpoints to access authenticated user details
+
 ## Application Pattern
 - Use Mediator in `Application` for use‑cases:
   - Write: `ICommand<T>` + `ICommandHandler<T, TRes>` (e.g., `DeleteRestaurantHandler`).
@@ -62,7 +71,8 @@ Goal: Make AI agents productive immediately in this .NET 9 + Aspire microservice
 - Service defaults: `src/RestoRate.ServiceDefaults/Extensions.cs`
 - Gateway: `src/RestoRate.Gateway/Program.cs`, `TokenExchangeMiddleware.cs`
 - Restaurant API example endpoint: `src/Restaurant/RestoRate.Restaurant.Api/Endpoints/Restaurants/CreateRestaurantEndpoint.cs`
-- Architecture index: `docs/ARCHITECTURE.md`; Layout rules: `docs/layout.md`; Diagrams: `docs/diagrams.md`
+- Architecture index: `docs/ARCHITECTURE.md`; Layout rules: `docs/layout.md`; Diagrams: `docs/diagrams.md`; Testing: `docs/testing.md`
+- Testing & OpenAPI docs: `.github/copilot-testing.md`
 
 ## When updating architecture
 - Keep `docs/diagrams.md` and `docs/layout.md` in sync with changes (Keycloak above Gateway; token exchange in C4). Register new services in `AppHost` and expose external endpoints where needed.

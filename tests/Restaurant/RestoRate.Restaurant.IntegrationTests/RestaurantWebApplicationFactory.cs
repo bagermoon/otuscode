@@ -1,0 +1,44 @@
+using DotNet.Testcontainers.Containers;
+using MassTransit;
+using Microsoft.AspNetCore.TestHost;
+using RestoRate.BuildingBlocks.Data.Migrations;
+using RestoRate.Restaurant.Infrastructure.Data;
+using RestoRate.ServiceDefaults;
+
+using Testcontainers.PostgreSql;
+
+namespace RestoRate.Restaurant.IntegrationTests;
+
+public class RestaurantWebApplicationFactory
+    : BaseWebApplicationFactory<Program>
+{
+    private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder()
+            .WithDatabase(AppHostProjects.RestaurantDb)
+            .Build();
+    protected override IReadOnlyList<IContainer> Containers => [_postgres];
+
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        builder.ConfigureTestServices(services =>
+        {
+            // Add MassTransit In-Memory Test Harness
+            services.AddMassTransitTestHarness(cfg =>
+            {
+                // Register your consumers here
+                // You can configure sagas, activities, etc. as needed
+            });
+        });
+    }
+
+    protected async override Task OnInitializeAsync()
+    {
+        // Set environment variable before host is built
+        ContainerEnvironmentHelpers.SetPostgresEnvironmentVariables(
+            connectionString: _postgres.GetConnectionString(),
+            connectionName: AppHostProjects.RestaurantDb
+        );
+        
+        // Apply EF Core migrations
+        await DbMigrationRunner.RunAsync<RestaurantDbContext>(Services);
+    }
+}
