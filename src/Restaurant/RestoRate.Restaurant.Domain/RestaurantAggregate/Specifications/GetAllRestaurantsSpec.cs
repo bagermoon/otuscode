@@ -21,6 +21,7 @@ public sealed class GetAllRestaurantsSpec : Specification<Restaurant>
             .Include(r => r.Images)
             .Include(r => r.CuisineTypes)
             .Include(r => r.Tags)
+                .ThenInclude(rt => rt.Tag)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .OrderBy(r => r.Name);
@@ -32,6 +33,9 @@ public sealed class GetAllRestaurantsSpec : Specification<Restaurant>
             Query.Where(r => r.CuisineTypes.Any(ct => ct.CuisineType.Name == cuisineType));
 
         if (!string.IsNullOrWhiteSpace(tag))
-            Query.Where(r => r.Tags.Any(t => t.Tag.Name == tag));
+        {
+            var normalizedTag = tag.Trim().ToLower();
+            Query.Where(r => r.Tags.Any(t => t.Tag.Name.Equals(normalizedTag, StringComparison.InvariantCultureIgnoreCase)));
+        }
     }
 }

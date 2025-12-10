@@ -3,6 +3,7 @@ using Ardalis.SharedKernel;
 using Mediator;
 using Microsoft.Extensions.Logging;
 using RestoRate.Restaurant.Domain.Interfaces;
+using RestoRate.Restaurant.Domain.TagAggregate;
 using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
 using RestaurantEntity = RestoRate.Restaurant.Domain.RestaurantAggregate.Restaurant;

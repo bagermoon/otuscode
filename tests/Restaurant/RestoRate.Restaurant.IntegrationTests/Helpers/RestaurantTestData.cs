@@ -36,8 +36,9 @@ public static class RestaurantTestData
             }.AsReadOnly(),
             Tags: new List<string>
             {
-                Tag.Banquet.Name,
-                Tag.LiveMusic.Name
+                "Банкет",
+                "Живая музыка",
+                "Уютное место"
             }.AsReadOnly(),
             Images: null
         );
@@ -67,7 +68,7 @@ public static class RestaurantTestData
             }.AsReadOnly(),
             Tags: new List<string>
             {
-                Tag.Wedding.Name
+                "Банкет"
             }.AsReadOnly()
         );
     }
