@@ -10,6 +10,7 @@ public record RestaurantDto(
     LocationDto Location,
     OpenHoursDto OpenHours,
     MoneyDto AverageCheck,
+    string RestaurantStatus,
     IReadOnlyCollection<string> CuisineTypes,
     IReadOnlyCollection<string> Tags,
     IReadOnlyCollection<RestaurantImageDto> Images);

@@ -56,6 +56,11 @@ public class RestaurantConfiguration : IEntityTypeConfiguration<Domain.Restauran
             ac.Property(m => m.Currency);
         });
 
+        builder.Property(r => r.RestaurantStatus)
+            .HasConversion(
+                p => p.Value,
+                p => Status.FromValue(p));
+
         builder.HasMany(r => r.CuisineTypes)
             .WithOne()
             .HasForeignKey(ct => ct.RestaurantId)

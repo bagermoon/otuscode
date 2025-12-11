@@ -1,11 +1,17 @@
 using Ardalis.Result;
+using Ardalis.SharedKernel;
+
 using FluentAssertions;
+
 using Microsoft.Extensions.Logging;
+
 using NSubstitute;
+
 using RestoRate.Abstractions.Messaging;
 using RestoRate.Contracts.Restaurant.Events;
 using RestoRate.Restaurant.Application.UseCases.Create;
 using RestoRate.Restaurant.Domain.Interfaces;
+using RestoRate.Restaurant.Domain.TagAggregate;
 using RestoRate.Restaurant.UnitTests.Helpers;
 using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
@@ -15,6 +21,7 @@ namespace RestoRate.Restaurant.UnitTests.UseCases.Create
     public class CreateRestaurantHandlerTests
     {
         private readonly IRestaurantService _restaurantService;
+        private readonly IRepository<Tag> _tagRepository;
         private readonly IIntegrationEventBus _integrationEventBus;
         private readonly ILogger<CreateRestaurantHandler> _logger;
         private readonly CreateRestaurantHandler _handler;
@@ -24,11 +31,13 @@ namespace RestoRate.Restaurant.UnitTests.UseCases.Create
         {
             _output = output;
             _restaurantService = Substitute.For<IRestaurantService>();
+            _tagRepository = Substitute.For<IRepository<Tag>>();
             _integrationEventBus = Substitute.For<IIntegrationEventBus>();
             _logger = Substitute.For<ILogger<CreateRestaurantHandler>>();
 
             _handler = new CreateRestaurantHandler(
                 _restaurantService,
+                _tagRepository,
                 _integrationEventBus,
                 _logger);
         }
@@ -64,6 +73,7 @@ namespace RestoRate.Restaurant.UnitTests.UseCases.Create
             result.Value.Should().NotBeNull();
             result.Value.RestaurantId.Should().Be(restaurantId);
             result.Value.Name.Should().Be(dto.Name);
+            result.Value.RestaurantStatus.Should().Be(Status.Draft.Name);
 
             await _integrationEventBus
                 .Received(1)

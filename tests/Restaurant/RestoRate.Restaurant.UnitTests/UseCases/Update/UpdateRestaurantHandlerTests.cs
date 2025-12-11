@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Ardalis.Result;
+using Ardalis.SharedKernel;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using RestoRate.Restaurant.Application.UseCases.Update;
 using RestoRate.Restaurant.Domain.Interfaces;
+using RestoRate.Restaurant.Domain.TagAggregate;
 using RestoRate.Restaurant.UnitTests.Helpers;
 using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
@@ -17,6 +19,7 @@ namespace RestoRate.Restaurant.UnitTests.UseCases.Update;
 public class UpdateRestaurantHandlerTests
 {
     private readonly IRestaurantService _restaurantService;
+    private readonly IRepository<Tag> _tagRepository;
     private readonly ILogger<UpdateRestaurantHandler> _logger;
     private readonly UpdateRestaurantHandler _handler;
     private readonly ITestOutputHelper _output;
@@ -25,8 +28,9 @@ public class UpdateRestaurantHandlerTests
     {
         _output = output;
         _restaurantService = Substitute.For<IRestaurantService>();
+        _tagRepository = Substitute.For<IRepository<Tag>>();
         _logger = Substitute.For<ILogger<UpdateRestaurantHandler>>();
-        _handler = new UpdateRestaurantHandler(_restaurantService, _logger);
+        _handler = new UpdateRestaurantHandler(_restaurantService, _tagRepository, _logger);
     }
 
     [Fact]

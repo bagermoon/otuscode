@@ -1,9 +1,15 @@
 using Ardalis.Result;
+using Ardalis.SharedKernel;
+
 using Mediator;
+
 using Microsoft.Extensions.Logging;
+
 using RestoRate.Restaurant.Application.DTOs;
 using RestoRate.Restaurant.Application.DTOs.CRUD;
 using RestoRate.Restaurant.Domain.Interfaces;
+using RestoRate.Restaurant.Domain.TagAggregate;
+using RestoRate.Restaurant.Domain.TagAggregate.Specifications;
 using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
 
@@ -11,6 +17,7 @@ namespace RestoRate.Restaurant.Application.UseCases.Update;
 
 public sealed class UpdateRestaurantHandler(
     IRestaurantService restaurantService,
+    IRepository<Tag> tagRepository,
     ILogger<UpdateRestaurantHandler> logger)
     : ICommandHandler<UpdateRestaurantCommand, Result>
 {
@@ -33,9 +40,28 @@ public sealed class UpdateRestaurantHandler(
                 .Select(ct => CuisineType.FromName(ct))
                 .ToList();
 
-            var tags = request.Dto.Tags
-                .Select(t => Tag.FromName(t))
-                .ToList();
+            var restaurantTags = new List<Tag>();
+            if (request.Dto.Tags != null && request.Dto.Tags.Count != 0)
+            {
+                var uniqueTags = request.Dto.Tags.Distinct(StringComparer.OrdinalIgnoreCase);
+
+                foreach (var tagName in uniqueTags)
+                {
+                    var spec = new TagByNameSpec(tagName);
+                    var existingTag = await tagRepository.FirstOrDefaultAsync(spec, cancellationToken);
+
+                    if (existingTag != null)
+                    {
+                        restaurantTags.Add(existingTag);
+                    }
+                    else
+                    {
+                        var newTag = new Tag(tagName);
+                        await tagRepository.AddAsync(newTag, cancellationToken);
+                        restaurantTags.Add(newTag);
+                    }
+                }
+            }
 
             var result = await restaurantService.UpdateRestaurant(
                 request.Dto.RestaurantId,
@@ -48,7 +74,7 @@ public sealed class UpdateRestaurantHandler(
                 openHours,
                 averageCheck,
                 cuisineTypes,
-                tags);
+                restaurantTags);
 
             if (result.Status == ResultStatus.NotFound)
             {

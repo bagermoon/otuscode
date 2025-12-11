@@ -3,6 +3,7 @@ using Ardalis.SharedKernel;
 using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
 using RestoRate.Restaurant.Domain.RestaurantAggregate.Events;
+using RestoRate.Restaurant.Domain.TagAggregate;
 
 namespace RestoRate.Restaurant.Domain.RestaurantAggregate;
 
@@ -16,6 +17,7 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
     public Location Location { get; private set; } = default!;
     public OpenHours OpenHours { get; private set; } = default!;
     public Money AverageCheck { get; private set; } = default!;
+    public Status RestaurantStatus { get; private set; } = Status.Draft;
 
     private readonly List<RestaurantImage> _images = new();
     private readonly List<RestaurantCuisineType> _cuisineTypes = new();
@@ -47,6 +49,7 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
         Location = Guard.Against.Null(location, nameof(location));
         OpenHours = Guard.Against.Null(openHours, nameof(openHours));
         AverageCheck = Guard.Against.Null(averageCheck, nameof(averageCheck));
+        RestaurantStatus = Status.Draft;
 
         RegisterDomainEvent(new RestaurantCreatedEvent(this));
     }
@@ -59,7 +62,6 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
 
         var image = new RestaurantImage(Id, url, altText, displayOrder, isPrimary);
         _images.Add(image);
-        QueueUpdatedEvent();
 
         return image;
     }
@@ -73,7 +75,6 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
             img.UnmarkAsPrimary();
 
         targetImage.MarkAsPrimary();
-        QueueUpdatedEvent();
     }
 
     public void AddCuisineType(CuisineType cuisineType)
@@ -84,18 +85,16 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
             return;
 
         _cuisineTypes.Add(new RestaurantCuisineType(Id, cuisineType));
-        QueueUpdatedEvent();
     }
 
-    public void AddTag(SharedKernel.Enums.Tag tag)
+    public void AddTag(Tag tag)
     {
         Guard.Against.Null(tag, nameof(tag));
 
-        if (_tags.Any(t => t.Tag.Equals(tag)))
+        if (_tags.Any(t => t.TagId.Equals(tag.Id)))
             return;
 
-        _tags.Add(new RestaurantTag(Id, tag));
-        QueueUpdatedEvent();
+        _tags.Add(new RestaurantTag(Id, tag.Id));
     }
 
     public void RemoveImage(Guid imageId)
@@ -104,7 +103,6 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
         if (image != null)
         {
             _images.Remove(image);
-            QueueUpdatedEvent();
         }
     }
 
@@ -112,68 +110,54 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
     {
         var cuisineType = _cuisineTypes.FirstOrDefault(ct => ct.Id == cuisineTypeId);
         if (cuisineType != null)
-        {
             _cuisineTypes.Remove(cuisineType);
-            QueueUpdatedEvent();
-        }
     }
 
     public void RemoveTag(Guid tagId)
     {
         var tag = _tags.FirstOrDefault(t => t.Id == tagId);
         if (tag != null)
-        {
             _tags.Remove(tag);
-            QueueUpdatedEvent();
-        }
     }
 
     public void UpdateName(string name)
     {
         Name = Guard.Against.NullOrEmpty(name, nameof(name));
-        QueueUpdatedEvent();
     }
 
     public void UpdateDescription(string description)
     {
         Description = Guard.Against.NullOrEmpty(description, nameof(description));
-        QueueUpdatedEvent();
     }
 
     public void UpdatePhoneNumber(PhoneNumber phoneNumber)
     {
         PhoneNumber = Guard.Against.Null(phoneNumber, nameof(phoneNumber));
-        QueueUpdatedEvent();
     }
 
     public void UpdateEmail(Email email)
     {
         Email = Guard.Against.Null(email, nameof(email));
-        QueueUpdatedEvent();
     }
 
     public void UpdateAddress(Address address)
     {
         Address = Guard.Against.Null(address, nameof(address));
-        QueueUpdatedEvent();
     }
 
     public void UpdateLocation(Location location)
     {
         Location = Guard.Against.Null(location, nameof(location));
-        QueueUpdatedEvent();
     }
 
     public void UpdateOpenHours(OpenHours openHours)
     {
         OpenHours = Guard.Against.Null(openHours, nameof(openHours));
-        QueueUpdatedEvent();
     }
 
     public void UpdateAverageCheck(Money averageCheck)
     {
         AverageCheck = Guard.Against.Null(averageCheck, nameof(averageCheck));
-        QueueUpdatedEvent();
     }
 
     public void UpdateCuisineTypes(IEnumerable<CuisineType> cuisineTypes)
@@ -181,28 +165,74 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
         _cuisineTypes.Clear();
         foreach (var ct in cuisineTypes)
             _cuisineTypes.Add(new RestaurantCuisineType(Id, ct));
-
-        QueueUpdatedEvent();
     }
 
-    public void UpdateTags(IEnumerable<SharedKernel.Enums.Tag> tags)
+    public void UpdateTags(IEnumerable<Tag> tags)
     {
-        _tags.Clear();
-        foreach (var tag in tags)
-            _tags.Add(new RestaurantTag(Id, tag));
+        Guard.Against.Null(tags, nameof(tags));
 
-        QueueUpdatedEvent();
+        var newTagsList = tags.ToList();
+
+        var tagsToRemove = _tags
+            .Where(existing => !newTagsList.Any(nt => nt.Id == existing.TagId))
+            .ToList();
+
+        foreach (var tagToRemove in tagsToRemove)
+            _tags.Remove(tagToRemove);
+
+        foreach (var newTag in newTagsList)
+            if (!_tags.Any(existing => existing.TagId == newTag.Id))
+                _tags.Add(new RestaurantTag(Id, newTag.Id));
+    }
+
+    public void SendToModeration()
+    {
+        if (RestaurantStatus != Status.Draft && RestaurantStatus != Status.Rejected)
+            return;
+
+        RestaurantStatus = Status.OnModeration;
+        RegisterDomainEvent(new RestaurantUpdatedEvent(this));
+    }
+
+    public void Publish()
+    {
+        if (RestaurantStatus != Status.OnModeration)
+            return;
+
+        RestaurantStatus = Status.Published;
+        RegisterDomainEvent(new RestaurantUpdatedEvent(this));
+    }
+
+    public void Reject()
+    {
+        if (RestaurantStatus != Status.OnModeration)
+            return;
+
+        RestaurantStatus = Status.Rejected;
+        RegisterDomainEvent(new RestaurantUpdatedEvent(this));
     }
 
     public void MarkDeleted()
     {
-        if (_deletedEventQueued)
-        {
+        if (RestaurantStatus == Status.Archived)
             return;
-        }
 
-        RegisterDomainEvent(new RestaurantDeletedEvent(this));
-        _deletedEventQueued = true;
+        RestaurantStatus = Status.Archived;
+
+        if (!_deletedEventQueued)
+        {
+            RegisterDomainEvent(new RestaurantDeletedEvent(this));
+            _deletedEventQueued = true;
+        }
+    }
+
+    public void Restore()
+    {
+        if (RestaurantStatus != Status.Archived)
+            return;
+
+        RestaurantStatus = Status.Draft;
+        RegisterDomainEvent(new RestaurantUpdatedEvent(this));
     }
 
     public new void ClearDomainEvents()
@@ -210,16 +240,5 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
         base.ClearDomainEvents();
         _updatedEventQueued = false;
         _deletedEventQueued = false;
-    }
-
-    private void QueueUpdatedEvent()
-    {
-        if (_updatedEventQueued)
-        {
-            return;
-        }
-
-        RegisterDomainEvent(new RestaurantUpdatedEvent(this));
-        _updatedEventQueued = true;
     }
 }
