@@ -24,7 +24,8 @@ public class ReviewAddedDomainEventHandler(
             RestaurantId: notification.Review.RestaurantId,
             AuthorId: userContext.UserId,
             Rating: notification.Review.Rating,
-            Text: notification.Review.Comment ?? string.Empty,
+            Comment: notification.Review.Comment ?? string.Empty,
+            AverageCheck: null,
             Tags: Array.Empty<string>());
 
         await integrationEventBus.PublishAsync(integrationEvent, cancellationToken);

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace RestoRate.BuildingBlocks.Data.Repository;
 
-public class Repository<TEntity, TContext> : RepositoryBase<TEntity>, IRepository<TEntity>
+public class Repository<TEntity, TContext> : RepositoryBase<TEntity>, IRepository<TEntity>, IReadRepository<TEntity>
     where TEntity : class, IAggregateRoot
     where TContext : DbContext
 {

@@ -59,6 +59,7 @@ public interface IIntegrationEvent { }
 
 ```csharp
 using RestoRate.Abstractions.Messaging;
+using RestoRate.Contracts.Common.Dtos;
 
 namespace RestoRate.Contracts.Review.Events;
 
@@ -67,8 +68,9 @@ public sealed record ReviewAddedEvent(
     Guid RestaurantId,
     Guid AuthorId,
     int Rating,
-    string Text,
-    string[] Tags) : IIntegrationEvent;
+    MoneyDto? AverageCheck,
+    string? Comment,
+    string[]? Tags) : IIntegrationEvent;
 ```
 
 Замечания по распространению:

@@ -83,15 +83,15 @@ public record Rating
 
 public record Money
 {
-    public decimal Amount { get; private init; }
+    public long AmountMinor { get; private init; }
     public string Currency { get; private init; }
     private Money() { }
-    public Money(decimal amount, string currency = "RUB")
+    public Money(long amount, string currency = "RUB")
     {
-        Amount = amount;
+        AmountMinor = amount;
         Currency = currency;
     }
-    public override string ToString() => $"{Amount} {Currency}";
+    public override string ToString() => $"{AmountMinor} {Currency}";
 }
 
 // Restaurant Aggregate
@@ -109,7 +109,7 @@ public class Restaurant : AggregateRoot<RestaurantId>
         Rating = new Rating(averageRate, currentCheck, reviewCount);
         AddDomainEvent(new RestaurantRatingUpdatedEvent(Id, averageRate, reviewCount));
     }
-    public void UpdateAverageCheck(decimal amount, string currency = "RUB")
+    public void UpdateAverageCheck(long amount, string currency = "RUB")
     {
         var money = new Money(amount, currency);
         var currentRate = Rating?.AverageRate ?? 0;
@@ -146,7 +146,7 @@ public class MongoDbReviewRepository : IReviewRepository
 *   **MassTransit + RabbitMQ (рекомендуется)** — краткий пример публикации, потребления и настройки:
 ```csharp
 // Publish (например, в Review Service)
-await publish.Publish(new ReviewAddedEvent(reviewId, restaurantId, authorId, rating, text, tags));
+await publish.Publish(new ReviewAddedEvent(reviewId, restaurantId, authorId, rating, null, text, tags));
 
 // Consumer (например, в Moderation Service)
 public sealed class ReviewAddedConsumer : IConsumer<ReviewAddedEvent>

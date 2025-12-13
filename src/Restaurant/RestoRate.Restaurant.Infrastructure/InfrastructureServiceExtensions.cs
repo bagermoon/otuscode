@@ -8,6 +8,8 @@ using RestoRate.Restaurant.Infrastructure.Repositories;
 using RestoRate.BuildingBlocks.Data;
 using RestaurantEntity = RestoRate.Restaurant.Domain.RestaurantAggregate.Restaurant;
 using RestoRate.BuildingBlocks.Messaging;
+using RestoRate.BuildingBlocks.Data.Repository;
+using RestoRate.Restaurant.Domain.TagAggregate;
 
 namespace RestoRate.Restaurant.Infrastructure;
 
@@ -21,8 +23,8 @@ public static class InfrastructureServiceExtensions
         builder.AddMassTransitEventBus(AppHostProjects.RabbitMQ);
 
         builder.Services
-            .AddScoped<IRepository<RestaurantEntity>, RestaurantRepository>()
-            .AddScoped<IReadRepository<RestaurantEntity>, RestaurantReadRepository>()
+            .AddScoped(typeof(IRepository<>), typeof(EfRepository<>))
+            .AddScoped(typeof(IReadRepository<>), typeof(EfRepository<>))
         ;
 
         return builder;
