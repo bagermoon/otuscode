@@ -3,12 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using Ardalis.Result;
 using Ardalis.SharedKernel;
+
 using Mediator;
+
 using Microsoft.Extensions.Logging;
+
 using RestoRate.Restaurant.Application.DTOs;
 using RestoRate.Restaurant.Domain.RestaurantAggregate.Specifications;
+using RestoRate.SharedKernel.Enums;
+
 using RestaurantEntity = RestoRate.Restaurant.Domain.RestaurantAggregate.Restaurant;
 
 namespace RestoRate.Restaurant.Application.UseCases.GetAll;
@@ -54,6 +60,7 @@ public sealed class GetAllRestaurantsHandler(
                     restaurant.OpenHours.OpenTime,
                     restaurant.OpenHours.CloseTime),
                 new MoneyDto(restaurant.AverageCheck.Amount, restaurant.AverageCheck.Currency),
+                restaurant.RestaurantStatus.Name,
                 restaurant.CuisineTypes.Select(ct => ct.CuisineType.Name).ToList(),
                 restaurant.Tags.Select(t => t.Tag.Name).ToList(),
                 restaurant.Images

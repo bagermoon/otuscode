@@ -1,5 +1,6 @@
 using Ardalis.Result;
 using RestoRate.Restaurant.Domain.RestaurantAggregate;
+using RestoRate.Restaurant.Domain.TagAggregate;
 using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
 

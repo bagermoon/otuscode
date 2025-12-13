@@ -22,7 +22,7 @@ public static class RestaurantTestData
                 new TimeOnly(9, 0),
                 new TimeOnly(22, 0)
             ),
-            AverageCheck: new MoneyDto(1500, "RUB"),
+            AverageCheck: new MoneyDto(1500, "RUB"),          
             CuisineTypes: new List<string>
             {
                 CuisineType.Italian.Name,
@@ -30,8 +30,9 @@ public static class RestaurantTestData
             }.AsReadOnly(),
             Tags: new List<string>
             {
-                Tag.Banquet.Name,
-                Tag.LiveMusic.Name
+                "Банкет",
+                "Живая музыка",
+                "Уютное место"
             }.AsReadOnly(),
             Images: null
         );
@@ -61,7 +62,7 @@ public static class RestaurantTestData
             }.AsReadOnly(),
             Tags: new List<string>
             {
-                Tag.Wedding.Name
+                "Банкет"
             }.AsReadOnly()
         );
     }

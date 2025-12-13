@@ -1,14 +1,29 @@
 using RestoRate.Restaurant.Application.DTOs;
 using RestoRate.Restaurant.Application.DTOs.CRUD;
+
+using RestoRate.Restaurant.Domain.RestaurantAggregate;
+using RestoRate.Restaurant.Domain.TagAggregate;
+
 using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
 
 using RestaurantEntity = RestoRate.Restaurant.Domain.RestaurantAggregate.Restaurant;
+using TagEntity = RestoRate.Restaurant.Domain.TagAggregate.Tag;
 
 namespace RestoRate.Restaurant.UnitTests.Helpers;
 
 public static class TestDataBuilder
 {
+    #region Tag
+
+    private static readonly List<string> _availableTagNames = new()
+    {
+         "Банкет",
+         "Живая музыка",
+         "Уютное место"
+    };
+
+    #endregion
     #region RestaurantDto
     public static CreateRestaurantDto CreateValidRestaurantDto(
         string? name = null,
@@ -42,9 +57,9 @@ public static class TestDataBuilder
 
             Tags: (tags?.ToList() ?? new List<string>
             {
-                Tag.Banquet.Name,
-                Tag.LiveMusic.Name,
-                Tag.SummerTerrace.Name
+                "Банкет",
+                "Живая музыка",
+                "Уютное место"
             }).AsReadOnly(),
 
             Images: images?.ToList().AsReadOnly()
@@ -78,8 +93,8 @@ public static class TestDataBuilder
             }).AsReadOnly(),
             Tags: (tags?.ToList() ?? new List<string>
             {
-                Tag.Wedding.Name,
-                Tag.CorporateParty.Name
+                "Банкет",
+                "Живая музыка"
             }).AsReadOnly()
         );
     }
@@ -92,8 +107,7 @@ public static class TestDataBuilder
 
     public static List<string> GetRandomTags(int count = 3)
     {
-        var allTags = Tag.List.Select(t => t.Name).ToList();
-        return allTags.Take(count).ToList();
+        return _availableTagNames.Take(count).ToList();
     }
 
     public static CreateRestaurantImageDto CreateValidImageDto(
@@ -134,7 +148,15 @@ public static class TestDataBuilder
         SetPrivatePropertyValue(restaurant, "Id", id);
 
         restaurant.AddCuisineType(CuisineType.Italian);
-        restaurant.AddTag(Tag.Banquet);
+
+        var defaultTag = new TagEntity("Живая музыка");
+
+        SetPrivatePropertyValue(defaultTag, "Id", Guid.NewGuid());
+
+        restaurant.AddTag(defaultTag);
+
+        FixTagNavigationProperty(restaurant, defaultTag);
+
         restaurant.ClearDomainEvents();
 
         return restaurant;
@@ -184,11 +206,19 @@ public static class TestDataBuilder
     public static RestaurantEntity CreateRestaurantEntityWithTags(
         Guid id,
         string name,
-        params Tag[] tags)
+        params TagEntity[] tags)
     {
         var restaurant = CreateRestaurantEntity(id, name);
 
+        foreach (var t in tags)
+            if (t.Id == Guid.Empty)
+                SetPrivatePropertyValue(t, "Id", Guid.NewGuid());
+
         restaurant.UpdateTags(tags);
+
+        foreach (var tagEntity in tags)
+            FixTagNavigationProperty(restaurant, tagEntity);
+
         restaurant.ClearDomainEvents();
         return restaurant;
     }
@@ -215,6 +245,15 @@ public static class TestDataBuilder
         if (property != null)
         {
             property.SetValue(obj, value);
+        }
+    }
+
+    private static void FixTagNavigationProperty(RestaurantEntity restaurant, TagEntity tagEntity)
+    {
+        var link = restaurant.Tags.FirstOrDefault(rt => rt.TagId == tagEntity.Id);
+        if (link != null)
+        {
+            SetPrivatePropertyValue(link, "Tag", tagEntity);
         }
     }
 

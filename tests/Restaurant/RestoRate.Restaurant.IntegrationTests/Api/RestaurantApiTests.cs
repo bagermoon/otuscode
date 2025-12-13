@@ -2,6 +2,7 @@ using FluentAssertions;
 
 using RestoRate.Restaurant.Application.DTOs;
 using RestoRate.Restaurant.IntegrationTests.Helpers;
+using RestoRate.SharedKernel.Enums;
 
 namespace RestoRate.Restaurant.IntegrationTests.Api;
 
@@ -28,20 +29,6 @@ public class RestaurantApiTests : IClassFixture<RestaurantWebApplicationFactory>
         _client = _factory.CreateClientWithUser(TestUser.User);
         _adminClient = _factory.CreateClientWithUser(TestUser.Admin);
     }
-
-    // public ValueTask InitializeAsync() => ValueTask.CompletedTask;
-
-    // public async ValueTask DisposeAsync()
-    // {
-    //     foreach (var id in _createdRestaurantIds)
-    //     {
-    //         try
-    //         {
-    //             await _client.DeleteAsync($"/restaurants/{id}", CancellationToken);
-    //         }
-    //         catch{ } // Игнорируем ошибки при очистке
-    //     }
-    // }
 
     [Fact]
     public async Task Admin_Could_See_WeatherForecast()
@@ -81,6 +68,7 @@ public class RestaurantApiTests : IClassFixture<RestaurantWebApplicationFactory>
         restaurant.Should().NotBeNull();
         restaurant!.RestaurantId.Should().NotBeEmpty();
         restaurant.Name.Should().Be(request.Name);
+        restaurant.RestaurantStatus.Should().Be(Status.Draft.Name);
 
         _createdRestaurantIds.Add(restaurant.RestaurantId);
         _output.WriteLine($"Созданный ресторан с ID: {restaurant.RestaurantId}");
@@ -169,7 +157,11 @@ public class RestaurantApiTests : IClassFixture<RestaurantWebApplicationFactory>
 
         // Проверяем удаление
         var getResponse = await _client.GetAsync($"/restaurants/{createdRestaurant.RestaurantId}", CancellationToken);
-        getResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        getResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var archivedRestaurant = await getResponse.Content.ReadFromJsonAsync<RestaurantDto>(CancellationToken);
+        archivedRestaurant.Should().NotBeNull();
+        archivedRestaurant!.RestaurantStatus.Should().Be(Status.Archived.Name);
     }
 
     [Fact]

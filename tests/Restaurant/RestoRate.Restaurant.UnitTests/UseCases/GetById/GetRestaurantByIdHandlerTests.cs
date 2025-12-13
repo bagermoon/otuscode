@@ -11,6 +11,8 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using RestoRate.Restaurant.Application.UseCases.GetById;
 using RestoRate.Restaurant.UnitTests.Helpers;
+using RestoRate.SharedKernel.Enums;
+
 using RestaurantEntity = RestoRate.Restaurant.Domain.RestaurantAggregate.Restaurant;
 
 namespace RestoRate.Restaurant.UnitTests.UseCases.GetById;
@@ -51,6 +53,7 @@ public class GetRestaurantByIdHandlerTests
         result.Value.Should().NotBeNull();
         result.Value.RestaurantId.Should().Be(restaurantId);
         result.Value.Name.Should().Be("Закусочная \"Тесткейк\"");
+        result.Value.RestaurantStatus.Should().Be(Status.Draft.Name);
     }
 
     [Fact]

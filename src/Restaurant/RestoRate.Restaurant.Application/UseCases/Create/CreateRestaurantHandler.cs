@@ -7,6 +7,8 @@ using RestoRate.Contracts.Restaurant.Events;
 using RestoRate.Restaurant.Application.DTOs;
 using RestoRate.Restaurant.Domain.Interfaces;
 using RestoRate.Contracts.Restaurant;
+using RestoRate.Restaurant.Domain.TagAggregate;
+using RestoRate.Restaurant.Domain.TagAggregate.Specifications;
 using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
 
@@ -14,6 +16,7 @@ namespace RestoRate.Restaurant.Application.UseCases.Create;
 
 public sealed class CreateRestaurantHandler(
     IRestaurantService restaurantService,
+    IRepository<Tag> tagRepository,
     IIntegrationEventBus integrationEventBus,
     ILogger<CreateRestaurantHandler> logger)
     : ICommandHandler<CreateRestaurantCommand, Result<RestaurantDto>>
@@ -37,9 +40,28 @@ public sealed class CreateRestaurantHandler(
                 .Select(ct => CuisineType.FromName(ct))
                 .ToList();
 
-            var tags = request.Dto.Tags
-                .Select(t => Tag.FromName(t))
-                .ToList();
+            var restaurantTags = new List<Tag>();
+            if (request.Dto.Tags != null && request.Dto.Tags.Count != 0)
+            {
+                var uniqueTags = request.Dto.Tags.Distinct(StringComparer.OrdinalIgnoreCase);
+
+                foreach (var tagName in uniqueTags)
+                {
+                    var spec = new TagByNameSpec(tagName);
+                    var existingTag = await tagRepository.FirstOrDefaultAsync(spec, cancellationToken);
+
+                    if (existingTag != null)
+                    {
+                        restaurantTags.Add(existingTag);
+                    }
+                    else
+                    {
+                        var newTag = new Tag(tagName);
+                        await tagRepository.AddAsync(newTag, cancellationToken);
+                        restaurantTags.Add(newTag);
+                    }
+                }
+            }
 
             var images = request.Dto.Images?
                 .Select(img => (img.Url, img.AltText, img.IsPrimary));
@@ -54,7 +76,7 @@ public sealed class CreateRestaurantHandler(
                 openHours,
                 averageCheck,
                 cuisineTypes,
-                tags,
+                restaurantTags,
                 images);
 
             if (result.Status != ResultStatus.Ok)
@@ -85,8 +107,9 @@ public sealed class CreateRestaurantHandler(
                     openHours.OpenTime,
                     openHours.CloseTime),
                 new MoneyDto(averageCheck.Amount, averageCheck.Currency),
+                RestaurantStatus: Status.Draft.Name,
                 cuisineTypes.Select(ct => ct.Name).ToList(),
-                tags.Select(t => t.Name).ToList(),
+                restaurantTags.Select(t => t.Name).ToList(),
                 Array.Empty<RestaurantImageDto>() // изображения тут по сути не нужны
             );
 

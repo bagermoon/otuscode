@@ -18,10 +18,19 @@ public class RestaurantTagConfiguration : IEntityTypeConfiguration<RestaurantTag
 
         builder.HasKey(i => i.Id);
 
-        builder.Property(r => r.Tag)
-            .HasConversion(
-                r => r.Value,
-                value => Tag.FromValue(value)
-            );
+        builder.HasOne<Domain.RestaurantAggregate.Restaurant>()
+            .WithMany(r => r.Tags)
+            .HasForeignKey(rt => rt.RestaurantId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(rt => rt.Tag)
+            .WithMany()
+            .HasForeignKey(rt => rt.TagId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(rt => new { rt.RestaurantId, rt.TagId })
+            .IsUnique();
+
+        builder.Navigation(rt => rt.Tag).AutoInclude(false); // добавлен в спецификации
     }
 }
