@@ -16,13 +16,11 @@ public static class UserContextServiceCollectionExtensions
             var providers = sp.GetServices<IUserContextProvider>()
                 .OrderByDescending(p => p.Priority);
 
-            foreach (var provider in providers)
-            {
-                if (provider.TryGet(out var ctx))
-                    return ctx;
-            }
+            var ctx = providers
+                .Select(p => { return p.TryGet(out var c) ? c : null; })
+                .FirstOrDefault(c => c != null);
 
-            return AnonymousUserContext.Instance;
+            return ctx ?? AnonymousUserContext.Instance;
         });
 
         return services;

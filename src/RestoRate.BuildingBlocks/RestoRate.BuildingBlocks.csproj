@@ -14,7 +14,4 @@
     <ProjectReference Include="..\RestoRate.Abstractions\RestoRate.Abstractions.csproj" />
     <ProjectReference Include="..\RestoRate.SharedKernel\RestoRate.SharedKernel.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Messaging\Identity\" />
-  </ItemGroup>
 </Project>

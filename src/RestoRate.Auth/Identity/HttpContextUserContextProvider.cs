@@ -16,7 +16,7 @@ public sealed class HttpContextUserContextProvider(IHttpContextAccessor httpCont
             return false;
         }
 
-        if (HttpContextUserContext.TryGetUserContext(httpContextAccessor, out var httpContextUserContext) == false)
+        if (!HttpContextUserContext.TryGetUserContext(httpContextAccessor, out var httpContextUserContext))
         {
             userContext = default!;
             return false;
