@@ -4,5 +4,5 @@ namespace RestoRate.Contracts.Restaurant.Events;
 
 public sealed record RestaurantCreatedEvent(
     Guid RestaurantId,
-    string Name
+    RestaurantStatus Status
 ) : IIntegrationEvent;

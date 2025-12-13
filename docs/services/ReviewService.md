@@ -84,12 +84,12 @@ public sealed class Review : AggregateRoot<ReviewId>
 
 - Публикует: `ReviewAddedEvent`, `ReviewUpdatedEvent`
 - Подписывается на: `ReviewModeratedEvent` (публикуется сервисом Moderation),
-  `RestaurantCreatedEvent`, `RestaurantUpdatedEvent`, `RestaurantArchivedEvent`
+  `RestaurantCreatedEvent`, `RestaurantArchivedEvent`
 
 ```mermaid
 flowchart LR
     %% Справочные события от Restaurant
-    RSVC[Restaurant Service] -- RestaurantCreatedEvent / RestaurantUpdatedEvent / RestaurantArchivedEvent --> MQ[(RabbitMQ)]
+    RSVC[Restaurant Service] -- RestaurantCreatedEvent / RestaurantArchivedEvent --> MQ[(RabbitMQ)]
     MQ --> RV
 
     %% Исходящие события сервиса Review
@@ -128,8 +128,8 @@ flowchart LR
 
 ### Примечания
 
-- Review Service поддерживает локальную проекцию «разрешённых ресторанов»,
-    синхронизируемую событиями `RestaurantCreatedEvent` / `RestaurantUpdatedEvent` / `RestaurantArchivedEvent`.
+    - Review Service поддерживает локальную проекцию «разрешённых ресторанов»,
+    синхронизируемую событиями `RestaurantCreatedEvent` / `RestaurantArchivedEvent`.
 - При создании отзыва сервис валидирует `RestaurantId` по этой проекции:
     отзыв можно добавить только для существующего и не архивированного ресторана.
 

@@ -21,7 +21,6 @@ RestoRate.Contracts/
 │   │   └── RestaurantDetailsDto.cs        # детали (опционально)
 │   └── Events/
 │       ├── RestaurantCreatedEvent.cs
-│       ├── RestaurantUpdatedEvent.cs
 │       └── RestaurantArchivedEvent.cs
 ├── Review/
 │   ├── Dtos/

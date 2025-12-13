@@ -6,7 +6,7 @@ using RestoRate.Abstractions.Messaging;
 using RestoRate.Contracts.Restaurant.Events;
 using RestoRate.Restaurant.Application.DTOs;
 using RestoRate.Restaurant.Domain.Interfaces;
-using RestoRate.Restaurant.Domain.RestaurantAggregate;
+using RestoRate.Contracts.Restaurant;
 using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
 
@@ -68,7 +68,7 @@ public sealed class CreateRestaurantHandler(
             await integrationEventBus.PublishAsync(new RestaurantCreatedEvent
                 (
                     RestaurantId: restaurantId,
-                    Name: request.Dto.Name
+                    Status: RestaurantStatus.Draft
                 ),
                 cancellationToken);
 
