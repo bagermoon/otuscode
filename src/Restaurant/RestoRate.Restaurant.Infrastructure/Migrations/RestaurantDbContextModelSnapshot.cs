@@ -41,10 +41,6 @@ namespace RestoRate.Restaurant.Infrastructure.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("name");
 
-                    b.Property<int>("RestaurantStatus")
-                        .HasColumnType("integer")
-                        .HasColumnName("restaurant_status");
-
                     b.HasKey("Id")
                         .HasName("pk_restaurants");
 
@@ -125,44 +121,17 @@ namespace RestoRate.Restaurant.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("restaurant_id");
 
-                    b.Property<Guid>("TagId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("tag_id");
+                    b.Property<int>("Tag")
+                        .HasColumnType("integer")
+                        .HasColumnName("tag");
 
                     b.HasKey("Id")
                         .HasName("pk_restaurant_tags");
 
-                    b.HasIndex("TagId")
-                        .HasDatabaseName("ix_restaurant_tags_tag_id");
-
-                    b.HasIndex("RestaurantId", "TagId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_restaurant_tags_restaurant_id_tag_id");
+                    b.HasIndex("RestaurantId")
+                        .HasDatabaseName("ix_restaurant_tags_restaurant_id");
 
                     b.ToTable("restaurant_tags", (string)null);
-                });
-
-            modelBuilder.Entity("RestoRate.Restaurant.Domain.TagAggregate.Tag", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
-
-                    b.Property<string>("NormalizedName")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("normalized_name");
-
-                    b.HasKey("Id")
-                        .HasName("pk_tag");
-
-                    b.ToTable("tag", (string)null);
                 });
 
             modelBuilder.Entity("RestoRate.Restaurant.Domain.RestaurantAggregate.Restaurant", b =>
@@ -185,50 +154,7 @@ namespace RestoRate.Restaurant.Infrastructure.Migrations
 
                             b1.HasKey("RestaurantId");
 
-                            b1.ToTable("restaurants");
-
-                            b1.WithOwner()
-                                .HasForeignKey("RestaurantId")
-                                .HasConstraintName("fk_restaurants_restaurants_id");
-                        });
-
-                    b.OwnsOne("RestoRate.SharedKernel.ValueObjects.Email", "Email", b1 =>
-                        {
-                            b1.Property<Guid>("RestaurantId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
-
-                            b1.Property<string>("Address")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasColumnName("email_address");
-
-                            b1.HasKey("RestaurantId");
-
-                            b1.ToTable("restaurants");
-
-                            b1.WithOwner()
-                                .HasForeignKey("RestaurantId")
-                                .HasConstraintName("fk_restaurants_restaurants_id");
-                        });
-
-                    b.OwnsOne("RestoRate.SharedKernel.ValueObjects.Location", "Location", b1 =>
-                        {
-                            b1.Property<Guid>("RestaurantId")
-                                .HasColumnType("uuid")
-                                .HasColumnName("id");
-
-                            b1.Property<double>("Latitude")
-                                .HasColumnType("double precision")
-                                .HasColumnName("location_latitude");
-
-                            b1.Property<double>("Longitude")
-                                .HasColumnType("double precision")
-                                .HasColumnName("location_longitude");
-
-                            b1.HasKey("RestaurantId");
-
-                            b1.ToTable("restaurants");
+                            b1.ToTable("restaurants", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("RestaurantId")
@@ -252,7 +178,50 @@ namespace RestoRate.Restaurant.Infrastructure.Migrations
 
                             b1.HasKey("RestaurantId");
 
-                            b1.ToTable("restaurants");
+                            b1.ToTable("restaurants", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("RestaurantId")
+                                .HasConstraintName("fk_restaurants_restaurants_id");
+                        });
+
+                    b.OwnsOne("RestoRate.SharedKernel.ValueObjects.Email", "Email", b1 =>
+                        {
+                            b1.Property<Guid>("RestaurantId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("id");
+
+                            b1.Property<string>("Address")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("email_address");
+
+                            b1.HasKey("RestaurantId");
+
+                            b1.ToTable("restaurants", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("RestaurantId")
+                                .HasConstraintName("fk_restaurants_restaurants_id");
+                        });
+
+                    b.OwnsOne("RestoRate.SharedKernel.ValueObjects.Location", "Location", b1 =>
+                        {
+                            b1.Property<Guid>("RestaurantId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("id");
+
+                            b1.Property<double>("Latitude")
+                                .HasColumnType("double precision")
+                                .HasColumnName("location_latitude");
+
+                            b1.Property<double>("Longitude")
+                                .HasColumnType("double precision")
+                                .HasColumnName("location_longitude");
+
+                            b1.HasKey("RestaurantId");
+
+                            b1.ToTable("restaurants", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("RestaurantId")
@@ -283,7 +252,7 @@ namespace RestoRate.Restaurant.Infrastructure.Migrations
 
                             b1.HasKey("RestaurantId");
 
-                            b1.ToTable("restaurants");
+                            b1.ToTable("restaurants", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("RestaurantId")
@@ -312,7 +281,7 @@ namespace RestoRate.Restaurant.Infrastructure.Migrations
 
                             b1.HasKey("RestaurantId");
 
-                            b1.ToTable("restaurants");
+                            b1.ToTable("restaurants", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("RestaurantId")
@@ -366,15 +335,6 @@ namespace RestoRate.Restaurant.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_restaurant_tags_restaurants_restaurant_id");
-
-                    b.HasOne("RestoRate.Restaurant.Domain.TagAggregate.Tag", "Tag")
-                        .WithMany()
-                        .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_restaurant_tags_tag_tag_id");
-
-                    b.Navigation("Tag");
                 });
 
             modelBuilder.Entity("RestoRate.Restaurant.Domain.RestaurantAggregate.Restaurant", b =>
