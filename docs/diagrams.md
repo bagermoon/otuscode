@@ -166,7 +166,7 @@
    
     Подробные потоки интеграционных событий описаны по сервисам:
 
-    - Restaurant Service: см. [RestoRate.RestaurantService.md](./services/RestoRate.RestaurantService.md#интеграционные-события)
+    - Restaurant Service: см. [RestaurantService.md](./services/RestaurantService.md#интеграционные-события)
     - Review Service: см. [ReviewService.md](./services/ReviewService.md#интеграционные-события)
     - Moderation Service: см. [ModerationService.md](./services/ModerationService.md#интеграционные-события)
     - Rating Service: см. [RatingService.md](./services/RatingService.md#интеграционные-события)
