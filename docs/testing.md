@@ -86,16 +86,16 @@
 ---
 ## Интеграционные тесты
 
-Интеграционные тесты находятся в проектах `tests/<Context>/<Context>.IntegrationTests` (например, `tests/Restaurant/RestoRate.Restaurant.IntegrationTests`). Они тестируют API endpoints с использованием WebApplicationFactory и требуют запущенных зависимостей (например, PostgreSQL, MongoDB), которые запускаются автоматически в docker.
+Интеграционные тесты находятся в проектах `tests/<Context>/<Context>.IntegrationTests` (например, `tests/Restaurant/RestoRate.RestaurantService.IntegrationTests`). Они тестируют API endpoints с использованием WebApplicationFactory и требуют запущенных зависимостей (например, PostgreSQL, MongoDB), которые запускаются автоматически в docker.
 
 ### Запуск интеграционных тестов
 
 ```powershell
 # Все интеграционные тесты
-dotnet test tests/Restaurant/RestoRate.Restaurant.IntegrationTests
+dotnet test tests/Restaurant/RestoRate.RestaurantService.IntegrationTests
 
 # Конкретный тест
-dotnet test tests/Restaurant/RestoRate.Restaurant.IntegrationTests --filter "FullyQualifiedName~CreateRestaurant"
+dotnet test tests/Restaurant/RestoRate.RestaurantService.IntegrationTests --filter "FullyQualifiedName~CreateRestaurant"
 ```
 
 ### Аутентификация в интеграционных тестах

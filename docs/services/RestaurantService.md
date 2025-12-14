@@ -3,7 +3,7 @@
 ## Restaurant
 
 ```csharp
-namespace RestoRate.Restaurant.Domain;
+namespace RestoRate.RestaurantService.Domain;
 
 public sealed class Restaurant : AggregateRoot<RestaurantId>
 {

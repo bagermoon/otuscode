@@ -402,7 +402,7 @@ public class ReviewAddedEventHandler
 
     protected override async Task OnInitializedAsync()
     {
-        restaurants = await RestaurantService.GetRestaurantsAsync();
+        restaurants = await RestoRate.RestaurantService.GetRestaurantsAsync();
         foreach (var r in restaurants)
         {
             ratings[r.Id] = await RatingService.GetRatingAsync(r.Id);

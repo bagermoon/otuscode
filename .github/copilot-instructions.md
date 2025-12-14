@@ -46,8 +46,8 @@ Goal: Make AI agents productive immediately in this .NET 9 + Aspire microservice
 ## EF Core (Restaurant) — migrations
 - Design‑time host: `src/RestoRate.Migrations` (used as `--startup-project`).
 - Commands (from repo root), also available as VS Code tasks:
-  - List: `dotnet ef migrations --startup-project .\src\RestoRate.Migrations --project .\src\Restaurant\RestoRate.Restaurant.Infrastructure list`
-  - Add:  `dotnet ef migrations --startup-project .\src\RestoRate.Migrations --project .\src\Restaurant\RestoRate.Restaurant.Infrastructure add <Name>`
+  - List: `dotnet ef migrations --startup-project .\src\RestoRate.Migrations --project .\src\Restaurant\RestoRate.RestaurantService.Infrastructure list`
+  - Add:  `dotnet ef migrations --startup-project .\src\RestoRate.Migrations --project .\src\Restaurant\RestoRate.RestaurantService.Infrastructure add <Name>`
 - Prefer running with AppHost up so DB/config are available. See `docs/migrations.md`.
 
 ## Gotchas
@@ -70,7 +70,7 @@ Goal: Make AI agents productive immediately in this .NET 9 + Aspire microservice
 - AppHost: `src/RestoRate.AppHost/AppHost.cs`
 - Service defaults: `src/RestoRate.ServiceDefaults/Extensions.cs`
 - Gateway: `src/RestoRate.Gateway/Program.cs`, `TokenExchangeMiddleware.cs`
-- Restaurant API example endpoint: `src/Restaurant/RestoRate.Restaurant.Api/Endpoints/Restaurants/CreateRestaurantEndpoint.cs`
+- Restaurant API example endpoint: `src/Restaurant/RestoRate.RestaurantService.Api/Endpoints/Restaurants/CreateRestaurantEndpoint.cs`
 - Architecture index: `docs/ARCHITECTURE.md`; Layout rules: `docs/layout.md`; Diagrams: `docs/diagrams.md`; Testing: `docs/testing.md`
 - Testing & OpenAPI docs: `.github/copilot-testing.md`
 

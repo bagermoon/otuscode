@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="AutoFixture.Xunit3" />
+    <PackageReference Include="AutoFixture.AutoNSubstitute" />
+    <PackageReference Include="NSubstitute" />
+    <PackageReference Include="FluentAssertions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\RestaurantService\RestoRate.RestaurantService.Application\RestoRate.RestaurantService.Application.csproj" />
+    <ProjectReference Include="..\..\..\src\RestaurantService\RestoRate.RestaurantService.Domain\RestoRate.RestaurantService.Domain.csproj" />
+    <ProjectReference Include="..\..\..\src\RestoRate.SharedKernel\RestoRate.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\..\src\RestoRate.Abstractions\RestoRate.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\src\RestoRate.Contracts\RestoRate.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>
