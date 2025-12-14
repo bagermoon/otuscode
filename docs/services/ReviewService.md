@@ -29,7 +29,6 @@ public sealed class Review : AggregateRoot<ReviewId>
         SuggestedAverageCheck = suggestedAverageCheck;
         Status = ReviewStatus.Pending;
         CreatedAt = DateTimeOffset.UtcNow;
-        AppendStatus(Status, null, "initial submission");
         AddDomainEvent(new ReviewAddedDomainEvent(id, restaurantId, rating));
     }
 
@@ -52,7 +51,6 @@ public sealed class Review : AggregateRoot<ReviewId>
     public ReviewStatus Status { get; private set; }
     public string? ModerationReason { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
-    public IReadOnlyCollection<ReviewStatusTransition> History => _history.AsReadOnly();
 
     public void UpdateContent(int rating, string text, IEnumerable<string> tags, Money? suggestedAverageCheck)
     {
@@ -69,13 +67,7 @@ public sealed class Review : AggregateRoot<ReviewId>
 
         Status = status;
         ModerationReason = reason;
-        AppendStatus(status, moderatorId, reason);
         AddDomainEvent(new ReviewModeratedDomainEvent(Id, RestaurantId, status, reason, moderatorId));
-    }
-
-    private void AppendStatus(ReviewStatus status, string? actorId, string? comment)
-    {
-        _history.Add(new ReviewStatusTransition(status, DateTimeOffset.UtcNow, actorId, comment));
     }
 }
 ```
