@@ -23,7 +23,7 @@ public class RestaurantTag : EntityBase<Guid>
     internal RestaurantTag(Guid restaurantId, Guid tagId)
     {
         Id = Guid.NewGuid();
-        RestaurantId = restaurantId;
-        TagId = tagId;
+        RestaurantId = Guard.Against.Default(restaurantId, nameof(restaurantId));
+        TagId = Guard.Against.Default(tagId, nameof(tagId));
     }
 }

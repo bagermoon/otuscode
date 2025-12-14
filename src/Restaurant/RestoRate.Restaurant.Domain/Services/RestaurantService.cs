@@ -3,6 +3,7 @@ using Ardalis.SharedKernel;
 using Mediator;
 using Microsoft.Extensions.Logging;
 using RestoRate.Restaurant.Domain.Interfaces;
+using RestoRate.Restaurant.Domain.RestaurantAggregate.Specifications;
 using RestoRate.Restaurant.Domain.TagAggregate;
 using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
@@ -74,7 +75,8 @@ public class RestaurantService(
     {
         logger.LogInformation("Обновление ресторана {RestaurantId}", restaurantId);
 
-        var restaurant = await repository.GetByIdAsync(restaurantId);
+        var spec = new GetRestaurantByIdSpec(restaurantId);
+        var restaurant = await repository.FirstOrDefaultAsync(spec);
         if (restaurant == null)
         {
             logger.LogWarning("Ресторан {RestaurantId} не найден", restaurantId);

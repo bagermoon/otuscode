@@ -41,6 +41,7 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
         OpenHours openHours,
         Money averageCheck)
     {
+        Id = Guid.NewGuid();
         Name = Guard.Against.NullOrEmpty(name, nameof(name));
         Description = Guard.Against.NullOrEmpty(description, nameof(description));
         PhoneNumber = Guard.Against.Null(phoneNumber, nameof(phoneNumber));

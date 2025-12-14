@@ -17,6 +17,7 @@ public class Tag : EntityBase<Guid>, IAggregateRoot
 
     public Tag(string name)
     {
+        Id = Guid.NewGuid();
         Name = Guard.Against.NullOrEmpty(name, nameof(name));
         NormalizedName = name.Trim().ToLowerInvariant();
     }
