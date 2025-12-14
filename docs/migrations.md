@@ -7,33 +7,33 @@
 - Список миграций (применённых и ожидающих):
 
     ```pwsh
-    dotnet aspire exec --resource ServiceRestaurantApi -- dotnet ef migrations --startup-project ..\..\RestoRate.Migrations --project ..\RestoRate.Restaurant.Infrastructure list
+    dotnet aspire exec --resource ServiceRestaurantApi -- dotnet ef migrations --startup-project ..\..\RestoRate.Migrations --project ..\RestoRate.RestaurantService.Infrastructure list
     ```
 
   Примечание о рабочей директории и создании миграции
 
-  - Когда вы запускаете команду через `dotnet aspire exec --resource ServiceRestaurantApi -- ...`, команда выполняется с текущей директорией, установленной в корень ресурса ServiceRestaurantApi (в этом репозитории это `src/Restaurant/RestoRate.Restaurant.Api`).
+  - Когда вы запускаете команду через `dotnet aspire exec --resource ServiceRestaurantApi -- ...`, команда выполняется с текущей директорией, установленной в корень ресурса ServiceRestaurantApi (в этом репозитории это `src/Restaurant/RestoRate.RestaurantService.Api`).
   - Поэтому относительные пути для параметров `--startup-project` и `--project` указываются относительно этого каталога:
 
   - `--startup-project ..\..\RestoRate.Migrations` (поднимаемся до `src`)
-  - `--project ..\RestoRate.Restaurant.Infrastructure` (переходим в соседний проект внутри `src/Restaurant`)
+  - `--project ..\RestoRate.RestaurantService.Infrastructure` (переходим в соседний проект внутри `src/Restaurant`)
 
 - Создать новую миграцию локально из корня репозитория (без `aspire`):
 
     ```pwsh
-    dotnet ef migrations --startup-project .\src\RestoRate.Migrations --project .\src\Restaurant\RestoRate.Restaurant.Infrastructure add SomeMigration
+    dotnet ef migrations --startup-project .\src\RestoRate.Migrations --project .\src\Restaurant\RestoRate.RestaurantService.Infrastructure add SomeMigration
     ```
 
 - Создать новую миграцию через `aspire exec` (использует пути относительно корня ресурса):
 
     ```pwsh
-    dotnet aspire exec --resource ServiceRestaurantApi -- dotnet ef migrations --startup-project ..\..\RestoRate.Migrations --project ..\RestoRate.Restaurant.Infrastructure add SomeMigration
+    dotnet aspire exec --resource ServiceRestaurantApi -- dotnet ef migrations --startup-project ..\..\RestoRate.Migrations --project ..\RestoRate.RestaurantService.Infrastructure add SomeMigration
     ```
 
 - Удаление последней миграции:
 
     ```pwsh
-    dotnet aspire exec --resource ServiceRestaurantApi -- dotnet ef migrations --startup-project ..\..\RestoRate.Migrations --project ..\RestoRate.Restaurant.Infrastructure remove
+    dotnet aspire exec --resource ServiceRestaurantApi -- dotnet ef migrations --startup-project ..\..\RestoRate.Migrations --project ..\RestoRate.RestaurantService.Infrastructure remove
     ```
 
 Примечания:

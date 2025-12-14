@@ -24,7 +24,7 @@ dotnet build RestoRate.slnx -c Debug
 Or build a single API project:
 
 ```powershell
-dotnet build src/Restaurant/RestoRate.Restaurant.Api/RestoRate.Restaurant.Api.csproj -c Debug
+dotnet build src/Restaurant/RestoRate.RestaurantService.Api/RestoRate.RestaurantService.Api.csproj -c Debug
 ```
 
 Search pattern for artifacts:
@@ -118,8 +118,8 @@ E2E tests use real Keycloak authentication with Playwright browser automation. S
 ## Service-Specific Testing
 
 ### Restaurant Service
-- **API Project:** `src/Restaurant/RestoRate.Restaurant.Api`
-- **Tests:** `tests/Restaurant/RestoRate.Restaurant.UnitTests`, `tests/Restaurant/RestoRate.Restaurant.IntegrationTests`
+- **API Project:** `src/Restaurant/RestoRate.RestaurantService.Api`
+- **Tests:** `tests/Restaurant/RestoRate.RestaurantService.UnitTests`, `tests/Restaurant/RestoRate.RestaurantService.IntegrationTests`
 - **Database:** PostgreSQL (via Aspire or standalone)
 
 ### Review Service

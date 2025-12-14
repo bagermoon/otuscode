@@ -50,7 +50,7 @@ var migrations = builder.AddProject<RestoRate_Migrations>("migrations")
 
 #region ServiceRestaurantApi
 var restaurantApiBearerAudience = builder.AddParameter("restaurant-api-bearer-audience", value: "restorate-restaurant-api", publishValueAsDefault: true);
-var restaurantApi = builder.AddProject<RestoRate_Restaurant_Api>(AppHostProjects.ServiceRestaurantApi)
+var restaurantApi = builder.AddProject<RestoRate_RestaurantService_Api>(AppHostProjects.ServiceRestaurantApi)
     .WithReference(keycloak)
     .WithReference(restaurantDb)
     .WithReference(rabbitmq)

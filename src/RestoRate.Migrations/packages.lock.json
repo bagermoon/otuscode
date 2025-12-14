@@ -863,17 +863,17 @@
           "RestoRate.SharedKernel": "[1.0.0, )"
         }
       },
-      "restorate.restaurant.domain": {
+      "RestoRate.RestaurantService.domain": {
         "type": "Project",
         "dependencies": {
           "RestoRate.SharedKernel": "[1.0.0, )"
         }
       },
-      "restorate.restaurant.infrastructure": {
+      "RestoRate.RestaurantService.infrastructure": {
         "type": "Project",
         "dependencies": {
           "RestoRate.BuildingBlocks": "[1.0.0, )",
-          "RestoRate.Restaurant.Domain": "[1.0.0, )",
+          "RestoRate.RestaurantService.Domain": "[1.0.0, )",
           "RestoRate.SharedKernel": "[1.0.0, )"
         }
       },

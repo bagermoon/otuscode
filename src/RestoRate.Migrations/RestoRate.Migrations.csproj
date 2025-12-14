@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Restaurant\RestoRate.Restaurant.Infrastructure\RestoRate.Restaurant.Infrastructure.csproj" />
+    <ProjectReference Include="..\RestaurantService\RestoRate.RestaurantService.Infrastructure\RestoRate.RestaurantService.Infrastructure.csproj" />
     <ProjectReference Include="..\RestoRate.BuildingBlocks\RestoRate.BuildingBlocks.csproj" />
     <ProjectReference Include="..\RestoRate.ServiceDefaults\RestoRate.ServiceDefaults.csproj" />
   </ItemGroup>
