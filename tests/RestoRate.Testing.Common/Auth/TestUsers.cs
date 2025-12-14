@@ -5,8 +5,8 @@ public static class TestUsers
     private static readonly Dictionary<TestUser, TestUserInfo> _users = new()
     {
         [TestUser.Anonymous] = new("anonymous", [], "anonymous@example.com"),
-        [TestUser.User] = new("user", ["user"], "user@example.com"),
-        [TestUser.Admin] = new("admin", ["admin"], "admin@example.com")
+        [TestUser.User] = new("user", ["user"], "user@example.com", "user"),
+        [TestUser.Admin] = new("admin", ["admin"], "admin@example.com", "admin")
     };
 
     public static TestUserInfo Get(TestUser type) => _users[type];

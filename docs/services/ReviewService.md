@@ -29,7 +29,6 @@ public sealed class Review : AggregateRoot<ReviewId>
         SuggestedAverageCheck = suggestedAverageCheck;
         Status = ReviewStatus.Pending;
         CreatedAt = DateTimeOffset.UtcNow;
-        AppendStatus(Status, null, "initial submission");
         AddDomainEvent(new ReviewAddedDomainEvent(id, restaurantId, rating));
     }
 
@@ -52,7 +51,6 @@ public sealed class Review : AggregateRoot<ReviewId>
     public ReviewStatus Status { get; private set; }
     public string? ModerationReason { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
-    public IReadOnlyCollection<ReviewStatusTransition> History => _history.AsReadOnly();
 
     public void UpdateContent(int rating, string text, IEnumerable<string> tags, Money? suggestedAverageCheck)
     {
@@ -69,13 +67,7 @@ public sealed class Review : AggregateRoot<ReviewId>
 
         Status = status;
         ModerationReason = reason;
-        AppendStatus(status, moderatorId, reason);
         AddDomainEvent(new ReviewModeratedDomainEvent(Id, RestaurantId, status, reason, moderatorId));
-    }
-
-    private void AppendStatus(ReviewStatus status, string? actorId, string? comment)
-    {
-        _history.Add(new ReviewStatusTransition(status, DateTimeOffset.UtcNow, actorId, comment));
     }
 }
 ```
@@ -84,12 +76,12 @@ public sealed class Review : AggregateRoot<ReviewId>
 
 - Публикует: `ReviewAddedEvent`, `ReviewUpdatedEvent`
 - Подписывается на: `ReviewModeratedEvent` (публикуется сервисом Moderation),
-  `RestaurantCreatedEvent`, `RestaurantUpdatedEvent`, `RestaurantArchivedEvent`
+  `RestaurantCreatedEvent`, `RestaurantArchivedEvent`
 
 ```mermaid
 flowchart LR
     %% Справочные события от Restaurant
-    RSVC[Restaurant Service] -- RestaurantCreatedEvent / RestaurantUpdatedEvent / RestaurantArchivedEvent --> MQ[(RabbitMQ)]
+    RSVC[Restaurant Service] -- RestaurantCreatedEvent / RestaurantArchivedEvent --> MQ[(RabbitMQ)]
     MQ --> RV
 
     %% Исходящие события сервиса Review
@@ -128,8 +120,8 @@ flowchart LR
 
 ### Примечания
 
-- Review Service поддерживает локальную проекцию «разрешённых ресторанов»,
-    синхронизируемую событиями `RestaurantCreatedEvent` / `RestaurantUpdatedEvent` / `RestaurantArchivedEvent`.
+    - Review Service поддерживает локальную проекцию «разрешённых ресторанов»,
+    синхронизируемую событиями `RestaurantCreatedEvent` / `RestaurantArchivedEvent`.
 - При создании отзыва сервис валидирует `RestaurantId` по этой проекции:
     отзыв можно добавить только для существующего и не архивированного ресторана.
 

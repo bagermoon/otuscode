@@ -73,7 +73,8 @@ public sealed class Restaurant : AggregateRoot<RestaurantId>
 
 ## Интеграционные события
 
-- Публикует: `RestaurantCreatedEvent`, `RestaurantUpdatedEvent`, `RestaurantArchivedEvent`
+Сервис Restaurant публикует следующие интеграционные события из `RestoRate.Contracts.Restaurant.Events`:
+- Публикует: `RestaurantCreatedEvent`, `RestaurantArchivedEvent`
 - Подписывается на: `RestaurantRatingRecalculatedEvent`
 
 ```mermaid
@@ -83,7 +84,7 @@ flowchart LR
         RS[API/Application]
     end
 
-    RS -- RestaurantCreatedEvent / RestaurantUpdatedEvent / RestaurantArchivedEvent --> MQ[(RabbitMQ)]
+    RS -- RestaurantCreatedEvent / RestaurantArchivedEvent --> MQ[(RabbitMQ)]
 
     MQ --> ReviewSvc[Review Service]
 
@@ -105,9 +106,10 @@ flowchart LR
 
 ### Примечания
 
-- Оранжевый — события Restaurant (Created/Updated/Archived), публикуемые сервисом Restaurant и доставляемые в Review Service.
+- Оранжевый — события Restaurant (Created/Archived), публикуемые сервисом Restaurant и доставляемые в Review Service.
 - Синий — событие Rating (`RestaurantRatingRecalculatedEvent`), публикуемое сервисом Rating и доставляемое обратно в Restaurant для проекции.
 - Пунктир — доставка события от RabbitMQ к потребителю; сплошная линия — публикация события в RabbitMQ.
+- **Внутренние события** (Domain): `RestaurantCreatedDomainEvent`, `RestaurantPublishedDomainEvent`, `RestaurantArchivedDomainEvent`, `RestaurantRatingAppliedDomainEvent`, `RestaurantAverageCheckAppliedDomainEvent`.
 
 ## Последовательность событий (Sequence)
 
@@ -124,8 +126,8 @@ sequenceDiagram
     RS->>MQ: Publish RestaurantCreatedEvent
     MQ->>RV: Deliver RestaurantCreatedEvent (инициализация каталога отзывов)
 
-    RS->>MQ: Publish RestaurantUpdatedEvent / RestaurantArchivedEvent
-    MQ->>RV: Deliver RestaurantUpdatedEvent / RestaurantArchivedEvent
+    RS->>MQ: Publish RestaurantArchivedEvent
+    MQ->>RV: Deliver RestaurantArchivedEvent
 
     note over RS,RT: Рейтинг рассчитывается сервисом Rating по событиям Review
 

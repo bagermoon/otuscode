@@ -13,7 +13,8 @@ public static class IdentityExtensions
         this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
         builder.Services.AddHttpContextAccessor();
-        builder.Services.AddScoped<IUserContext, HttpContextUserContext>();
+        builder.Services.AddScoped<IUserContextProvider, HttpContextUserContextProvider>();
+        builder.Services.AddUserContext();
         return builder;
     }
 }

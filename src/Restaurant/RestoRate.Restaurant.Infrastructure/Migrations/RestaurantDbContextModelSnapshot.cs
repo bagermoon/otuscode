@@ -17,7 +17,7 @@ namespace RestoRate.Restaurant.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.10")
+                .HasAnnotation("ProductVersion", "9.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -40,6 +40,10 @@ namespace RestoRate.Restaurant.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
                         .HasColumnName("name");
+
+                    b.Property<int>("RestaurantStatus")
+                        .HasColumnType("integer")
+                        .HasColumnName("restaurant_status");
 
                     b.HasKey("Id")
                         .HasName("pk_restaurants");
@@ -121,17 +125,50 @@ namespace RestoRate.Restaurant.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("restaurant_id");
 
-                    b.Property<int>("Tag")
-                        .HasColumnType("integer")
-                        .HasColumnName("tag");
+                    b.Property<Guid>("TagId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tag_id");
 
                     b.HasKey("Id")
                         .HasName("pk_restaurant_tags");
 
-                    b.HasIndex("RestaurantId")
-                        .HasDatabaseName("ix_restaurant_tags_restaurant_id");
+                    b.HasIndex("TagId")
+                        .HasDatabaseName("ix_restaurant_tags_tag_id");
+
+                    b.HasIndex("RestaurantId", "TagId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_restaurant_tags_restaurant_id_tag_id");
 
                     b.ToTable("restaurant_tags", (string)null);
+                });
+
+            modelBuilder.Entity("RestoRate.Restaurant.Domain.TagAggregate.Tag", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("normalized_name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_tags");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("ix_tags_normalized_name");
+
+                    b.ToTable("tags", (string)null);
                 });
 
             modelBuilder.Entity("RestoRate.Restaurant.Domain.RestaurantAggregate.Restaurant", b =>
@@ -335,6 +372,15 @@ namespace RestoRate.Restaurant.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_restaurant_tags_restaurants_restaurant_id");
+
+                    b.HasOne("RestoRate.Restaurant.Domain.TagAggregate.Tag", "Tag")
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_restaurant_tags_tag_tag_id");
+
+                    b.Navigation("Tag");
                 });
 
             modelBuilder.Entity("RestoRate.Restaurant.Domain.RestaurantAggregate.Restaurant", b =>

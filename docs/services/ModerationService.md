@@ -15,7 +15,7 @@ public sealed class ModerationTask : AggregateRoot<ModerationTaskId>
         RestaurantId restaurantId,
         UserId authorId,
         int rating,
-        string text,
+        string comment,
         IReadOnlyCollection<string> tags)
     {
         Id = id;
@@ -23,7 +23,7 @@ public sealed class ModerationTask : AggregateRoot<ModerationTaskId>
         RestaurantId = restaurantId;
         AuthorId = authorId;
         Rating = rating;
-        Text = text;
+        Comment = comment;
         Tags = tags;
         Status = ModerationStatus.Pending;
         CreatedAt = DateTimeOffset.UtcNow;
@@ -43,7 +43,7 @@ public sealed class ModerationTask : AggregateRoot<ModerationTaskId>
     public RestaurantId RestaurantId { get; private set; }
     public UserId AuthorId { get; private set; }
     public int Rating { get; private set; }
-    public string Text { get; private set; } = string.Empty;
+    public string Comment { get; private set; } = string.Empty;
     public IReadOnlyCollection<string> Tags { get; private set; } = Array.Empty<string>();
     public ModerationStatus Status { get; private set; }
     public string? DecisionReason { get; private set; }

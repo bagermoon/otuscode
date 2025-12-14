@@ -3,9 +3,12 @@ using RestaurantEntity = RestoRate.Restaurant.Domain.RestaurantAggregate.Restaur
 using RestoRate.BuildingBlocks.Data.Repository;
 using RestoRate.Restaurant.Infrastructure.Data;
 
+using Ardalis.SharedKernel;
+
 namespace RestoRate.Restaurant.Infrastructure.Repositories;
 
-public class RestaurantRepository(RestaurantDbContext context)
-    : Repository<RestaurantEntity, RestaurantDbContext>(context)
+public class EfRepository<T>(RestaurantDbContext context)
+    : Repository<T, RestaurantDbContext>(context)
+    where T : class, IAggregateRoot
 {
 }

@@ -1,9 +1,12 @@
 using MassTransit;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+using RestoRate.Abstractions.Identity;
 using RestoRate.Abstractions.Messaging;
+using RestoRate.BuildingBlocks.Messaging.Identity;
 
 namespace RestoRate.BuildingBlocks.Messaging;
 
@@ -15,6 +18,9 @@ public static class MassTransitExtensions
         Action<IBusRegistrationConfigurator>? configure = null)
     {
         var connectionString = builder.Configuration.GetConnectionString(connectionName);
+
+        builder.Services.AddScoped<IUserContextProvider, MassTransitUserContextProvider>();
+        builder.Services.AddUserContext();
 
         builder.Services.AddMassTransit(x =>
         {
@@ -34,7 +40,7 @@ public static class MassTransitExtensions
                 cfg.Host(new Uri(connectionString));
                 cfg.UseMessageRetry(r => r.Intervals(500, 1000));
                 cfg.UseInMemoryOutbox(context);
-
+                cfg.UseConsumeFilter(typeof(ConsumeUserContextFilter<>), context);
                 cfg.ConfigureEndpoints(context);
             });
         });
