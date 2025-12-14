@@ -37,7 +37,7 @@ public sealed class MassTransitUserContextProvider : IUserContextProvider
         }
 
         // for cases when the payload is not available yet
-        if (HeaderUserContext.TryGetUserContext(consumeContext, out headerUserContext))
+        if (UserContextHeaderCodec.TryRead(consumeContext.Headers, out headerUserContext))
         {
             userContext = headerUserContext;
             return true;

@@ -12,7 +12,7 @@ where T : class
 
     public async Task Send(ConsumeContext<T> context, IPipe<ConsumeContext<T>> next)
     {
-        if (HeaderUserContext.TryGetUserContext(context, out var userContext))
+        if (UserContextHeaderCodec.TryRead(context.Headers, out var userContext))
         {
             context.GetOrAddPayload(() => userContext);
         }

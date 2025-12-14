@@ -2,6 +2,7 @@ using MassTransit;
 
 using RestoRate.Abstractions.Identity;
 using RestoRate.Abstractions.Messaging;
+using RestoRate.BuildingBlocks.Messaging.Identity;
 
 namespace RestoRate.BuildingBlocks.Messaging;
 
@@ -29,20 +30,6 @@ public class MassTransitEventBus(
 
     private void SetAuthHeaders(PublishContext ctx, bool overwriteExisting)
     {
-        if (_userContext is null || !_userContext.IsAuthenticated)
-            return;
-
-        void Set(string key, object? value)
-        {
-            if (!overwriteExisting && ctx.Headers.TryGetHeader(key, out _)) return;
-            ctx.Headers.Set(key, value);
-        }
-
-        Set(IntegrationHeaders.UserId, _userContext.UserId);
-        Set(IntegrationHeaders.UserFullName, _userContext.FullName ?? _userContext.Name);
-        Set(IntegrationHeaders.UserName, _userContext.Name);
-        Set(IntegrationHeaders.UserEmail, _userContext.Email);
-        Set(IntegrationHeaders.UserRoles, _userContext.Roles is null ? null : string.Join(",", _userContext.Roles));
-        Set(IntegrationHeaders.IsAuthenticated, _userContext.IsAuthenticated);
+        UserContextHeaderCodec.TryWrite(ctx.Headers, _userContext, overwriteExisting);
     }
 }
