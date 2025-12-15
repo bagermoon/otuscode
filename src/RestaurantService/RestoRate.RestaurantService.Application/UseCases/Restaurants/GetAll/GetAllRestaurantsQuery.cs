@@ -1,8 +1,10 @@
 using Ardalis.Result;
+
 using Mediator;
+
 using RestoRate.RestaurantService.Application.DTOs;
 
-namespace RestoRate.RestaurantService.Application.UseCases.GetAll;
+namespace RestoRate.RestaurantService.Application.UseCases.Restaurants.GetAll;
 
 public sealed record GetAllRestaurantsQuery(
     int PageNumber = 1,

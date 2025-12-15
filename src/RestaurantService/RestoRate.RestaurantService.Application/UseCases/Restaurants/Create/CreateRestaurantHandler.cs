@@ -12,7 +12,7 @@ using RestoRate.RestaurantService.Domain.TagAggregate.Specifications;
 using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
 
-namespace RestoRate.RestaurantService.Application.UseCases.Create;
+namespace RestoRate.RestaurantService.Application.UseCases.Restaurants.Create;
 
 public sealed class CreateRestaurantHandler(
     IRestaurantService restaurantService,
