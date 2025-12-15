@@ -11,7 +11,7 @@ using RestoRate.SharedKernel.Enums;
 
 using RestaurantEntity = RestoRate.RestaurantService.Domain.RestaurantAggregate.Restaurant;
 
-namespace RestoRate.RestaurantService.Application.UseCases.GetById;
+namespace RestoRate.RestaurantService.Application.UseCases.Restaurants.GetById;
 
 public sealed class GetRestaurantByIdHandler(
     IReadRepository<RestaurantEntity> readRepository,

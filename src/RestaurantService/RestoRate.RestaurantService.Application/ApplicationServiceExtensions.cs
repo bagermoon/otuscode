@@ -3,7 +3,7 @@ using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
 using RestoRate.RestaurantService.Application.Configurations;
-using RestoRate.RestaurantService.Application.UseCases.Create;
+using RestoRate.RestaurantService.Application.UseCases.Restaurants.Create;
 using RestoRate.RestaurantService.Domain.Interfaces;
 using RestoRate.RestaurantService.Domain.Services;
 

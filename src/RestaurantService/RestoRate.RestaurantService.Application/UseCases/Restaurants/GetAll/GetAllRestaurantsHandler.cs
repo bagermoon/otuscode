@@ -17,7 +17,7 @@ using RestoRate.SharedKernel.Enums;
 
 using RestaurantEntity = RestoRate.RestaurantService.Domain.RestaurantAggregate.Restaurant;
 
-namespace RestoRate.RestaurantService.Application.UseCases.GetAll;
+namespace RestoRate.RestaurantService.Application.UseCases.Restaurants.GetAll;
 
 public sealed class GetAllRestaurantsHandler(
     IReadRepository<RestaurantEntity> readRepository,
