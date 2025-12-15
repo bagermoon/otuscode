@@ -1,0 +1,36 @@
+name: ci / pr check
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - main
+      - release-*
+    paths:
+      - '**/*'
+      - '!.github/**'
+      - '!**/*.md'
+      - '!**/docs/**'
+      - '!.editorconfig'
+      - '!LICENSE'
+      - 'README.md'
+
+jobs:
+  test_build:
+    if: ${{ github.event.pull_request.draft == false }}
+    runs-on: ubuntu-latest
+
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v5
+        with:
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+
+      - run: dotnet restore --locked-mode
+      - name: Create the package
+        run: dotnet build --no-restore --configuration Release

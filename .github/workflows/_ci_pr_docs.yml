@@ -1,0 +1,22 @@
+name: ci / pr docs
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - main
+      - release-*
+    paths:
+      - '.github/**'
+      - '**/*.md'
+      - '**/docs/**'
+      - '.editorconfig'
+      - 'LICENSE'
+      - '!README.md'
+
+jobs:
+  check_changes:
+    if: ${{ github.event.pull_request.draft == false }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - run: echo "Checking document's changes"
