@@ -2,7 +2,7 @@ using Ardalis.Result;
 
 using Mediator;
 
-using RestoRate.RestaurantService.Application.DTOs;
+using RestoRate.Contracts.Restaurant.DTOs;
 using RestoRate.RestaurantService.Application.UseCases.Restaurants.GetAll;
 
 namespace RestoRate.RestaurantService.Api.Endpoints.Restaurants;

@@ -4,13 +4,13 @@ using Mediator;
 using Microsoft.Extensions.Logging;
 using RestoRate.Abstractions.Messaging;
 using RestoRate.Contracts.Restaurant.Events;
-using RestoRate.RestaurantService.Application.DTOs;
 using RestoRate.RestaurantService.Domain.Interfaces;
 using RestoRate.Contracts.Restaurant;
 using RestoRate.RestaurantService.Domain.TagAggregate;
 using RestoRate.RestaurantService.Domain.TagAggregate.Specifications;
 using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
+using RestoRate.Contracts.Restaurant.DTOs;
 
 namespace RestoRate.RestaurantService.Application.UseCases.Restaurants.Create;
 
