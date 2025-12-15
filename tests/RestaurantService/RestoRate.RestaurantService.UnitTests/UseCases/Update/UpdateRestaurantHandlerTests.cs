@@ -3,12 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using Ardalis.Result;
 using Ardalis.SharedKernel;
+
 using FluentAssertions;
+
 using Microsoft.Extensions.Logging;
+
 using NSubstitute;
-using RestoRate.RestaurantService.Application.UseCases.Update;
+
+using RestoRate.RestaurantService.Application.UseCases.Restaurants.Update;
 using RestoRate.RestaurantService.Domain.Interfaces;
 using RestoRate.RestaurantService.Domain.TagAggregate;
 using RestoRate.RestaurantService.UnitTests.Helpers;

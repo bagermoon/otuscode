@@ -2,7 +2,7 @@ using Ardalis.Result;
 
 using Mediator;
 
-using RestoRate.RestaurantService.Application.UseCases.Delete;
+using RestoRate.RestaurantService.Application.UseCases.Restaurants.Delete;
 
 namespace RestoRate.RestaurantService.Api.Endpoints.Restaurants;
 

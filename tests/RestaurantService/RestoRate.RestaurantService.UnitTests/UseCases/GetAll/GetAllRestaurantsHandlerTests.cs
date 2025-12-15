@@ -8,7 +8,8 @@ using Ardalis.Specification;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using RestoRate.RestaurantService.Application.UseCases.GetAll;
+
+using RestoRate.RestaurantService.Application.UseCases.Restaurants.GetAll;
 using RestoRate.RestaurantService.UnitTests.Helpers;
 using RestoRate.SharedKernel.Enums;
 using RestaurantEntity = RestoRate.RestaurantService.Domain.RestaurantAggregate.Restaurant;
