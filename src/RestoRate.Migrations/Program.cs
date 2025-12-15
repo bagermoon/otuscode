@@ -1,8 +1,9 @@
 using RestoRate.BuildingBlocks.Data;
 using RestoRate.BuildingBlocks.Data.Migrations;
-using RestoRate.SharedKernel.Diagnostics;
-using RestoRate.ServiceDefaults;
+using RestoRate.Migrations.RestaurantSeeders;
 using RestoRate.RestaurantService.Infrastructure.Data;
+using RestoRate.ServiceDefaults;
+using RestoRate.SharedKernel.Diagnostics;
 
 var builder = Host.CreateApplicationBuilder(args);
 builder.AddServiceDefaults();
@@ -12,7 +13,8 @@ builder.Services
 
 #region restaurant migrations
 builder.AddPostgresDbContext<RestaurantDbContext>(AppHostProjects.RestaurantDb);
-builder.Services.AddMigration<RestaurantDbContext>();
+builder.Services.AddTransient<TagSeeder>();
+builder.Services.AddMigration<RestaurantDbContext, RestaurantSeeder>();
 #endregion
 
 

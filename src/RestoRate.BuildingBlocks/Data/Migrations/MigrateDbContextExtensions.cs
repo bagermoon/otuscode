@@ -15,7 +15,7 @@ public static class MigrateDbContextExtensions
         where TContext : DbContext
         where TDbSeeder : class, IDbSeeder<TContext>
     {
-        services.AddScoped<IDbSeeder<TContext>, TDbSeeder>();
+        services.AddTransient<IDbSeeder<TContext>, TDbSeeder>();
         services.ConfigureDbContext<TContext>((sp, options) =>
         {
             options

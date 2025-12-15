@@ -37,7 +37,7 @@ public class RestaurantSeeder(TagSeeder tagSeeder) : IDbSeeder<RestaurantDbConte
             new Email("info@lapasta.ru"),
             new Address("г. Москва, ул. Ленина, 10", "10"),
             new Location(55.751244, 37.618423),
-            new OpenHours(DayOfWeek.Monday, new TimeOnly(10, 0), new TimeOnly(23, 0)),
+            new OpenHours(DayOfWeek.Monday, new TimeOnly(10, 0), new TimeOnly(23, 59)),
             new Money(2500, "RUB")
         );
         firstRestaurant.AddCuisineType(CuisineType.Italian);
@@ -75,7 +75,7 @@ public class RestaurantSeeder(TagSeeder tagSeeder) : IDbSeeder<RestaurantDbConte
             new Email("geo@tbilisi.rest"),
             new Address("г. Москва, пр. Мира, 5", "5"),
             new Location(55.776123, 37.632111),
-            new OpenHours(DayOfWeek.Monday, new TimeOnly(12, 0), new TimeOnly(00, 0)),
+            new OpenHours(DayOfWeek.Monday, new TimeOnly(12, 0), new TimeOnly(23, 59)),
             new Money(1800, "RUB")
         );
         secondRestaurant.AddCuisineType(CuisineType.Georgian);
