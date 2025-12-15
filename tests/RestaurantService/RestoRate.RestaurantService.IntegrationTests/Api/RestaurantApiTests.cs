@@ -1,6 +1,6 @@
 using FluentAssertions;
 
-using RestoRate.RestaurantService.Application.DTOs;
+using RestoRate.Contracts.Restaurant.DTOs;
 using RestoRate.RestaurantService.IntegrationTests.Helpers;
 using RestoRate.SharedKernel.Enums;
 

@@ -5,8 +5,6 @@ using Mediator;
 
 using Microsoft.Extensions.Logging;
 
-using RestoRate.RestaurantService.Application.DTOs;
-using RestoRate.RestaurantService.Application.DTOs.CRUD;
 using RestoRate.RestaurantService.Domain.Interfaces;
 using RestoRate.RestaurantService.Domain.TagAggregate;
 using RestoRate.RestaurantService.Domain.TagAggregate.Specifications;

@@ -5,7 +5,7 @@ using Mediator;
 
 using Microsoft.Extensions.Logging;
 
-using RestoRate.RestaurantService.Application.DTOs;
+using RestoRate.Contracts.Restaurant.DTOs;
 using RestoRate.RestaurantService.Domain.RestaurantAggregate.Specifications;
 using RestoRate.SharedKernel.Enums;
 

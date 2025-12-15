@@ -1,5 +1,5 @@
-using RestoRate.RestaurantService.Application.DTOs;
-using RestoRate.RestaurantService.Application.DTOs.CRUD;
+using RestoRate.Contracts.Restaurant.DTOs;
+using RestoRate.Contracts.Restaurant.DTOs.CRUD;
 
 using RestoRate.RestaurantService.Domain.RestaurantAggregate;
 using RestoRate.RestaurantService.Domain.TagAggregate;
