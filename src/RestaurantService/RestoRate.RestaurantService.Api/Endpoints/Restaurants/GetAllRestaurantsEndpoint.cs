@@ -1,8 +1,9 @@
 using Ardalis.Result;
+
 using Mediator;
 
-using RestoRate.Contracts.Restaurant.DTOs;
-using RestoRate.RestaurantService.Application.UseCases.GetAll;
+using RestoRate.RestaurantService.Application.DTOs;
+using RestoRate.RestaurantService.Application.UseCases.Restaurants.GetAll;
 
 namespace RestoRate.RestaurantService.Api.Endpoints.Restaurants;
 
@@ -38,7 +39,7 @@ internal static class GetAllRestaurantsEndpoint
         .WithName("GetAllRestaurants")
         .WithSummary("Получить список ресторанов")
         .WithDescription("Получает список ресторанов с пагинацией и фильтрацией")
-        .Produces<Application.UseCases.GetAll.PagedResult<RestaurantDto>>(StatusCodes.Status200OK)
+        .Produces<Application.UseCases.Restaurants.GetAll.PagedResult<RestaurantDto>>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status400BadRequest);
 
         return group;

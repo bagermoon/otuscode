@@ -9,7 +9,8 @@ using Ardalis.Specification;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using RestoRate.RestaurantService.Application.UseCases.GetById;
+
+using RestoRate.RestaurantService.Application.UseCases.Restaurants.GetById;
 using RestoRate.RestaurantService.UnitTests.Helpers;
 using RestoRate.SharedKernel.Enums;
 

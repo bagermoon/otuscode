@@ -1,8 +1,12 @@
 using Ardalis.Result;
+
 using FluentAssertions;
+
 using Microsoft.Extensions.Logging;
+
 using NSubstitute;
-using RestoRate.RestaurantService.Application.UseCases.Delete;
+
+using RestoRate.RestaurantService.Application.UseCases.Restaurants.Delete;
 using RestoRate.RestaurantService.Domain.Interfaces;
 
 namespace RestoRate.RestaurantService.UnitTests.UseCases.Delete;

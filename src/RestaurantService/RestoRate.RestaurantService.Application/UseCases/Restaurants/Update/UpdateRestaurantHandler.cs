@@ -11,7 +11,7 @@ using RestoRate.RestaurantService.Domain.TagAggregate.Specifications;
 using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
 
-namespace RestoRate.RestaurantService.Application.UseCases.Update;
+namespace RestoRate.RestaurantService.Application.UseCases.Restaurants.Update;
 
 public sealed class UpdateRestaurantHandler(
     IRestaurantService restaurantService,
