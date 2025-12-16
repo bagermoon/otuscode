@@ -4,14 +4,15 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - main
-      - release-*
     paths:
-      - '.github/**'
-      - '**/*.md'
-      - '**/docs/**'
-      - '.editorconfig'
-      - 'LICENSE'
-      - '!README.md'
+      - ".github/**"
+      - "**/*.md"
+      - ".markdownlint.json"
+      - ".markdownlint-cli2.mjs"
+      - "package.json"
+      - "package-lock.json"
+      - ".editorconfig"
+      - "LICENSE"
 
 jobs:
   check_changes:
@@ -19,4 +20,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - run: echo "Checking document's changes"
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: |
+            .github
+            docs
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+      - name: Install JS deps
+        run: npm ci
+      - uses: DavidAnson/markdownlint-cli2-action@v22
+        with:
+          config: .markdownlint-cli2.mjs
+          globs: |
+            README.md
+            docs/**/*.md
+
+      # - name: Check for broken links in markdown (lychee-action)
+      #   uses: lycheeverse/lychee-action@v1.10.0
+      #   with:
+      #     args: --verbose --no-progress --exclude README.md -- *.md docs/**/*.md

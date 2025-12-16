@@ -3,12 +3,14 @@
 Документ фиксирует рекомендуемую структуру проектов и правила разделения ответственности между `ServiceDefaults`, `Contracts`, `Abstractions`, `BuildingBlocks`, `SharedKernel`, `Common` и константами в контексте .NET 9, .NET Aspire (AppHost, ServiceDefaults), Gateway (YARP) и Blazor Server Dashboard.
 
 ## Цели
+
 - Чёткие границы между доменом и инфраструктурой.
 - Единый подход к service discovery и устойчивым HTTP‑клиентам (через ServiceDefaults).
 - Повторно используемые, но корректно изолированные общие компоненты.
 - Удобная локальная разработка и запуск через Aspire AppHost.
 
 ## Как принимать решение (быстрый чек‑лист)
+
 - Общий доменный базовый тип/утилита для нескольких сервисов → `RestoRate.SharedKernel`.
 - Порт/интерфейс для реализации инфраструктурой (репозиторий, шина, время, контекст пользователя) → `RestoRate.Abstractions` (а также application‑pipeline behaviors — валидация/логирование на базе Mediator и logging abstractions).
 - Переносимый «wire»‑контракт (HTTP DTO, интеграционное событие) между сервисами → `RestoRate.Contracts`.
@@ -40,6 +42,7 @@
 Примеры контекстов: `Restaurant`, `Review`, `Rating`, `Moderation`.
 
 ### Зависимости между слоями (строго)
+
 - `Api` → `Application` → `Domain`.
 - `Infrastructure` → `Application` + `Domain`.
 - `Application` и `Infrastructure` могут ссылаться на `RestoRate.Abstractions` и `RestoRate.SharedKernel`; `Domain` остаётся зависимым только от `RestoRate.SharedKernel`.
@@ -47,11 +50,12 @@
 - Сервисы не ссылаются на `Domain/Application` других сервисов. Межсервисный обмен — только через `Contracts`.
 
 ### Общие пакеты (границы использования)
-  - `RestoRate.Abstractions` — допустимо в слоях `Api`, `Application`, `Infrastructure`; НЕ в `Domain`. Пакет может ссылаться на `RestoRate.SharedKernel`, если портам нужны доменные базовые типы.
-  - `RestoRate.BuildingBlocks` — только `Api` и `Infrastructure`; НЕ в `Domain`; в `Application` только если тип не тянет инфраструктуру (редко).
-  - `RestoRate.ServiceDefaults` — в каждом `Program.cs` внешних точек входа.
-  - `RestoRate.Contracts` — в `Api`, `Application`, `Infrastructure`; НЕ в `Domain`.
-  - `RestoRate.SharedKernel` — первоочередно для доменных проектов; может использоваться в `Application`, если необходимо работать с доменными событиями, при этом пакет не ссылается на слои выше.
+
+- `RestoRate.Abstractions` — допустимо в слоях `Api`, `Application`, `Infrastructure`; НЕ в `Domain`. Пакет может ссылаться на `RestoRate.SharedKernel`, если портам нужны доменные базовые типы.
+- `RestoRate.BuildingBlocks` — только `Api` и `Infrastructure`; НЕ в `Domain`; в `Application` только если тип не тянет инфраструктуру (редко).
+- `RestoRate.ServiceDefaults` — в каждом `Program.cs` внешних точек входа.
+- `RestoRate.Contracts` — в `Api`, `Application`, `Infrastructure`; НЕ в `Domain`.
+- `RestoRate.SharedKernel` — первоочередно для доменных проектов; может использоваться в `Application`, если необходимо работать с доменными событиями, при этом пакет не ссылается на слои выше.
 
 ## Ответственность слоёв (Layer Responsibilities)
 
@@ -87,13 +91,13 @@
 
 ### Матрица использования пакетов
 
-| Пакет           | Domain | Application | Infrastructure | Api | Содержит                                 | Избегать                                   |
-|-----------------|:------:|:-----------:|:--------------:|:---:|-------------------------------------------|--------------------------------------------|
-| SharedKernel    |   ✔    |      ◐      |       ✖        |  ✖  | Доменные базовые типы/утилиты; Diagnostics IDs/sources | Порты/интерфейсы, инфраструктурные детали  |
-| Abstractions    |   ✖    |      ✔      |       ✔        |  ✔  | Порты/интерфейсы, application pipeline behaviors | Доменные базовые типы, конкретные реализации|
-| Contracts       |   ✖    |      ✔      |       ✔        |  ✔  | Wire DTO/интеграционные события           | Бизнес‑логика                               |
-| BuildingBlocks  |   ✖    |     ◐       |       ✔        |  ✔  | Инфраструктурные реализации/DI‑расширения | Доменные типы                               |
-| ServiceDefaults |   ✖    |      ✖      |       ✔        |  ✔  | Хостинг, discovery, resilience, telemetry | Бизнес‑логика                               |
+| Пакет | Domain | Application | Infrastructure | Api | Содержит | Избегать |
+| --- | --- | --- | --- | --- | --- | --- |
+| SharedKernel | ✔ | ◐ | ✖ | ✖ | Доменные базовые типы/утилиты; Diagnostics IDs/sources | Порты/интерфейсы, инфраструктурные детали |
+| Abstractions | ✖ | ✔ | ✔ | ✔ | Порты/интерфейсы, application pipeline behaviors | Доменные базовые типы, конкретные реализации |
+| Contracts | ✖ | ✔ | ✔ | ✔ | Wire DTO/интеграционные события | Бизнес‑логика |
+| BuildingBlocks | ✖ | ◐ | ✔ | ✔ | Инфраструктурные реализации/DI‑расширения | Доменные типы |
+| ServiceDefaults | ✖ | ✖ | ✔ | ✔ | Хостинг, discovery, resilience, telemetry | Бизнес‑логика |
 
 Примечание: ◐ — допускается редко и только если тип не тянет инфраструктуру. `Application` может брать отдельные базовые типы из `SharedKernel` (например, доменные события) без формирования обратных зависимостей.
 
@@ -122,6 +126,7 @@
     - `Migrations.AddMigration<TContext, TSeeder>()` и `IDbSeeder<TContext>`.
 
 Границы:
+
 - `Abstractions` не тянут инфраструктуру и не попадают в Domain.
 - `BuildingBlocks` не просачиваются в Domain и минимально используются в Application.
 
@@ -156,6 +161,7 @@
   - Избегайте «магических» строк: группируйте в единые константы и не смешивайте доменные константы с инфраструктурными.
 
 ### Именование DI‑расширений
+
 - Application DI: `Add<Context>Application()` в `<Context>.Application` (пространство имён `Microsoft.Extensions.DependencyInjection` или используемое из проекта).
 - API host: `Add<Context>Api(this IHostApplicationBuilder)` в `<Context>.Api` (пространство имён `Microsoft.Extensions.Hosting`).
 - Папка с обработчиками событий/уведомлений в Application — `Handlers`.
@@ -177,6 +183,7 @@
 ## Runtime и инфраструктура
 
 ## Aspire: внутренние и внешние эндпойнты
+
 - Публичные точки входа (Gateway, Blazor UI, Keycloak UI) помечайте как внешние:
   - `builder.AddProject<...>("gateway").WithExternalHttpEndpoints();`
   - `builder.AddProject<...>("blazor-dashboard").WithExternalHttpEndpoints();`
@@ -185,12 +192,14 @@
 - Для discovery используйте URI вида `https+http://{serviceName}` и `HttpClient`, сконфигурированные `ServiceDefaults` (устойчивость + discovery по умолчанию).
 
 ## Правила для Program.cs (каждый Api/UI)
+
 - `builder.AddServiceDefaults();` — Общие метрики, расширения аутентификации HttpClient и OpenTelemetry.
 - Регистрировать DI для Application/Infrastructure.
 - `app.MapDefaultEndpoints();` — health‑эндпойнты (в Dev).
 - В Dev — OpenAPI (по необходимости), в Prod — согласно политике безопасности.
 
 Дополнительно для EF Core:
+
 - В `DbContext` используем `UseSnakeCaseNamingConvention()` для таблиц/столбцов (PostgreSQL / Npgsql).
 - Явные `HasColumnName(...)` не требуются, если совпадают с результатом конвенции (рекомендовано удалять избыточные маппинги).
 - С `AddDbContextPool` перехватчики EF должны быть безопасны для корневого контейнера. Наш `EventDispatchInterceptor` регистрируется как singleton и вытягивает scoped‑сервисы внутри обработчика через контекст.
@@ -198,18 +207,20 @@
 Смотрите `RestoRate.BuildingBlocks/Data/DbContextExtensions.cs` и `.../Data/Interceptors/EventDispatchInterceptor.cs`.
 
 ## Тестирование (???)
+
 - Юнит‑тесты домена (Domain) без инфраструктуры.
 - Тесты Application‑слоя (моки портов).
 - Интеграционные тесты Infrastructure с Testcontainers (PostgreSQL/MongoDB/RabbitMQ/Redis).
 - Контрактные тесты для `Contracts` (совместимость DTO/событий между сервисами).
 
 ## Рекомендации по именованию
+
 - Проекты: `RestoRate.<Context>.<Layer>`.
 - Пространства имён соответствуют структуре каталогов.
 - События и маршруты RabbitMQ: доменные префиксы (`restaurant.*`, `review.*`).
 
-
 ## Чек‑лист
+
 - Доменные объекты — только в `Domain` (или в `SharedKernel`, если общий доменный блок).
 - Никакой инфраструктуры в `Domain` и `SharedKernel`.
 

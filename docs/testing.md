@@ -12,49 +12,56 @@
 - .NET 9 SDK установлен.
 - Playwright установлен (см. ниже).
 
-
 ### Установка Playwright
 
 В корне репозитория есть скрипт [`playwright.ps1`](playwright.ps1):
 
 - Установить браузеры:
-  ```
+
+  ```pwsh
   pwsh ./playwright.ps1 install
   ```
+
 - Генерация кода теста (запуск интерактивного рекордера):
-  ```
+
+  ```pwsh
   pwsh ./playwright.ps1 codegen https://localhost:7291/
   ```
+
 - Просмотр trace после теста:
-  ```
+
+  ```pwsh
   pwsh ./playwright.ps1 show-trace .\artifacts\bin\RestoRate.E2ETests\debug\playwright-traces\IntegrationTest1.DashboardIsLoaded.zip
   ```
-
 
 ### Запуск E2E тестов
 
 1. Убедитесь, что Docker запущен.
 2. Запустите все сервисы через Aspire AppHost:
-  ```
-  dotnet run --project src/RestoRate.AppHost
-  ```
+
+    ```pwsh
+    dotnet run --project src/RestoRate.AppHost
+    ```
+
 3. Запустите тесты:
-  ```
+
+  ```pwsh
   dotnet test tests/RestoRate.E2ETests
   ```
-
 
 ### Создание E2E теста
 
 - Тесты размещаются в проекте [`tests/RestoRate.E2ETests`](../tests/RestoRate.E2ETests).
 - Для тестов с аутентификацией используйте атрибут `[User(TestUser.Admin)]` (или другой пользователь).
 - В проекте используется файл `GlobalUsings.cs` для глобальных директив:
+
   ```csharp
   global using Microsoft.Playwright;
   global using RestoRate.E2ETests.Auth;
   global using RestoRate.E2ETests.Base;
   global using Microsoft.Playwright.Xunit.v3;
   ```
+
 - Пример теста с Playwright и авторизацией:
 
   ```csharp
@@ -76,7 +83,6 @@
 
 ### Примечания
 
-
 - Все тесты предполагают, что сервисы подняты через Aspire и доступны для взаимодействия.
 - Для корректной работы Playwright и браузеров используйте скрипт установки перед первым запуском.
 - Для отладки используйте `show-trace` после выполнения теста.
@@ -84,6 +90,7 @@
 - Трейсы располагаются в директории `.\artifacts\bin\RestoRate.E2ETests\debug\playwright-traces`
 
 ---
+
 ## Интеграционные тесты
 
 Интеграционные тесты находятся в проектах `tests/<Context>/<Context>.IntegrationTests` (например, `tests/Restaurant/RestoRate.RestaurantService.IntegrationTests`). Они тестируют API endpoints с использованием WebApplicationFactory и требуют запущенных зависимостей (например, PostgreSQL, MongoDB), которые запускаются автоматически в docker.
@@ -152,6 +159,7 @@ public class RestaurantApiTests : IClassFixture<RestaurantWebApplicationFactory>
 ```
 
 **Важно:** Тестовая аутентификация полностью имитирует production поведение:
+
 - Claims используют те же типы, что и Keycloak JWT (`"roles"`, `"preferred_username"`, `sub`, `email`)
 - `IUserContext` работает идентично в тестах и production
 - Role-based authorization policies (`[Authorize(Roles = "admin")]`) работают без изменений

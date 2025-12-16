@@ -4,15 +4,16 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - main
-      - release-*
     paths:
       - '**/*'
       - '!.github/**'
       - '!**/*.md'
-      - '!**/docs/**'
+      - "!.markdownlint.json"
+      - "!.markdownlint-cli2.mjs"
+      - "!package.json"
+      - "!package-lock.json"
       - '!.editorconfig'
       - '!LICENSE'
-      - 'README.md'
 
 jobs:
   test_build:
@@ -30,7 +31,7 @@ jobs:
         with:
           cache: true
           cache-dependency-path: '**/packages.lock.json'
+          global-json-file: global.json
 
-      - run: dotnet restore --locked-mode
-      - name: Create the package
+      - name: Build solution
         run: dotnet build --no-restore --configuration Release
