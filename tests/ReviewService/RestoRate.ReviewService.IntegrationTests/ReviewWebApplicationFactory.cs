@@ -25,8 +25,6 @@ public class ReviewWebApplicationFactory
     }
     protected async override Task OnInitializeAsync()
     {
-        await _mongo.StartAsync();
-
         var connectionString = _mongo.GetConnectionString();
         var connectionStringBuilder = new MongoUrlBuilder(connectionString)
         {
