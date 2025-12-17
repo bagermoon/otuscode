@@ -1,4 +1,4 @@
-namespace RestoRate.RestaurantService.Application.DTOs;
+namespace RestoRate.Contracts.Restaurant.DTOs;
 
 public record MoneyDto(
     decimal Amount,

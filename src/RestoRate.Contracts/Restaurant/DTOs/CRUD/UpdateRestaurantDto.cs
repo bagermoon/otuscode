@@ -1,4 +1,4 @@
-namespace RestoRate.RestaurantService.Application.DTOs.CRUD;
+namespace RestoRate.Contracts.Restaurant.DTOs.CRUD;
 
 public record UpdateRestaurantDto(
     Guid RestaurantId,
