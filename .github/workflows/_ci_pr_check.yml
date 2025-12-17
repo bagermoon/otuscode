@@ -19,10 +19,11 @@ jobs:
   test_build:
     if: ${{ github.event.pull_request.draft == false }}
     runs-on: ubuntu-latest
-
     permissions:
       actions: read
       contents: read
+      checks: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v6
 
@@ -35,3 +36,12 @@ jobs:
 
       - name: Build solution
         run: dotnet build --no-restore --configuration Release
+      - name: Run Tests
+        run:  dotnet test --no-build --no-restore -c Release --verbosity minimal -- --filter-query '/(*UnitTests)|(*IntegrationTests)' --report-xunit-trx --ignore-exit-code 8 --output Detailed
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2          
+        if: (!cancelled())
+        with:
+          files: |
+            artifacts/**/*.trx
