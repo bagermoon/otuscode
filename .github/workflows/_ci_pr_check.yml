@@ -33,15 +33,15 @@ jobs:
           cache: true
           cache-dependency-path: '**/packages.lock.json'
           global-json-file: global.json
-
+      - name: Restore
+        run: dotnet restore
       - name: Build solution
         run: dotnet build --no-restore --configuration Release
       - name: Run Tests
         run:  dotnet test --no-build --no-restore -c Release --verbosity minimal -- --filter-query '/(*UnitTests)|(*IntegrationTests)' --report-xunit-trx --ignore-exit-code 8 --output Detailed
-
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2          
-        if: (!cancelled())
+        if: ${{ always() && !cancelled() }}
         with:
           files: |
             artifacts/**/*.trx
