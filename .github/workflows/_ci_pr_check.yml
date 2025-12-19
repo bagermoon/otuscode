@@ -67,6 +67,11 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v6
+      - run: |
+          if (!(Test-Path -PathType container $env:NUGET_PACKAGES))
+          {
+            New-Item -ItemType Directory -Force -Path $env:NUGET_PACKAGES
+          }
       - name: Setup dotnet
         uses: actions/setup-dotnet@v5
         with:
