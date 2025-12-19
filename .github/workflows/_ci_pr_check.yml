@@ -85,13 +85,19 @@ jobs:
         env:
           ALL_CHANGED_FILES: ${{ steps.changed-linux-lockfiles.outputs.all_changed_files }}
         run: |
-          for file in ${ALL_CHANGED_FILES}; do
-            proj=$(Get-ChildItem -Path (Split-Path $file) -Filter *.csproj | Select-Object -First 1).FullName
-            if ($proj) {
-              Write-Host "Restoring project $proj for win-x64"
-              dotnet restore $proj -r win-x64 --force-evaluate
-            }
-          done
+          foreach ($file in $ALL_CHANGED_FILES) {
+              # Get the directory containing the file
+              $directory = Split-Path $file -Parent
+              
+              # Find the first .csproj file in that directory
+              $proj = Get-ChildItem -Path $directory -Filter *.csproj -File | 
+                      Select-Object -First 1 -ExpandProperty FullName
+              
+              if ($proj) {
+                  Write-Host "Restoring project $proj for win-x64"
+                  dotnet restore $proj -r win-x64 --force-evaluate
+              }
+          }
       - name: Publish updated windows lock files
         if: ${{ steps.changed-linux-lockfiles.outputs.any_changed == 'true' }}
         uses: stefanzweifel/git-auto-commit-action@v7
