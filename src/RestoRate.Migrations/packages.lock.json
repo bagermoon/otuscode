@@ -1187,18 +1187,6 @@
         "resolved": "10.0.0",
         "contentHash": "257hh1ep1Gqm1Lm0ulxf7vVBVMJuGN6EL4xSWjpi46DffXzm1058IiWsfSC06zSm7SniN+Tb5160UnXsSa8rRg=="
       }
-    },
-    "net9.0/win-x64": {
-      "System.Diagnostics.EventLog": {
-        "type": "Transitive",
-        "resolved": "10.0.0",
-        "contentHash": "uaFRda9NjtbJRkdx311eXlAA3n2em7223c1A8d1VWyl+4FL9vkG7y2lpPfBU9HYdj/9KgdRNdn1vFK8ZYCYT/A=="
-      },
-      "System.Text.Encodings.Web": {
-        "type": "Transitive",
-        "resolved": "10.0.0",
-        "contentHash": "257hh1ep1Gqm1Lm0ulxf7vVBVMJuGN6EL4xSWjpi46DffXzm1058IiWsfSC06zSm7SniN+Tb5160UnXsSa8rRg=="
-      }
     }
   }
 }
