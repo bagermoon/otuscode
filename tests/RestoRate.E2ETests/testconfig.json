@@ -1,5 +1,6 @@
 {
   "xUnit": {
+    "culture": "ru-RU",
     "failSkips": false,
     "failWarns": false
   }

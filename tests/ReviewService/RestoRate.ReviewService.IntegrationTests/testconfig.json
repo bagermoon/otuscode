@@ -1,7 +1,7 @@
 {
   "xUnit": {
+    "culture": "ru-RU",
     "failSkips": false,
-    "failWarns": false,
-    "parallelizeTestCollections": false
+    "failWarns": false
   }
 }
