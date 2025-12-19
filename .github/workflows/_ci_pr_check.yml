@@ -34,7 +34,7 @@ jobs:
           cache-dependency-path: '**/packages.lock.json'
           global-json-file: global.json
       - name: Restore
-        run: dotnet restore --locked-mode
+        run: dotnet restore --locked-mode -r linux-x64
       - name: Build solution
         run: dotnet build --no-restore -c Release
       - name: Run Tests
