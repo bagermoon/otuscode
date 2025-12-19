@@ -16,24 +16,19 @@ on:
       - '!LICENSE'
 
 jobs:
-  test_build:
-    if: ${{ github.event.pull_request.draft == false }}
+  update_linux_lockfiles:
     runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request.draft == false }}
     permissions:
       actions: read
       contents: write
-      checks: write
-      pull-requests: write
     steps:
-      - uses: actions/checkout@v6
-
       - name: Setup dotnet
         uses: actions/setup-dotnet@v5
         with:
           cache: true
           cache-dependency-path: |
             **/packages.lock.json
-            **/packages.*.lock.json
           global-json-file: global.json
       - name: Detect changes in windows-specific lock files
         id: changed-win-lockfiles
@@ -60,6 +55,60 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "chore: update linux lock files"
+
+  update_windows_lockfiles:
+    runs-on: windows-latest
+    if: ${{ github.event.pull_request.draft == false }}
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v5
+        with:
+          cache: true
+          cache-dependency-path: |
+            **/packages.win.lock.json
+          global-json-file: global.json
+      - name: Detect changes in linux-specific lock files
+        id: changed-linux-lockfiles
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            src/**/packages.lock.json
+            tests/**/packages.lock.json
+
+      - name: Generate windows lock files if needed
+        if: ${{ steps.changed-linux-lockfiles.outputs.any_changed == 'true' }}
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-linux-lockfiles.outputs.all_changed_files }}
+        run: |
+          for file in ${ALL_CHANGED_FILES}; do
+            proj=$(Get-ChildItem -Path (Split-Path $file) -Filter *.csproj | Select-Object -First 1).FullName
+            if ($proj) {
+              Write-Host "Restoring project $proj for win-x64"
+              dotnet restore $proj -r win-x64 --force-evaluate
+            }
+          done
+      - name: Publish updated windows lock files
+        if: ${{ steps.changed-linux-lockfiles.outputs.any_changed == 'true' }}
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: "chore: update windows lock files"
+  test_build:
+    
+    if: ${{ github.event.pull_request.draft == false && !cancelled() && !failure() }}
+    needs: 
+      - update_linux_lockfiles
+      - update_windows_lockfiles
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+      checks: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
       - name: Restore
         run: dotnet restore --locked-mode -r linux-x64
       - name: Build solution
