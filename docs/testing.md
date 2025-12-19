@@ -95,6 +95,12 @@
 
 Интеграционные тесты находятся в проектах `tests/<Context>/<Context>.IntegrationTests` (например, `tests/Restaurant/RestoRate.RestaurantService.IntegrationTests`). Они тестируют API endpoints с использованием WebApplicationFactory и требуют запущенных зависимостей (например, PostgreSQL, MongoDB), которые запускаются автоматически в docker.
 
+### Тестовый раннер (Microsoft Testing Platform)
+
+В этом репозитории используется Microsoft Testing Platform (MTP) для запуска тестов в CI и локально. Конфигурация xUnit для MTP хранится в `testconfig.json` внутри соответствующего тестового проекта (путь `tests/*`).
+
+**Важно**: при изменении зависимостей/пакетов обязательно локально выполните `dotnet restore --force-evaluate` и зафиксируйте обновлённые `packages.lock.json`, потому что CI запускает `dotnet restore --locked-mode` и ожидает, что lock-файлы в репозитории синхронизированы с графом зависимостей.
+
 ### Запуск интеграционных тестов
 
 ```powershell
