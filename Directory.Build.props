@@ -11,6 +11,20 @@
     <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
     <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestoreUseStaticGraphEvaluation>true</RestoreUseStaticGraphEvaluation>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Prefer an explicitly requested RID (dotnet restore/build -r sets RestoreRuntimeIdentifier) -->
+    <RequestedRID Condition="'$(RuntimeIdentifier)'!=''">$(RuntimeIdentifier)</RequestedRID>
+    <RequestedRID Condition="'$(RequestedRID)'=='' and '$(RestoreRuntimeIdentifier)'!=''">$(RestoreRuntimeIdentifier)</RequestedRID>
+
+    <!-- Fallback to current OS when no RID was specified -->
+    <DetectedRID Condition="'$(RequestedRID)'=='' and '$(OS)'=='Windows_NT'">win-x64</DetectedRID>
+    <DetectedRID Condition="'$(RequestedRID)'=='' and '$(OS)'!='Windows_NT'">linux-x64</DetectedRID>
+
+    <EffectiveRID Condition="'$(RequestedRID)'!=''">$(RequestedRID)</EffectiveRID>
+    <EffectiveRID Condition="'$(EffectiveRID)'==''">$(DetectedRID)</EffectiveRID>
     <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
   </PropertyGroup>
 

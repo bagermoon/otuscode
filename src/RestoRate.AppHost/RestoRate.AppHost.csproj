@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <UserSecretsId>a0c8c2db-8e70-4c0d-838b-551801c2a801</UserSecretsId>
+    <NuGetLockFilePath Condition="'$(EffectiveRID)' == 'win-x64'">packages.win.lock.json</NuGetLockFilePath>
   </PropertyGroup>
 
   <ItemGroup>
