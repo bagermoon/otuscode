@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - ".github/**"
+      - ".github/workflows/**"
       - "**/*.md"
       - ".markdownlint.json"
       - ".markdownlint-cli2.mjs"

@@ -13,8 +13,31 @@ public class ReviewWebApplicationFactory
     private readonly MongoDbContainer _mongo = new MongoDbBuilder().Build();
 
     protected override IReadOnlyList<IContainer> Containers => [_mongo];
+    
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.ConfigureAppConfiguration((context, config) =>
+        {
+            var connectionString = _mongo.GetConnectionString();
+            var connectionStringBuilder = new MongoUrlBuilder(connectionString)
+            {
+                DatabaseName = AppHostProjects.ReviewDb,
+                AuthenticationSource = "admin",
+            };
+
+            // Set environment variable before host is built
+            // ContainerEnvironmentHelpers.SetMongoEnvironmentVariables(
+            //     connectionString: connectionStringBuilder.ToString(),
+            //     connectionName: AppHostProjects.ReviewDb
+            // );
+
+            config.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Aspire:MongoDB:Driver:DisableHealthChecks"] = true.ToString(),
+                ["Aspire:MongoDB:Driver:DisableTracing"] = true.ToString(),
+                [$"ConnectionStrings:{AppHostProjects.ReviewDb}"] = connectionStringBuilder.ToString(),
+            });
+        });
         builder.ConfigureTestServices(services =>
         {
             services.AddMassTransitTestHarness(cfg =>
@@ -25,17 +48,17 @@ public class ReviewWebApplicationFactory
     }
     protected async override Task OnInitializeAsync()
     {
-        var connectionString = _mongo.GetConnectionString();
-        var connectionStringBuilder = new MongoUrlBuilder(connectionString)
-        {
-            DatabaseName = AppHostProjects.ReviewDb,
-            AuthenticationSource = "admin",
-        };
+        // var connectionString = _mongo.GetConnectionString();
+        // var connectionStringBuilder = new MongoUrlBuilder(connectionString)
+        // {
+        //     DatabaseName = AppHostProjects.ReviewDb,
+        //     AuthenticationSource = "admin",
+        // };
 
         // Set environment variable before host is built
-        ContainerEnvironmentHelpers.SetMongoEnvironmentVariables(
-            connectionString: connectionStringBuilder.ToString(),
-            connectionName: AppHostProjects.ReviewDb
-        );
+        // ContainerEnvironmentHelpers.SetMongoEnvironmentVariables(
+        //     connectionString: connectionStringBuilder.ToString(),
+        //     connectionName: AppHostProjects.ReviewDb
+        // );
     }
 }

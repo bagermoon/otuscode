@@ -372,6 +372,16 @@
           "Npgsql": "9.0.4"
         }
       },
+      "Npgsql.EntityFrameworkCore.PostgreSQL": {
+        "type": "Transitive",
+        "resolved": "9.0.4",
+        "contentHash": "mw5vcY2IEc7L+IeGrxpp/J5OSnCcjkjAgJYCm/eD52wpZze8zsSifdqV7zXslSMmfJG2iIUGZyo3KuDtEFKwMQ==",
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore": "[9.0.1, 10.0.0)",
+          "Microsoft.EntityFrameworkCore.Relational": "[9.0.1, 10.0.0)",
+          "Npgsql": "9.0.3"
+        }
+      },
       "Npgsql.OpenTelemetry": {
         "type": "Transitive",
         "resolved": "9.0.4",
@@ -517,7 +527,7 @@
           "RestoRate.SharedKernel": "[1.0.0, )"
         }
       },
-      "RestoRate.RestaurantService.domain": {
+      "restorate.restaurantservice.domain": {
         "type": "Project",
         "dependencies": {
           "RestoRate.SharedKernel": "[1.0.0, )"
@@ -761,17 +771,6 @@
         "dependencies": {
           "Microsoft.EntityFrameworkCore": "9.0.9",
           "MongoDB.Driver": "3.5.0"
-        }
-      },
-      "Npgsql.EntityFrameworkCore.PostgreSQL": {
-        "type": "CentralTransitive",
-        "requested": "[9.0.4, )",
-        "resolved": "9.0.4",
-        "contentHash": "mw5vcY2IEc7L+IeGrxpp/J5OSnCcjkjAgJYCm/eD52wpZze8zsSifdqV7zXslSMmfJG2iIUGZyo3KuDtEFKwMQ==",
-        "dependencies": {
-          "Microsoft.EntityFrameworkCore": "[9.0.1, 10.0.0)",
-          "Microsoft.EntityFrameworkCore.Relational": "[9.0.1, 10.0.0)",
-          "Npgsql": "9.0.3"
         }
       },
       "OpenTelemetry.Exporter.OpenTelemetryProtocol": {

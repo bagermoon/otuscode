@@ -5,9 +5,9 @@ on:
     branches:
       - main
     paths:
-      - '**/*'
-      - '!.github/**'
-      - '!**/*.md'
+      - "**/*"
+      - "!.github/*"
+      - "!**/*.md"
       - "!.markdownlint.json"
       - "!.markdownlint-cli2.mjs"
       - "!package.json"
@@ -34,9 +34,9 @@ jobs:
           cache-dependency-path: '**/packages.lock.json'
           global-json-file: global.json
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore --locked-mode
       - name: Build solution
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build --no-restore -c Release
       - name: Run Tests
         run:  dotnet test --no-build --no-restore -c Release --verbosity minimal -- --filter-query '/(*UnitTests)|(*IntegrationTests)' --report-xunit-trx --ignore-exit-code 8 --output Detailed
       - name: Publish Test Results

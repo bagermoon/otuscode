@@ -1,6 +1,7 @@
 {
   "xUnit": {
     "failSkips": false,
-    "failWarns": false
+    "failWarns": false,
+    "parallelizeTestCollections": false
   }
 }
