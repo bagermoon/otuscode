@@ -799,6 +799,8 @@
           "OpenTelemetry.Api": "[1.14.0, 2.0.0)"
         }
       }
-    }
+    },
+    "net9.0/linux-x64": {},
+    "net9.0/win-x64": {}
   }
 }

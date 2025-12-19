@@ -386,6 +386,8 @@
           "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.11"
         }
       }
-    }
+    },
+    "net9.0/linux-x64": {},
+    "net9.0/win-x64": {}
   }
 }
