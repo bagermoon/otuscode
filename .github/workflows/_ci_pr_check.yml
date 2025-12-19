@@ -60,6 +60,8 @@ jobs:
   update_windows_lockfiles:
     runs-on: windows-latest
     if: ${{ github.event.pull_request.draft == false }}
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
     permissions:
       actions: read
       contents: write
