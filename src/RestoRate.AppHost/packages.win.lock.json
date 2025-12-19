@@ -1143,13 +1143,6 @@
         }
       }
     },
-    "net9.0/linux-x64": {
-      "System.Diagnostics.EventLog": {
-        "type": "Transitive",
-        "resolved": "9.0.11",
-        "contentHash": "2Us/NchH6SM69NYWzf8NRyeftdv3ILso8LMiMdAjT7ECTiZKzddiXWhAyQj6ZzbddoAOHS9GdlPbAAkwCPID3Q=="
-      }
-    },
     "net9.0/win-x64": {
       "System.Diagnostics.EventLog": {
         "type": "Transitive",
