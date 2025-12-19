@@ -23,6 +23,7 @@ jobs:
       actions: read
       contents: write
     steps:
+      - uses: actions/checkout@v6
       - name: Setup dotnet
         uses: actions/setup-dotnet@v5
         with:
@@ -63,6 +64,7 @@ jobs:
       actions: read
       contents: write
     steps:
+      - uses: actions/checkout@v6
       - name: Setup dotnet
         uses: actions/setup-dotnet@v5
         with:
