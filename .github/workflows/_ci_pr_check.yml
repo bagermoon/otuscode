@@ -92,6 +92,7 @@ jobs:
         env:
           ALL_CHANGED_FILES: ${{ steps.changed-linux-lockfiles.outputs.all_changed_files }}
         run: |
+          Write-Host $env:ALL_CHANGED_FILES
           foreach ($file in $env:ALL_CHANGED_FILES.Split([Environment]::NewLine)) {
               # Get the directory containing the file
               $directory = Split-Path $file -Parent
