@@ -13,7 +13,7 @@ builder.Services
 
 #region restaurant migrations
 builder.AddPostgresDbContext<RestaurantDbContext>(AppHostProjects.RestaurantDb);
-builder.Services.AddTransient<TagSeeder>();
+builder.Services.AddMigration<RestaurantDbContext, TagSeeder>();
 builder.Services.AddMigration<RestaurantDbContext, RestaurantSeeder>();
 #endregion
 

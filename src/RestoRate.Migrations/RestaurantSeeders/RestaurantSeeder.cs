@@ -17,16 +17,14 @@ using TagEntity = RestoRate.RestaurantService.Domain.TagAggregate.Tag;
 
 namespace RestoRate.Migrations.RestaurantSeeders;
 
-public class RestaurantSeeder(TagSeeder tagSeeder) : IDbSeeder<RestaurantDbContext>
+public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
 {
-    public async Task SeedAsync(RestaurantDbContext context)
+    public async Task SeedAsync(RestaurantDbContext context, CancellationToken ct = default)
     {
-        await tagSeeder.SeedAsync(context);
-
-        if (await context.Restaurants.AnyAsync())
+        if (await context.Restaurants.AnyAsync(ct))
             return;
 
-        List<TagEntity> dbTags = await context.Set<TagEntity>().ToListAsync();
+        List<TagEntity> dbTags = await context.Set<TagEntity>().ToListAsync(ct);
 
         var restaurants = new List<Restaurant>();
 
@@ -97,11 +95,11 @@ public class RestaurantSeeder(TagSeeder tagSeeder) : IDbSeeder<RestaurantDbConte
 
         restaurants.Add(secondRestaurant);
 
-        await context.Restaurants.AddRangeAsync(restaurants);
-        await context.SaveChangesAsync();
+        await context.Restaurants.AddRangeAsync(restaurants, ct);
+        await context.SaveChangesAsync(ct);
     }
 
-    private void TryAddTag(
+    private static void TryAddTag(
         Restaurant restaurant,
         List<TagEntity> availableTags,
         string tagName)

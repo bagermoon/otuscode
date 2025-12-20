@@ -16,9 +16,9 @@ namespace RestoRate.Migrations.RestaurantSeeders;
 
 public class TagSeeder : IDbSeeder<RestaurantDbContext>
 {
-    public async Task SeedAsync(RestaurantDbContext context)
+    public async Task SeedAsync(RestaurantDbContext context, CancellationToken ct = default)
     {
-        if (await context.Set<TagEntity>().AnyAsync())
+        if (await context.Set<TagEntity>().AnyAsync(ct))
             return;
 
         var tags = new List<TagEntity>
@@ -31,7 +31,7 @@ public class TagSeeder : IDbSeeder<RestaurantDbContext>
             new TagEntity("Детская комната")
         };
 
-        await context.Set<TagEntity>().AddRangeAsync(tags);
-        await context.SaveChangesAsync();
+        await context.Set<TagEntity>().AddRangeAsync(tags, ct);
+        await context.SaveChangesAsync(ct);
     }
 }

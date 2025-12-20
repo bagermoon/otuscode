@@ -21,13 +21,20 @@ public static class MigrateDbContextExtensions
             options
                 .UseSeeding((context, _) =>
                 {
-                    var seeder = sp.GetRequiredService<IDbSeeder<TContext>>();
-                    seeder.SeedAsync((TContext)context).GetAwaiter().GetResult();
+                    var seeders = sp.GetServices<IDbSeeder<TContext>>();
+                    foreach (var seeder in seeders)
+                    {
+                        seeder.SeedAsync((TContext)context).GetAwaiter().GetResult();
+                    }
+                    
                 })
                 .UseAsyncSeeding(async (context, _, token) =>
                 {
-                    var seeder = sp.GetRequiredService<IDbSeeder<TContext>>();
-                    await seeder.SeedAsync((TContext)context);
+                    var seeders = sp.GetServices<IDbSeeder<TContext>>();
+                    foreach (var seeder in seeders)
+                    {
+                        await seeder.SeedAsync((TContext)context, token);
+                    }
                 });
         });
         return services.AddMigration<TContext>();
