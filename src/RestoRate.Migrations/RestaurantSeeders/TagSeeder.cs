@@ -1,13 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Microsoft.EntityFrameworkCore;
 
 using RestoRate.BuildingBlocks.Data.Migrations;
-using RestoRate.RestaurantService.Domain.TagAggregate;
 using RestoRate.RestaurantService.Infrastructure.Data;
 
 using TagEntity = RestoRate.RestaurantService.Domain.TagAggregate.Tag;
