@@ -44,3 +44,4 @@ jobs:
         with:
           dotnet_format: true
           dotnet_format_args: "whitespace"
+          continue_on_error: false
