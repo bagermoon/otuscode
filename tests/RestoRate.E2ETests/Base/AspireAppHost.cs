@@ -1,5 +1,7 @@
 using Aspire.Hosting;
+
 using Microsoft.Extensions.Hosting;
+
 using RestoRate.ServiceDefaults;
 
 namespace RestoRate.E2ETests.Base;

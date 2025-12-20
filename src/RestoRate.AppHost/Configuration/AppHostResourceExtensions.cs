@@ -90,7 +90,7 @@ public static class AppHostResourceExtensions
         )
         .WithImageTag(config.ImageTag)
         .WithRealmImport("restorate-realm.json")
-        
+
         .WithExternalHttpEndpoints()
         .WithLifetime(config.LifetimePersistent ? ContainerLifetime.Persistent : ContainerLifetime.Session);
 

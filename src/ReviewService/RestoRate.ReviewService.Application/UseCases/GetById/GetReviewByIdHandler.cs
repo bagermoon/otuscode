@@ -6,6 +6,7 @@ using Mediator;
 using Microsoft.Extensions.Logging;
 
 using RestoRate.ReviewService.Application.DTOs;
+
 using ReviewEntity = RestoRate.ReviewService.Domain.ReviewAggregate.Review;
 
 namespace RestoRate.ReviewService.Application.UseCases.GetById;

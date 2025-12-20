@@ -1,4 +1,5 @@
 using Ardalis.Result;
+
 using Mediator;
 
 using RestoRate.Contracts.Restaurant.DTOs;
