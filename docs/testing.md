@@ -14,7 +14,7 @@
 
 ### Установка Playwright
 
-В корне репозитория есть скрипт [`playwright.ps1`](playwright.ps1):
+В корне репозитория есть скрипт [`playwright.ps1`](../playwright.ps1):
 
 - Установить браузеры:
 

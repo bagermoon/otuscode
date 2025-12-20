@@ -4,125 +4,60 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - main
-    paths:
-      - "**/*"
-      - "!.github/*"
-      - "!**/*.md"
-      - "!.markdownlint.json"
-      - "!.markdownlint-cli2.mjs"
-      - "!package.json"
-      - "!package-lock.json"
-      - '!.editorconfig'
-      - '!LICENSE'
-
 jobs:
+  lint_docs:
+    if: ${{ github.event.pull_request.draft == false }}
+    uses: ./.github/workflows/_wc_lint_docs.yml
+    permissions:
+      actions: write
+      contents: read
+    with:
+      ref: ${{ github.ref }}
+      environment: development
+  lint_csharp:
+    if: ${{ github.event.pull_request.draft == false }}
+    uses: ./.github/workflows/_wc_lint_csharp.yml
+    permissions:
+      actions: write
+      contents: read
+    with:
+      ref: ${{ github.ref }}
+      environment: development
   update_linux_lockfiles:
-    runs-on: ubuntu-latest
-    if: ${{ github.event.pull_request.draft == false }}
+    if: ${{ github.event.pull_request.draft == false && !cancelled() && !failure() }}
+    needs:
+      - lint_docs
+      - lint_csharp
     permissions:
-      actions: read
+      actions: write
       contents: write
-    steps:
-      - uses: actions/checkout@v6
-      - name: Detect changes in windows-specific lock files
-        id: changed-win-lockfiles
-        uses: tj-actions/changed-files@v47
-        with:
-          since_last_remote_commit: true
-          files: |
-            src/**/packages.win.lock.json
-            tests/**/packages.win.lock.json
-      - name: Setup dotnet
-        if: ${{ steps.changed-win-lockfiles.outputs.any_changed == 'true' }}
-        uses: actions/setup-dotnet@v5
-        with:
-          cache: true
-          cache-dependency-path: |
-            **/packages.lock.json
-          global-json-file: global.json
-      - name: Generate linux lock files if needed
-        if: ${{ steps.changed-win-lockfiles.outputs.any_changed == 'true' }}
-        env:
-          ALL_CHANGED_FILES: ${{ steps.changed-win-lockfiles.outputs.all_changed_files }}
-        run: |
-          for file in ${ALL_CHANGED_FILES}; do
-            proj=$(find "$(dirname "$file")" -maxdepth 1 -type f -name '*.csproj' | head -n 1 || true)
-            if [ -n "$proj" ]; then
-              echo "Restoring project $proj for linux-x64"
-              dotnet restore "$proj" -r linux-x64 --force-evaluate
-            fi
-          done
-      - name: Publish updated linux lock files
-        if: ${{ steps.changed-win-lockfiles.outputs.any_changed == 'true' }}
-        uses: stefanzweifel/git-auto-commit-action@v7
-        with:
-          commit_message: "chore: update linux lock files"
-
+    uses: ./.github/workflows/_wc_update_linux_lockfiles.yml
+    with:
+      ref: ${{ github.ref }}
+      environment: development
   update_windows_lockfiles:
-    runs-on: windows-latest
-    if: ${{ github.event.pull_request.draft == false }}
-    env:
-      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+    if: ${{ github.event.pull_request.draft == false && !cancelled() && !failure() }}
+    needs:
+      - lint_docs
+      - lint_csharp
     permissions:
-      actions: read
+      actions: write
       contents: write
-    steps:
-      - uses: actions/checkout@v6
-      - name: Detect changes in linux-specific lock files
-        id: changed-linux-lockfiles
-        uses: tj-actions/changed-files@v47
-        with:
-          since_last_remote_commit: true
-          files: |
-            src/**/packages.lock.json
-            tests/**/packages.lock.json
-      - if: ${{ steps.changed-linux-lockfiles.outputs.any_changed == 'true' }}
-        run: |
-          if (!(Test-Path -PathType container $env:NUGET_PACKAGES))
-          {
-            New-Item -ItemType Directory -Force -Path $env:NUGET_PACKAGES
-          }
-      - name: Setup dotnet
-        if: ${{ steps.changed-linux-lockfiles.outputs.any_changed == 'true' }}
-        uses: actions/setup-dotnet@v5
-        with:
-          cache: true
-          cache-dependency-path: |
-            **/packages.win.lock.json
-          global-json-file: global.json
-      - name: Generate windows lock files if needed
-        if: ${{ steps.changed-linux-lockfiles.outputs.any_changed == 'true' }}
-        env:
-          ALL_CHANGED_FILES: ${{ steps.changed-linux-lockfiles.outputs.all_changed_files }}
-        run: |
-          foreach ($file in $env:ALL_CHANGED_FILES -split " ") {
-              # Get the directory containing the file
-              $directory = Split-Path $file -Parent
-              
-              # Find the first .csproj file in that directory
-              $proj = Get-ChildItem -Path $directory -Filter *.csproj -File | 
-                      Select-Object -First 1 -ExpandProperty FullName
-              
-              if ($proj) {
-                  Write-Host "Restoring project $proj for win-x64"
-                  dotnet restore $proj -r win-x64 --force-evaluate
-              }
-          }
-      - name: Publish updated windows lock files
-        if: ${{ steps.changed-linux-lockfiles.outputs.any_changed == 'true' }}
-        uses: stefanzweifel/git-auto-commit-action@v7
-        with:
-          commit_message: "chore: update windows lock files"
+    uses: ./.github/workflows/_wc_update_windows_lockfiles.yml
+    with:
+      ref: ${{ github.ref }}
+      environment: development      
   test_build:
-    
     if: ${{ github.event.pull_request.draft == false && !cancelled() && !failure() }}
     needs: 
+      - lint_docs
+      - lint_csharp
       - update_linux_lockfiles
       - update_windows_lockfiles
     runs-on: ubuntu-latest
     permissions:
       actions: read
-      contents: write
+      contents: read
       checks: write
       pull-requests: write
     steps:
