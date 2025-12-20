@@ -15,6 +15,8 @@ public static class MigrateDbContextExtensions
         where TContext : DbContext
         where TDbSeeder : class, IDbSeeder<TContext>
     {
+        // Seeders are registered as transient because they are stateless and resolved only during
+        // application startup seeding, and multiple seeders may be registered per DbContext.
         services.AddTransient<IDbSeeder<TContext>, TDbSeeder>();
         services.ConfigureDbContext<TContext>((sp, options) =>
         {
