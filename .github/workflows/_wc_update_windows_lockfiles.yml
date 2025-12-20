@@ -9,6 +9,10 @@ on:
         description: Environment to execute the workflow in
         type: string
         required: true
+    outputs:
+      sha:
+        description: Git SHA checked out after updates
+        value: ${{ jobs.update_windows_lockfiles.outputs.sha }}
 permissions:
   actions: write
   contents: write
@@ -22,8 +26,13 @@ jobs:
     name: Update Windows lock files
     runs-on: windows-latest
     environment: ${{ inputs.environment }}
+    outputs:
+      sha: ${{ steps.result_sha.outputs.sha }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
       - name: Detect changes in linux-specific lock files
         id: changed-linux-lockfiles
         uses: tj-actions/changed-files@v47
@@ -70,3 +79,10 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "chore: update windows lock files"
+
+      - name: Export resulting SHA
+        id: result_sha
+        if: ${{ always() }}
+        shell: pwsh
+        run: |
+          "sha=$(git rev-parse HEAD)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append

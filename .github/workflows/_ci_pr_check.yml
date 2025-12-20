@@ -20,6 +20,7 @@ jobs:
     permissions:
       actions: write
       contents: read
+      checks: write
     with:
       ref: ${{ github.ref }}
       environment: development
@@ -33,19 +34,20 @@ jobs:
       contents: write
     uses: ./.github/workflows/_wc_update_linux_lockfiles.yml
     with:
-      ref: ${{ github.ref }}
+      ref: ${{ github.head_ref }}
       environment: development
   update_windows_lockfiles:
     if: ${{ github.event.pull_request.draft == false && !cancelled() && !failure() }}
     needs:
       - lint_docs
       - lint_csharp
+      - update_linux_lockfiles
     permissions:
       actions: write
       contents: write
     uses: ./.github/workflows/_wc_update_windows_lockfiles.yml
     with:
-      ref: ${{ github.ref }}
+      ref: ${{ github.head_ref }}
       environment: development      
   test_build:
     if: ${{ github.event.pull_request.draft == false && !cancelled() && !failure() }}
@@ -56,12 +58,14 @@ jobs:
       - update_windows_lockfiles
     runs-on: ubuntu-latest
     permissions:
-      actions: read
+      actions: write
       contents: read
       checks: write
       pull-requests: write
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.update_windows_lockfiles.outputs.sha || github.sha }}
       - name: Setup dotnet
         uses: actions/setup-dotnet@v5
         with:

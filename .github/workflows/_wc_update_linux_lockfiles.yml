@@ -9,6 +9,10 @@ on:
         description: Environment to execute the workflow in
         type: string
         required: true
+    outputs:
+      sha:
+        description: Git SHA checked out after updates
+        value: ${{ jobs.update_linux_lockfiles.outputs.sha }}
 permissions:
   actions: write
   contents: write
@@ -22,10 +26,15 @@ jobs:
     name: Update Linux lock files
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
+    outputs:
+      sha: ${{ steps.result_sha.outputs.sha }}
     env:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
       - name: Detect changes in windows-specific lock files
         id: changed-win-lockfiles
         uses: tj-actions/changed-files@v47
@@ -63,3 +72,9 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "chore: update linux lock files"
+
+      - name: Export resulting SHA
+        id: result_sha
+        if: ${{ always() }}
+        run: |
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"

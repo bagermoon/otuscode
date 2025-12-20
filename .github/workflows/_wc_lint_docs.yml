@@ -26,9 +26,6 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref }}
-          sparse-checkout: |
-            .github
-            docs
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
