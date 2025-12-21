@@ -30,6 +30,7 @@
 
     <!-- Generate separate lock files for windows/linux builds -->
     <NuGetLockFilePath Condition="'$(EffectiveRID)' == 'win-x64'">packages.win.lock.json</NuGetLockFilePath>
+    <NuGetLockFilePath Condition="'$(EffectiveRID)' == 'linux-x64'">packages.linux.lock.json</NuGetLockFilePath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">

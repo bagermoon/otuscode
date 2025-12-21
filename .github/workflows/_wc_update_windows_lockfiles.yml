@@ -38,8 +38,8 @@ jobs:
         uses: tj-actions/changed-files@v47
         with:
           files: |
-            src/**/packages.lock.json
-            tests/**/packages.lock.json
+            src/**/packages.linux.lock.json
+            tests/**/packages.linux.lock.json
       - name: Ensure NUGET_PACKAGES exists
         if: ${{ steps.changed-linux-lockfiles.outputs.any_changed == 'true' }}
         run: |

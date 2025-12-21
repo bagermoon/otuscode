@@ -32,7 +32,7 @@ jobs:
         with:
           cache: true
           cache-dependency-path: |
-            **/packages.lock.json
+            **/packages.linux.lock.json
           global-json-file: global.json
 
       - name: Setup Node
