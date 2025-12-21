@@ -86,6 +86,8 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
             isPrimary: false
         );
 
+        secondRestaurant.SendToModeration();
+        secondRestaurant.Publish();
         restaurants.Add(secondRestaurant);
 
         await context.Restaurants.AddRangeAsync(restaurants, ct);
