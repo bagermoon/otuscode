@@ -1,0 +1,53 @@
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: The branch, tag or SHA to checkout
+        required: true
+        type: string
+      environment:
+        description: Environment to execute the workflow in
+        type: string
+        required: true
+permissions:
+  actions: write
+  contents: read
+concurrency:
+  group: ci-lint-docs-${{ inputs.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint_docs:
+    name: Lint docs
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref }}
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: package-lock.json
+      - name: Install JS deps
+        run: npm ci
+      - uses: DavidAnson/markdownlint-cli2-action@v22
+        with:
+          config: .markdownlint-cli2.mjs
+          globs: |
+            README.md
+            docs/**/*.md
+      - name: Restore lychee cache
+        uses: actions/cache@v4
+        with:
+          path: .lycheecache
+          key: cache-lychee-${{ github.sha }}
+          restore-keys: cache-lychee-
+      - name: Check for broken links in markdown (lychee-action)
+        uses: lycheeverse/lychee-action@v1
+        with:
+          fail: true
+          args: --cache --max-cache-age 1d --verbose --no-progress '*.md' 'docs/**/*.md'

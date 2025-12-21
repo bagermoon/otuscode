@@ -12,11 +12,11 @@ public class TestAuthHandler : AuthenticationHandler<TestAuthOptions>
     public TestAuthHandler(IOptionsMonitor<TestAuthOptions> options,
         ILoggerFactory logger, UrlEncoder encoder)
         : base(options, logger, encoder)
-    {}
+    { }
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         var user = TestUsers.Get(Options.User);
-    
+
         List<Claim> claims = [
             new Claim(ClaimTypes.Name, user.Name),
             new Claim("preferred_username", user.Name),

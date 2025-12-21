@@ -1,4 +1,5 @@
 using Ardalis.Result;
+
 using Mediator;
 
 namespace RestoRate.RestaurantService.Application.UseCases.RestaurantImage.RemoveRestaurantImage;

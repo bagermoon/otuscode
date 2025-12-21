@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using Ardalis.Result;
 using Ardalis.SharedKernel;
 using Ardalis.Specification;
+
 using FluentAssertions;
+
 using Microsoft.Extensions.Logging;
+
 using NSubstitute;
 
 using RestoRate.RestaurantService.Application.UseCases.Restaurants.GetById;

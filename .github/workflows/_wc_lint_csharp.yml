@@ -1,0 +1,47 @@
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: The branch, tag or SHA to checkout
+        required: true
+        type: string
+      environment:
+        description: Environment to execute the workflow in
+        type: string
+        required: true
+
+permissions:
+  actions: write
+  contents: read
+  checks: write
+concurrency:
+  group: ci-lint-csharp-${{ inputs.ref }}
+  cancel-in-progress: true
+jobs:
+  lint_csharp:
+    name: Lint C#
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref }}
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v5
+        with:
+          cache: true
+          cache-dependency-path: |
+            **/packages.lock.json
+          global-json-file: global.json
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 16
+      - name: Run linters
+        uses: wearerequired/lint-action@v2
+        with:
+          dotnet_format: true
+          dotnet_format_args: "whitespace"
+          continue_on_error: false

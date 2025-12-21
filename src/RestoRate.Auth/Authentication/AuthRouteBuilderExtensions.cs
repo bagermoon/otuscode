@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+
 using RestoRate.Auth.Authentication;
 
 namespace Microsoft.AspNetCore.Routing;

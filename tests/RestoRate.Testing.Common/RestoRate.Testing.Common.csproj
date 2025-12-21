@@ -5,9 +5,6 @@
     <OutputType>Library</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="Auth\" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="TestContainers" />

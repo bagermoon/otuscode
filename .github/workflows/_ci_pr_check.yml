@@ -1,0 +1,87 @@
+name: ci / pr check
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - main
+jobs:
+  lint_docs:
+    if: ${{ github.event.pull_request.draft == false }}
+    uses: ./.github/workflows/_wc_lint_docs.yml
+    permissions:
+      actions: write
+      contents: read
+    with:
+      ref: ${{ github.ref }}
+      environment: development
+  lint_csharp:
+    if: ${{ github.event.pull_request.draft == false }}
+    uses: ./.github/workflows/_wc_lint_csharp.yml
+    permissions:
+      actions: write
+      contents: read
+      checks: write
+    with:
+      ref: ${{ github.ref }}
+      environment: development
+  update_linux_lockfiles:
+    if: ${{ github.event.pull_request.draft == false && !cancelled() && !failure() }}
+    needs:
+      - lint_docs
+      - lint_csharp
+    permissions:
+      actions: write
+      contents: write
+    uses: ./.github/workflows/_wc_update_linux_lockfiles.yml
+    with:
+      ref: ${{ github.head_ref }}
+      environment: development
+  update_windows_lockfiles:
+    if: ${{ github.event.pull_request.draft == false && !cancelled() && !failure() }}
+    needs:
+      - lint_docs
+      - lint_csharp
+      - update_linux_lockfiles
+    permissions:
+      actions: write
+      contents: write
+    uses: ./.github/workflows/_wc_update_windows_lockfiles.yml
+    with:
+      ref: ${{ github.head_ref }}
+      environment: development      
+  test_build:
+    if: ${{ github.event.pull_request.draft == false && !cancelled() && !failure() }}
+    needs: 
+      - lint_docs
+      - lint_csharp
+      - update_linux_lockfiles
+      - update_windows_lockfiles
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
+      checks: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.update_windows_lockfiles.outputs.sha || github.sha }}
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v5
+        with:
+          cache: true
+          cache-dependency-path: |
+            **/packages.lock.json
+          global-json-file: global.json
+      - name: Restore
+        run: dotnet restore --locked-mode -r linux-x64
+      - name: Build solution
+        run: dotnet build --no-restore -c Release
+      - name: Run Tests
+        run:  dotnet test --no-build --no-restore -c Release --verbosity minimal -- --filter-query '/(*UnitTests)|(*IntegrationTests)' --report-xunit-trx --ignore-exit-code 8 --output Detailed
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2          
+        if: ${{ always() && !cancelled() }}
+        with:
+          files: |
+            artifacts/**/*.trx

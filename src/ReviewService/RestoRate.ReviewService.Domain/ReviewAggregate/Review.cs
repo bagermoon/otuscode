@@ -1,4 +1,5 @@
 using System;
+
 using Ardalis.SharedKernel;
 
 using RestoRate.Contracts.Review.Events;
@@ -34,8 +35,8 @@ public class Review : EntityBase<Guid>, IAggregateRoot
 
     public static Review Create(Guid restaurantId, Guid userId, int rating, string comment)
     {
-        var review =  new Review(restaurantId, userId, rating, comment);
-        
+        var review = new Review(restaurantId, userId, rating, comment);
+
         review.RegisterDomainEvent(new ReviewAddedDomainEvent(review));
         return review;
     }

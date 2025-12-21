@@ -47,7 +47,7 @@ public class KeycloakScalarSecurityTransformer(
         configuration
             .GetSection(KeycloakSettingsOptions.SectionName)
             .Bind(settings);
-            
+
         var keycloakEndpoint = await GetKeycloakHostUri(cancellationToken);
         var authorizationUrl = new Uri(keycloakEndpoint, $"/realms/{settings.Realm}/protocol/openid-connect/auth");
         var tokenUrl = new Uri($"{keycloakEndpoint.Scheme}://{AppHostProjects.Keycloak.ToLower()}/realms/{settings.Realm}/protocol/openid-connect/token");

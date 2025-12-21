@@ -3,15 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using Ardalis.SharedKernel;
 using Ardalis.Specification;
+
 using FluentAssertions;
+
 using Microsoft.Extensions.Logging;
+
 using NSubstitute;
 
 using RestoRate.RestaurantService.Application.UseCases.Restaurants.GetAll;
 using RestoRate.RestaurantService.UnitTests.Helpers;
 using RestoRate.SharedKernel.Enums;
+
 using RestaurantEntity = RestoRate.RestaurantService.Domain.RestaurantAggregate.Restaurant;
 
 namespace RestoRate.RestaurantService.UnitTests.UseCases.GetAll;
