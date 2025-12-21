@@ -71,7 +71,7 @@ jobs:
               
               if ($proj) {
                   Write-Host "Restoring project $proj for win-x64"
-                  dotnet restore $proj -r win-x64 --force-evaluate
+                  dotnet restore $proj --force-evaluate
               }
           }
       - name: Publish updated windows lock files

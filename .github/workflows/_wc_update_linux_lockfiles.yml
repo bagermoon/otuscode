@@ -64,7 +64,7 @@ jobs:
             proj=$(find "$(dirname "$file")" -maxdepth 1 -type f -name '*.csproj' | head -n 1 || true)
             if [ -n "$proj" ]; then
               echo "Restoring project $proj for linux-x64"
-              dotnet restore "$proj" -r linux-x64 --force-evaluate
+              dotnet restore "$proj" --force-evaluate
             fi
           done
       - name: Publish updated linux lock files
