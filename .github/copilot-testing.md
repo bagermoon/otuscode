@@ -2,6 +2,8 @@
 
 This document provides testing instructions and guidance for finding OpenAPI documentation in the RestoRate project.
 
+Note: this repository uses the Microsoft Testing Platform (MTP) for CI and local `dotnet test` runs. xUnit MTP configuration lives in `testconfig.json` inside individual test projects under `tests/*`, and MTP support is enabled via `tests/Directory.Build.props` (`UseMicrosoftTestingPlatformRunner` / `TestingPlatformDotnetTestSupport`). There are no projects targeting VSTest-only runners. CI runs `dotnet restore --locked-mode`, so regenerate and commit `packages.lock.json` locally after dependency changes.
+
 ## Related Documentation
 
 - [Copilot Instructions](copilot-instructions.md) - Main AI agent guidelines for this repository

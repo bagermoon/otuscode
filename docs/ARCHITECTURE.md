@@ -10,9 +10,10 @@
 - Testing and integration tests: [docs/testing.md](./testing.md)
 
 Diagnostics
+
 - Diagnostic constants live in `RestoRate.SharedKernel.Diagnostics`:
-	- `ActivitySources` — string names for tracing sources
-	- `LoggingEventIds` — int IDs for LoggerMessage
+  - `ActivitySources` — string names for tracing sources
+  - `LoggingEventIds` — int IDs for LoggerMessage
 - Convert to framework types (e.g., `EventId`) at call sites.
 
 Historic note: older `RestoRate.Shared.*` (Application/Infrastructure/SharedKernel) packages were consolidated into focused `Contracts`, `BuildingBlocks`, and optional `Abstractions` to avoid leaking application layer cross‑service and to reduce coupling.

@@ -633,6 +633,16 @@
           "Npgsql": "9.0.4"
         }
       },
+      "Npgsql.EntityFrameworkCore.PostgreSQL": {
+        "type": "Transitive",
+        "resolved": "9.0.4",
+        "contentHash": "mw5vcY2IEc7L+IeGrxpp/J5OSnCcjkjAgJYCm/eD52wpZze8zsSifdqV7zXslSMmfJG2iIUGZyo3KuDtEFKwMQ==",
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore": "[9.0.1, 10.0.0)",
+          "Microsoft.EntityFrameworkCore.Relational": "[9.0.1, 10.0.0)",
+          "Npgsql": "9.0.3"
+        }
+      },
       "Npgsql.OpenTelemetry": {
         "type": "Transitive",
         "resolved": "9.0.4",
@@ -863,13 +873,13 @@
           "RestoRate.SharedKernel": "[1.0.0, )"
         }
       },
-      "RestoRate.RestaurantService.domain": {
+      "restorate.restaurantservice.domain": {
         "type": "Project",
         "dependencies": {
           "RestoRate.SharedKernel": "[1.0.0, )"
         }
       },
-      "RestoRate.RestaurantService.infrastructure": {
+      "restorate.restaurantservice.infrastructure": {
         "type": "Project",
         "dependencies": {
           "RestoRate.BuildingBlocks": "[1.0.0, )",
@@ -1117,17 +1127,6 @@
           "MongoDB.Driver": "3.5.0"
         }
       },
-      "Npgsql.EntityFrameworkCore.PostgreSQL": {
-        "type": "CentralTransitive",
-        "requested": "[9.0.4, )",
-        "resolved": "9.0.4",
-        "contentHash": "mw5vcY2IEc7L+IeGrxpp/J5OSnCcjkjAgJYCm/eD52wpZze8zsSifdqV7zXslSMmfJG2iIUGZyo3KuDtEFKwMQ==",
-        "dependencies": {
-          "Microsoft.EntityFrameworkCore": "[9.0.1, 10.0.0)",
-          "Microsoft.EntityFrameworkCore.Relational": "[9.0.1, 10.0.0)",
-          "Npgsql": "9.0.3"
-        }
-      },
       "OpenTelemetry.Exporter.OpenTelemetryProtocol": {
         "type": "CentralTransitive",
         "requested": "[1.14.0, )",
@@ -1175,6 +1174,18 @@
         "dependencies": {
           "OpenTelemetry.Api": "[1.14.0, 2.0.0)"
         }
+      }
+    },
+    "net9.0/linux-x64": {
+      "System.Diagnostics.EventLog": {
+        "type": "Transitive",
+        "resolved": "10.0.0",
+        "contentHash": "uaFRda9NjtbJRkdx311eXlAA3n2em7223c1A8d1VWyl+4FL9vkG7y2lpPfBU9HYdj/9KgdRNdn1vFK8ZYCYT/A=="
+      },
+      "System.Text.Encodings.Web": {
+        "type": "Transitive",
+        "resolved": "10.0.0",
+        "contentHash": "257hh1ep1Gqm1Lm0ulxf7vVBVMJuGN6EL4xSWjpi46DffXzm1058IiWsfSC06zSm7SniN+Tb5160UnXsSa8rRg=="
       }
     }
   }

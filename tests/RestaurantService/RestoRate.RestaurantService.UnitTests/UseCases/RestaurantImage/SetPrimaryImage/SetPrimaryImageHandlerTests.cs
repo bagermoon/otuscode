@@ -3,13 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using Ardalis.Result;
 using Ardalis.SharedKernel;
+
 using FluentAssertions;
+
 using Microsoft.Extensions.Logging;
+
 using NSubstitute;
+
 using RestoRate.RestaurantService.Application.UseCases.RestaurantImage.SetPrimaryImage;
 using RestoRate.RestaurantService.UnitTests.Helpers;
+
 using RestaurantEntity = RestoRate.RestaurantService.Domain.RestaurantAggregate.Restaurant;
 
 namespace RestoRate.RestaurantService.UnitTests.UseCases.RestaurantImage.SetPrimaryImage;

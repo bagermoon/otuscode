@@ -1,6 +1,7 @@
 using Ardalis.SharedKernel;
 
 using Microsoft.Extensions.Logging;
+
 using RestoRate.RestaurantService.Domain.RestaurantAggregate.Events;
 
 namespace RestoRate.RestaurantService.Application.Handlers;

@@ -120,12 +120,14 @@ flowchart LR
 
 ### Примечания
 
-    - Review Service поддерживает локальную проекцию «разрешённых ресторанов»,
-    синхронизируемую событиями `RestaurantCreatedEvent` / `RestaurantArchivedEvent`.
+- Review Service поддерживает локальную проекцию «разрешённых ресторанов»,
+  синхронизируемую событиями `RestaurantCreatedEvent` / `RestaurantArchivedEvent`.
+
 - При создании отзыва сервис валидирует `RestaurantId` по этой проекции:
     отзыв можно добавить только для существующего и не архивированного ресторана.
 
 Примечание по цветам стрелок:
+
 - Оранжевый — события Restaurant (Created/Updated/Archived)
 - Зелёный — события Review (Added/Updated)
 - Фиолетовый — событие Moderation (ReviewModerated)

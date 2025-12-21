@@ -24,7 +24,7 @@ public class RequestLoggingBehavior<TMessage, TResponse>(ILogger<RequestLoggingB
             _logger.LogHandlingRequestReport(typeof(TMessage).Name);
 
             Type myType = message.GetType();
-    
+
             IList<PropertyInfo> props = [.. myType.GetProperties()];
             foreach (PropertyInfo prop in props)
             {
@@ -39,7 +39,7 @@ public class RequestLoggingBehavior<TMessage, TResponse>(ILogger<RequestLoggingB
 
         _logger.LogHandlingRequestReportTime(typeof(TMessage).Name, response, sw.ElapsedMilliseconds);
         sw.Stop();
-    
+
         return response;
     }
 }

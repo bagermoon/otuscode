@@ -1,5 +1,7 @@
 using System.Collections.Concurrent;
+
 using Microsoft.EntityFrameworkCore;
+
 using Npgsql;
 
 namespace RestoRate.BuildingBlocks.Data.Migrations;

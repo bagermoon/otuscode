@@ -15,8 +15,8 @@ public class ValidationBehaviour<TMessage, TResponse> : IPipelineBehavior<TMessa
     }
 
     public async ValueTask<TResponse> Handle(
-        TMessage request, MessageHandlerDelegate<TMessage, 
-        TResponse> next, 
+        TMessage request, MessageHandlerDelegate<TMessage,
+        TResponse> next,
         CancellationToken cancellationToken)
     {
         if (_validators.Any())

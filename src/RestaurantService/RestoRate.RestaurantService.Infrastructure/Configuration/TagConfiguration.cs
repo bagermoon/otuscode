@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 using RestoRate.RestaurantService.Domain.TagAggregate;
 
 namespace RestoRate.RestaurantService.Infrastructure.Configuration;
