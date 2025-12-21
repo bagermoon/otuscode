@@ -74,7 +74,7 @@ jobs:
             **/packages.lock.json
           global-json-file: global.json
       - name: Restore
-        run: dotnet restore --locked-mode -r linux-x64
+        run: dotnet restore --locked-mode
       - name: Build solution
         run: dotnet build --no-restore -c Release
       - name: Run Tests

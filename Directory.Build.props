@@ -16,7 +16,6 @@
     <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <RestoreUseStaticGraphEvaluation>true</RestoreUseStaticGraphEvaluation>
-    <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
 
     <!-- Prefer an explicitly requested RID (dotnet restore/build -r sets RestoreRuntimeIdentifier) -->
     <RequestedRID Condition="'$(RuntimeIdentifier)'!=''">$(RuntimeIdentifier)</RequestedRID>

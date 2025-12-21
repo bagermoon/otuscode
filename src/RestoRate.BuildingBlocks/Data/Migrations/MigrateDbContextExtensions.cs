@@ -15,19 +15,28 @@ public static class MigrateDbContextExtensions
         where TContext : DbContext
         where TDbSeeder : class, IDbSeeder<TContext>
     {
-        services.AddScoped<IDbSeeder<TContext>, TDbSeeder>();
+        // Seeders are registered as transient because they are stateless and resolved only during
+        // application startup seeding, and multiple seeders may be registered per DbContext.
+        services.AddTransient<IDbSeeder<TContext>, TDbSeeder>();
         services.ConfigureDbContext<TContext>((sp, options) =>
         {
             options
                 .UseSeeding((context, _) =>
                 {
-                    var seeder = sp.GetRequiredService<IDbSeeder<TContext>>();
-                    seeder.SeedAsync((TContext)context).GetAwaiter().GetResult();
+                    var seeders = sp.GetServices<IDbSeeder<TContext>>();
+                    foreach (var seeder in seeders)
+                    {
+                        seeder.SeedAsync((TContext)context).GetAwaiter().GetResult();
+                    }
+
                 })
                 .UseAsyncSeeding(async (context, _, token) =>
                 {
-                    var seeder = sp.GetRequiredService<IDbSeeder<TContext>>();
-                    await seeder.SeedAsync((TContext)context);
+                    var seeders = sp.GetServices<IDbSeeder<TContext>>();
+                    foreach (var seeder in seeders)
+                    {
+                        await seeder.SeedAsync((TContext)context, token);
+                    }
                 });
         });
         return services.AddMigration<TContext>();

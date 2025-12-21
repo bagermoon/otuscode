@@ -217,7 +217,6 @@
           "System.Diagnostics.DiagnosticSource": "10.0.0"
         }
       }
-    },
-    "net9.0/linux-x64": {}
+    }
   }
 }
