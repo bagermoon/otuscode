@@ -355,7 +355,7 @@
       },
       "Microsoft.Extensions.Hosting": {
         "type": "CentralTransitive",
-        "requested": "[10.0.1, )",
+        "requested": "[9.0.11, )",
         "resolved": "9.0.11",
         "contentHash": "Ksq1SmeiQ2ZoBK7+u/a+0kNDY/11bl2vVyosfdgwsUmQXxKhPZvU53bdglSw9OHhIJOoJa1o1Pu8Dm6JLardpg==",
         "dependencies": {
@@ -385,7 +385,7 @@
       },
       "Microsoft.Extensions.Logging.Abstractions": {
         "type": "CentralTransitive",
-        "requested": "[10.0.1, )",
+        "requested": "[9.0.11, )",
         "resolved": "9.0.11",
         "contentHash": "UKWFTDwtZQIoypyt1YPVsxTnDK+0sKn26+UeSGeNlkRQddrkt9EC6kP4g94rgO/WOZkz94bKNlF1dVZN3QfPFQ==",
         "dependencies": {

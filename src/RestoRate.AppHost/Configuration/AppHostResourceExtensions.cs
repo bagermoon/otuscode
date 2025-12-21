@@ -57,13 +57,10 @@ public static class AppHostResourceExtensions
     public static IResourceBuilder<RedisResource> AddRedisResource(
         this IDistributedApplicationBuilder builder, RedisConfig config, bool useVolumes, bool useDedicatedPorts)
     {
-#pragma warning disable ASPIRECERTIFICATES001
         var redis = builder.AddRedis("redis",
             port: useDedicatedPorts ? 6380 : null)
-            .WithoutHttpsCertificate() // see: https://github.com/dotnet/aspire/issues/13612
             .WithImageTag(config.ImageTag)
             .WithLifetime(config.LifetimePersistent ? ContainerLifetime.Persistent : ContainerLifetime.Session);
-#pragma warning restore ASPIRECERTIFICATES001
         if (useVolumes)
         {
             redis.WithDataVolume();

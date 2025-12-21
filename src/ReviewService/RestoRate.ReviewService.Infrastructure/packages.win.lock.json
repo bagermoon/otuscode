@@ -105,8 +105,8 @@
       },
       "Microsoft.Extensions.DependencyInjection.Abstractions": {
         "type": "Transitive",
-        "resolved": "10.0.1",
-        "contentHash": "oIy8fQxxbUsSrrOvgBqlVgOeCtDmrcynnTG+FQufcUWBrwyPfwlUkCDB2vaiBeYPyT+20u9/HeuHeBf+H4F/8g=="
+        "resolved": "9.0.11",
+        "contentHash": "+ZxxZzcVU+IEzq12GItUzf/V3mEc5nSLiXijwvDc4zyhbjvSZZ043giSZqGnhakrjwRWjkerIHPrRwm9okEIpw=="
       },
       "Microsoft.Extensions.DependencyInjection.AutoActivation": {
         "type": "Transitive",
@@ -473,8 +473,8 @@
       },
       "System.Diagnostics.DiagnosticSource": {
         "type": "Transitive",
-        "resolved": "10.0.1",
-        "contentHash": "wVYO4/71Pk177uQ3TG8ZQFS3Pnmr98cF9pYxnpuIb/bMnbEWsdZZoLU/euv29mfSi2/Iuypj0TRUchPk7aqBGg=="
+        "resolved": "10.0.0",
+        "contentHash": "0KdBK+h7G13PuOSC2R/DalAoFMvdYMznvGRuICtkdcUMXgl/gYXsG6z4yUvTxHSMACorWgHCU1Faq0KUHU6yAQ=="
       },
       "System.IO.Pipelines": {
         "type": "Transitive",
@@ -507,15 +507,15 @@
           "Ardalis.GuardClauses": "[5.0.0, )",
           "FluentValidation": "[12.1.1, )",
           "Mediator.Abstractions": "[3.0.1, )",
-          "Microsoft.Extensions.Logging.Abstractions": "[10.0.1, )",
+          "Microsoft.Extensions.Logging.Abstractions": "[9.0.11, )",
           "RestoRate.SharedKernel": "[1.0.0, )"
         }
       },
       "restorate.buildingblocks": {
         "type": "Project",
         "dependencies": {
-          "Aspire.MongoDB.Driver": "[13.1.0, )",
-          "Aspire.Npgsql.EntityFrameworkCore.PostgreSQL": "[13.1.0, )",
+          "Aspire.MongoDB.Driver": "[13.0.2, )",
+          "Aspire.Npgsql.EntityFrameworkCore.PostgreSQL": "[13.0.2, )",
           "EFCore.NamingConventions": "[9.0.0, )",
           "MassTransit": "[8.5.7, )",
           "MassTransit.RabbitMQ": "[8.5.7, )",
@@ -614,9 +614,9 @@
       },
       "Aspire.MongoDB.Driver": {
         "type": "CentralTransitive",
-        "requested": "[13.1.0, )",
-        "resolved": "13.1.0",
-        "contentHash": "9lXY0eFfZhTrDAmlPrfT1SUQDhdLkSQmPQXPmHLaXXiYJVByv+dBxlxKXsp855SqYt2iuIe0Tfa6no1C2Abw3Q==",
+        "requested": "[13.0.2, )",
+        "resolved": "13.0.2",
+        "contentHash": "BqAChVfwWADfFSCprFan3NVfI5HfCYReg6jr3aHkVREMx5iufy/1bavVwboRKESxv3dxBQo5Vff6cZXMBrMObQ==",
         "dependencies": {
           "AspNetCore.HealthChecks.MongoDb": "9.0.0",
           "DnsClient": "1.8.0",
@@ -630,14 +630,14 @@
           "Microsoft.Extensions.Primitives": "9.0.11",
           "MongoDB.Driver": "3.5.0",
           "MongoDB.Driver.Core.Extensions.DiagnosticSources": "2.1.0",
-          "OpenTelemetry.Extensions.Hosting": "1.14.0"
+          "OpenTelemetry.Extensions.Hosting": "1.9.0"
         }
       },
       "Aspire.Npgsql.EntityFrameworkCore.PostgreSQL": {
         "type": "CentralTransitive",
-        "requested": "[13.1.0, )",
-        "resolved": "13.1.0",
-        "contentHash": "gc/tmvMUyF74jFIb6f2wDtCoDskOL2EDFz4xT86mhrLCc3HNkIx2MPTnz+Bj1NOEHtLtf7lo/JKpjBb6PAfCzw==",
+        "requested": "[13.0.2, )",
+        "resolved": "13.0.2",
+        "contentHash": "4dVj+SxFoKohaMFv8w8occHRGcJp60td2VKNW82Ualy8XFAy1fSo29t+lxGxtS7VntIlS25zxRn0eQl41gig3g==",
         "dependencies": {
           "Microsoft.Extensions.Caching.Memory": "9.0.11",
           "Microsoft.Extensions.Configuration.Abstractions": "9.0.11",
@@ -652,7 +652,7 @@
           "Npgsql.DependencyInjection": "9.0.4",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "9.0.4",
           "Npgsql.OpenTelemetry": "9.0.4",
-          "OpenTelemetry.Extensions.Hosting": "1.14.0"
+          "OpenTelemetry.Extensions.Hosting": "1.9.0"
         }
       },
       "EFCore.NamingConventions": {
@@ -752,12 +752,11 @@
       },
       "Microsoft.Extensions.Logging.Abstractions": {
         "type": "CentralTransitive",
-        "requested": "[10.0.1, )",
-        "resolved": "10.0.1",
-        "contentHash": "YkmyiPIWAXVb+lPIrM0LE5bbtLOJkCiRTFiHpkVOvhI7uTvCfoOHLEN0LcsY56GpSD7NqX3gJNpsaDe87/B3zg==",
+        "requested": "[9.0.11, )",
+        "resolved": "9.0.11",
+        "contentHash": "UKWFTDwtZQIoypyt1YPVsxTnDK+0sKn26+UeSGeNlkRQddrkt9EC6kP4g94rgO/WOZkz94bKNlF1dVZN3QfPFQ==",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.1",
-          "System.Diagnostics.DiagnosticSource": "10.0.1"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.11"
         }
       },
       "Microsoft.Extensions.ServiceDiscovery": {

@@ -2,16 +2,6 @@
   "version": 2,
   "dependencies": {
     "net9.0": {
-      "Aspire.Keycloak.Authentication": {
-        "type": "Direct",
-        "requested": "[13.1.0-preview.1.25616.3, )",
-        "resolved": "13.1.0-preview.1.25616.3",
-        "contentHash": "dh6McYpOyoPnn8vHLqWLr4i3VX+TQoAnctZh3fuOY9+nJAPoPvdxtlgeCIPAFxJ3ObTPCvZD3ec29b8fggzdlQ==",
-        "dependencies": {
-          "Microsoft.AspNetCore.Authentication.JwtBearer": "9.0.11",
-          "Microsoft.AspNetCore.Authentication.OpenIdConnect": "9.0.11"
-        }
-      },
       "Microsoft.AspNetCore.OpenApi": {
         "type": "Direct",
         "requested": "[9.0.11, )",
@@ -141,8 +131,8 @@
       },
       "Microsoft.Extensions.DependencyInjection.Abstractions": {
         "type": "Transitive",
-        "resolved": "10.0.1",
-        "contentHash": "oIy8fQxxbUsSrrOvgBqlVgOeCtDmrcynnTG+FQufcUWBrwyPfwlUkCDB2vaiBeYPyT+20u9/HeuHeBf+H4F/8g=="
+        "resolved": "9.0.11",
+        "contentHash": "+ZxxZzcVU+IEzq12GItUzf/V3mEc5nSLiXijwvDc4zyhbjvSZZ043giSZqGnhakrjwRWjkerIHPrRwm9okEIpw=="
       },
       "Microsoft.Extensions.DependencyInjection.AutoActivation": {
         "type": "Transitive",
@@ -436,8 +426,8 @@
       },
       "System.Diagnostics.DiagnosticSource": {
         "type": "Transitive",
-        "resolved": "10.0.1",
-        "contentHash": "wVYO4/71Pk177uQ3TG8ZQFS3Pnmr98cF9pYxnpuIb/bMnbEWsdZZoLU/euv29mfSi2/Iuypj0TRUchPk7aqBGg=="
+        "resolved": "10.0.0",
+        "contentHash": "0KdBK+h7G13PuOSC2R/DalAoFMvdYMznvGRuICtkdcUMXgl/gYXsG6z4yUvTxHSMACorWgHCU1Faq0KUHU6yAQ=="
       },
       "System.IdentityModel.Tokens.Jwt": {
         "type": "Transitive",
@@ -464,7 +454,7 @@
           "Ardalis.GuardClauses": "[5.0.0, )",
           "FluentValidation": "[12.1.1, )",
           "Mediator.Abstractions": "[3.0.1, )",
-          "Microsoft.Extensions.Logging.Abstractions": "[10.0.1, )",
+          "Microsoft.Extensions.Logging.Abstractions": "[9.0.11, )",
           "RestoRate.SharedKernel": "[1.0.0, )"
         }
       },
@@ -472,7 +462,7 @@
         "type": "Project",
         "dependencies": {
           "Ardalis.GuardClauses": "[5.0.0, )",
-          "Aspire.Keycloak.Authentication": "[13.1.0-preview.1.25616.3, )",
+          "Aspire.Keycloak.Authentication": "[13.0.2-preview.1.25603.5, )",
           "Microsoft.AspNetCore.OpenApi": "[9.0.11, )",
           "Microsoft.Extensions.ServiceDiscovery": "[10.1.0, )",
           "RestoRate.Abstractions": "[1.0.0, )",
@@ -551,6 +541,16 @@
           "Microsoft.EntityFrameworkCore.Relational": "9.0.8"
         }
       },
+      "Aspire.Keycloak.Authentication": {
+        "type": "CentralTransitive",
+        "requested": "[13.0.2-preview.1.25603.5, )",
+        "resolved": "13.0.2-preview.1.25603.5",
+        "contentHash": "s4wE6+ucsEGF31tWbPlyc7fFRwIY5AtA3kUM1Isz1GsHpHD6p1OllPK+5h2Yx7TyeR+pScrRaL+7e5eSQFmyoQ==",
+        "dependencies": {
+          "Microsoft.AspNetCore.Authentication.JwtBearer": "9.0.11",
+          "Microsoft.AspNetCore.Authentication.OpenIdConnect": "9.0.11"
+        }
+      },
       "FluentValidation": {
         "type": "CentralTransitive",
         "requested": "[12.1.1, )",
@@ -613,12 +613,11 @@
       },
       "Microsoft.Extensions.Logging.Abstractions": {
         "type": "CentralTransitive",
-        "requested": "[10.0.1, )",
-        "resolved": "10.0.1",
-        "contentHash": "YkmyiPIWAXVb+lPIrM0LE5bbtLOJkCiRTFiHpkVOvhI7uTvCfoOHLEN0LcsY56GpSD7NqX3gJNpsaDe87/B3zg==",
+        "requested": "[9.0.11, )",
+        "resolved": "9.0.11",
+        "contentHash": "UKWFTDwtZQIoypyt1YPVsxTnDK+0sKn26+UeSGeNlkRQddrkt9EC6kP4g94rgO/WOZkz94bKNlF1dVZN3QfPFQ==",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.1",
-          "System.Diagnostics.DiagnosticSource": "10.0.1"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.11"
         }
       },
       "Microsoft.Extensions.ServiceDiscovery": {
