@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 using RestoRate.SharedKernel.Enums;
 
 namespace RestoRate.RestaurantService.Infrastructure.Configuration;

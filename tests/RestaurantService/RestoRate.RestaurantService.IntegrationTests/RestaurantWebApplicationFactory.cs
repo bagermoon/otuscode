@@ -1,6 +1,9 @@
 using DotNet.Testcontainers.Containers;
+
 using MassTransit;
+
 using Microsoft.AspNetCore.TestHost;
+
 using RestoRate.BuildingBlocks.Data.Migrations;
 using RestoRate.RestaurantService.Infrastructure.Data;
 using RestoRate.ServiceDefaults;

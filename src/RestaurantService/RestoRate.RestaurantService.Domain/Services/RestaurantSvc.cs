@@ -1,12 +1,16 @@
 using Ardalis.Result;
 using Ardalis.SharedKernel;
+
 using Mediator;
+
 using Microsoft.Extensions.Logging;
+
 using RestoRate.RestaurantService.Domain.Interfaces;
 using RestoRate.RestaurantService.Domain.RestaurantAggregate.Specifications;
 using RestoRate.RestaurantService.Domain.TagAggregate;
 using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
+
 using RestaurantEntity = RestoRate.RestaurantService.Domain.RestaurantAggregate.Restaurant;
 
 namespace RestoRate.RestaurantService.Domain.Services;

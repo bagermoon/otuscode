@@ -28,7 +28,7 @@ public static class MigrateDbContextExtensions
                     {
                         seeder.SeedAsync((TContext)context).GetAwaiter().GetResult();
                     }
-                    
+
                 })
                 .UseAsyncSeeding(async (context, _, token) =>
                 {

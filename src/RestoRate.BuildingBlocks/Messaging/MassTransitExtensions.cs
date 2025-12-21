@@ -34,7 +34,7 @@ public static class MassTransitExtensions
                 x.UsingInMemory((context, cfg) => cfg.ConfigureEndpoints(context));
                 return;
             }
-            
+
             x.UsingRabbitMq((context, cfg) =>
             {
                 cfg.Host(new Uri(connectionString));

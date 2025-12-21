@@ -1,6 +1,8 @@
 using System.Diagnostics;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+
 using RestoRate.SharedKernel.Diagnostics;
 
 namespace RestoRate.BuildingBlocks.Data.Migrations;
