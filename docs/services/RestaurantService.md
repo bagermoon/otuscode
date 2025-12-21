@@ -74,6 +74,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId>
 ## Интеграционные события
 
 Сервис Restaurant публикует следующие интеграционные события из `RestoRate.Contracts.Restaurant.Events`:
+
 - Публикует: `RestaurantCreatedEvent`, `RestaurantArchivedEvent`
 - Подписывается на: `RestaurantRatingRecalculatedEvent`
 

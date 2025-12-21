@@ -1,7 +1,9 @@
 # Архитектура
+
 Ниже несколько вариантов схем в формате Mermaid (легко вставить в Markdown, GitHub, Obsidian, mkdocs), которые можно импортировать в draw.io (через плагин Mermaid) или преобразовать в Visio (экспорт → SVG → вставить в Visio). Я сделал несколько уровней: Общая архитектура, C4-подобный Container, Потоки (Sequence), Деплой/Инфраструктура, а также схема событий.
 
 1. Общая архитектура (High-Level)
+
     ```mermaid
     flowchart LR
     %% Client Layer - Left
@@ -74,7 +76,9 @@
     class GW gateway
     class KC idp
     ```
+
 1. Контейнерная (C4-подобная)
+
     ```mermaid
     flowchart LR
     actor(Client):::actor --> Gateway[API Gateway]
@@ -115,7 +119,9 @@
     class Keycloak idp
     class PostgreSQL,MongoDB,Redis,RabbitMQ db
     ```
+
 1. Поток: Добавление отзыва и модерация (Sequence)
+
     ```mermaid
     sequenceDiagram
         autonumber
@@ -162,8 +168,8 @@
         GW-->>C: 200 OK
     ```
 
-2. Схема событий
-   
+1. Схема событий
+
     Подробные потоки интеграционных событий описаны по сервисам:
 
     - Restaurant Service: см. [RestaurantService.md](./services/RestaurantService.md#интеграционные-события)
@@ -171,7 +177,8 @@
     - Moderation Service: см. [ModerationService.md](./services/ModerationService.md#интеграционные-события)
     - Rating Service: см. [RatingService.md](./services/RatingService.md#интеграционные-события)
 
-3. DDD Упрощённая модель (Entities + Events)
+1. DDD Упрощённая модель (Entities + Events)
+
     ```mermaid
     classDiagram
         class Restaurant {
@@ -253,4 +260,4 @@
         ReviewUpdatedEvent ..> RatingSnapshot : recalculate with new values
     ```
 
-        Примечание: блок выше показывает доменные события. Интеграционные контракты могут отличаться (например, доменное “RestaurantRatingUpdated” → интеграционное “RestaurantRatingRecalculatedEvent”). Фактические интеграционные потоки — в разделах «Интеграционные события» по сервисам.
+    Примечание: блок выше показывает доменные события. Интеграционные контракты могут отличаться (например, доменное “RestaurantRatingUpdated” → интеграционное “RestaurantRatingRecalculatedEvent”). Фактические интеграционные потоки — в разделах «Интеграционные события» по сервисам.

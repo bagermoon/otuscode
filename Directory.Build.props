@@ -9,8 +9,27 @@
     <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts</ArtifactsPath>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Enable repeatable package restores using a lock file -->
     <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestoreUseStaticGraphEvaluation>true</RestoreUseStaticGraphEvaluation>
+
+    <!-- Prefer an explicitly requested RID (dotnet restore/build -r sets RestoreRuntimeIdentifier) -->
+    <RequestedRID Condition="'$(RuntimeIdentifier)'!=''">$(RuntimeIdentifier)</RequestedRID>
+    <RequestedRID Condition="'$(RequestedRID)'=='' and '$(RestoreRuntimeIdentifier)'!=''">$(RestoreRuntimeIdentifier)</RequestedRID>
+
+    <!-- Fallback to current OS when no RID was specified -->
+    <DetectedRID Condition="'$(RequestedRID)'=='' and '$(OS)'=='Windows_NT'">win-x64</DetectedRID>
+    <DetectedRID Condition="'$(RequestedRID)'=='' and '$(OS)'!='Windows_NT'">linux-x64</DetectedRID>
+
+    <EffectiveRID Condition="'$(RequestedRID)'!=''">$(RequestedRID)</EffectiveRID>
+    <EffectiveRID Condition="'$(EffectiveRID)'==''">$(DetectedRID)</EffectiveRID>
+
+    <!-- Generate separate lock files for windows/linux builds -->
+    <NuGetLockFilePath Condition="'$(EffectiveRID)' == 'win-x64'">packages.win.lock.json</NuGetLockFilePath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">

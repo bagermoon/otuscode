@@ -1,6 +1,7 @@
-namespace RestoRate.RestaurantService.Application.DTOs.CRUD;
+namespace RestoRate.Contracts.Restaurant.DTOs;
 
-public record CreateRestaurantDto(
+public record RestaurantDto(
+    Guid RestaurantId,
     string Name,
     string? Description,
     string PhoneNumber,
@@ -9,6 +10,7 @@ public record CreateRestaurantDto(
     LocationDto Location,
     OpenHoursDto OpenHours,
     MoneyDto AverageCheck,
+    string RestaurantStatus,
     IReadOnlyCollection<string> CuisineTypes,
     IReadOnlyCollection<string> Tags,
-    IReadOnlyCollection<CreateRestaurantImageDto> Images);
+    IReadOnlyCollection<RestaurantImageDto> Images);

@@ -1,50 +1,51 @@
-# Система рецензирования и рейтинга ресторанов ("RestoRate").
+# Система рецензирования и рейтинга ресторанов ("RestoRate")
 
-### Концепция системы: "RestoRate"
+## Концепция системы: "RestoRate"
 
 Система позволяет пользователям оставлять рецензии на рестораны и выставлять оценки (1–10). Рецензия может содержать текст, теги ("семейный", "шумно", "кафе"), субъективный средний чек, впечатления. Контент проходит полуавтоматическую модерацию. Агрегированный рейтинг (средняя оценка, количество рецензий, распределение по оценкам) пересчитывается асинхронно.
 
 ---
 
-### Архитектура и компоненты
+## Архитектура и компоненты
 
-1.  **API Gateway (YARP):**
-    *   Единая точка входа для клиента.
-    *   Маршрутизация запросов к соответствующим микросервисам.
+1. **API Gateway (YARP):**
+    * Единая точка входа для клиента.
+    * Маршрутизация запросов к соответствующим микросервисам.
 
-2.  **Микросервисы (каждый — отдельный .NET проект):**
-    *   **Restaurant Service:** Управление каталогом ресторанов (CRUD). `Порт: 5001`
-        *   **Хранилище:** PostgreSQL.
-        *   **Сущности DDD:** `Restaurant` (Aggregate Root), `RestaurantId`.
-        *   **Поля:** Id, Name, Description, Address (City, Street, Building, Apartment, PostalCode), Photos (список изображений), Cuisine, Rating (AverageRate, AverageCheck, ReviewCount), OpenHours (часы работы), Tags (веган, бар), Location (гео координаты).
-    *   **Review Service:** Управление рецензиями. `Порт: 5002`
-        *   **Хранилище:** MongoDB.
-        *   **Сущности:** `Review`, `ReviewId`, `UserId`, `RestaurantId`.
-        *   **Поля:** Id рецензии, RestaurantId, UserId, Rate (1–10), Comment, Tags (уютно, шумно), SuggestedAverageCheck, Status (pending/approved/rejected), RejectionReason, CreatedAt.
-    *   **Rating Service:** Агрегирование и кеширование. `Порт: 5003`
-        *   **Кеш:** Redis.
-        *   **Метрики:** AverageRate (средняя оценка), ReviewCount (количество рецензий), AverageCheck (средний чек).
-        *   **Источник:** Слушает `ReviewAddedEvent`, `ReviewUpdatedEvent` (финальное обновление приходит после модерации через Review Service).
+2. **Микросервисы (каждый — отдельный .NET проект):**
+    * **Restaurant Service:** Управление каталогом ресторанов (CRUD). `Порт: 5001`
+        * **Хранилище:** PostgreSQL.
+        * **Сущности DDD:** `Restaurant` (Aggregate Root), `RestaurantId`.
+        * **Поля:** Id, Name, Description, Address (City, Street, Building, Apartment, PostalCode), Photos (список изображений), Cuisine, Rating (AverageRate, AverageCheck, ReviewCount), OpenHours (часы работы), Tags (веган, бар), Location (гео координаты).
+    * **Review Service:** Управление рецензиями. `Порт: 5002`
+        * **Хранилище:** MongoDB.
+        * **Сущности:** `Review`, `ReviewId`, `UserId`, `RestaurantId`.
+        * **Поля:** Id рецензии, RestaurantId, UserId, Rate (1–10), Comment, Tags (уютно, шумно), SuggestedAverageCheck, Status (pending/approved/rejected), RejectionReason, CreatedAt.
+    * **Rating Service:** Агрегирование и кеширование. `Порт: 5003`
+        * **Кеш:** Redis.
+        * **Метрики:** AverageRate (средняя оценка), ReviewCount (количество рецензий), AverageCheck (средний чек).
+        * **Источник:** Слушает `ReviewAddedEvent`, `ReviewUpdatedEvent` (финальное обновление приходит после модерации через Review Service).
 
-3.  **Связь между сервисами:**
-    *   **События (RabbitMQ):**
-        *   `RestaurantCreatedEvent` (от Restaurant Service).
-        *   `ReviewAddedEvent`, `ReviewUpdatedEvent` (от Review Service).
-        *   `ReviewModeratedEvent` (от Moderation Service).
-    *   **Синхронные вызовы (минимально):**
-        *   Review Service при отсутствии локально кэшируемого значения может проверить ресторан через REST.
+3. **Связь между сервисами:**
+    * **События (RabbitMQ):**
+        * `RestaurantCreatedEvent` (от Restaurant Service).
+        * `ReviewAddedEvent`, `ReviewUpdatedEvent` (от Review Service).
+        * `ReviewModeratedEvent` (от Moderation Service).
+    * **Синхронные вызовы (минимально):**
+        * Review Service при отсутствии локально кэшируемого значения может проверить ресторан через REST.
 
-4.  **Инфраструктура:**
-    *   **RabbitMQ:** Поток доменных событий.
-    *   **PostgreSQL:** Каталог ресторанов.
-    *   **MongoDB:** Рецензии + задачи модерации.
-    *   **Redis:** Горячие агрегаты рейтингов.
+4. **Инфраструктура:**
+    * **RabbitMQ:** Поток доменных событий.
+    * **PostgreSQL:** Каталог ресторанов.
+    * **MongoDB:** Рецензии + задачи модерации.
+    * **Redis:** Горячие агрегаты рейтингов.
 
 ---
 
-### Реализация стека технологий
+## Реализация стека технологий
 
-#### 1. DDD и Value Objects
+### 1. DDD и Value Objects
+
 ```csharp
 // Address Value Object
 public record Address
@@ -120,8 +121,10 @@ public class Restaurant : AggregateRoot<RestaurantId>
 }
 ```
 
-#### 2. Асинхронные операции и Сериализация
-*   **Везде `async/await`.** Например, `MongoDbReviewRepository`:
+### 2. Асинхронные операции и Сериализация
+
+* **Везде `async/await`.** Например, `MongoDbReviewRepository`:
+
 ```csharp
 public class MongoDbReviewRepository : IReviewRepository
 {
@@ -143,7 +146,9 @@ public class MongoDbReviewRepository : IReviewRepository
     }
 }
 ```
-*   **MassTransit + RabbitMQ (рекомендуется)** — краткий пример публикации, потребления и настройки:
+
+* **MassTransit + RabbitMQ (рекомендуется)** — краткий пример публикации, потребления и настройки:
+
 ```csharp
 // Publish (например, в Review Service)
 await publish.Publish(new ReviewAddedEvent(reviewId, restaurantId, authorId, rating, null, text, tags));
@@ -163,41 +168,42 @@ builder.Services.AddMassTransit(x =>
 });
 ```
 
-#### 3. Логи и Метрики
-*   **Логи:** `ILogger<T>` + Serilog для структурированного логирования в JSON/Elasticsearch.
-*   **Метрики:** `System.Diagnostics.Metrics` + OpenTelemetry для сбора метрик (количество запросов, ошибок, длительность операций) и экспорта в Prometheus/Grafana.
+### 3. Логи и Метрики
 
-#### 4. Тестирование
-*   **Unit-тесты (xUnit, NSubstitute):** Тестирование доменной логики (например, расчет рейтинга в Rating Service), обработчиков команд.
-*   **Интеграционные тесты (TestContainers):** Запуск реальных контейнеров с БД и RabbitMQ для тестирования репозиториев и обработчиков событий.
+* **Логи:** `ILogger<T>` + Serilog для структурированного логирования в JSON/Elasticsearch.
+* **Метрики:** `System.Diagnostics.Metrics` + OpenTelemetry для сбора метрик (количество запросов, ошибок, длительность операций) и экспорта в Prometheus/Grafana.
 
----
+### 4. Тестирование
 
-### Поток данных: Пользователь добавляет рецензию
-
-1.  **Клиент** отправляет `POST /api/restaurants/{id}/reviews`.
-2.  **Gateway** перенаправляет в **Review Service**.
-3.  **Review Service** сохраняет рецензию (status=pending) и публикует `ReviewAddedEvent`.
-4.  **Moderation Service** (если требуется) обрабатывает и публикует `ReviewModeratedEvent`.
-5.  **Review Service** принимает `ReviewModeratedEvent`, обновляет статус и публикует `ReviewUpdatedEvent`.
-6.  **Rating Service** на `ReviewAddedEvent`/`ReviewUpdatedEvent` пересчитывает агрегаты и обновляет Redis.
-6.  **Клиент** при чтении получает актуальный рейтинг из кеша.
+* **Unit-тесты (xUnit, NSubstitute):** Тестирование доменной логики (например, расчет рейтинга в Rating Service), обработчиков команд.
+* **Интеграционные тесты (TestContainers):** Запуск реальных контейнеров с БД и RabbitMQ для тестирования репозиториев и обработчиков событий.
 
 ---
 
-### Как это развернуть и показать "без заморочек"
+## Поток данных: Пользователь добавляет рецензию
 
-1.  **`docker-compose.yml`** для поднятия всей инфраструктуры (RabbitMQ, PostgreSQL, MongoDB, Redis) одной командой.
-2.  **Код на GitHub:** Отдельные папки для каждого микросервиса, API Gateway и общих библиотек (Domain Events, Shared Kernel).
-3.  **`README.md`** с инструкцией: `docker-compose up -d` и `dotnet run` для каждого сервиса в своем терминале.
-4.  **Postman-коллекция** с примерами запросов ко всем API.
+1. **Клиент** отправляет `POST /api/restaurants/{id}/reviews`.
+2. **Gateway** перенаправляет в **Review Service**.
+3. **Review Service** сохраняет рецензию (status=pending) и публикует `ReviewAddedEvent`.
+4. **Moderation Service** (если требуется) обрабатывает и публикует `ReviewModeratedEvent`.
+5. **Review Service** принимает `ReviewModeratedEvent`, обновляет статус и публикует `ReviewUpdatedEvent`.
+6. **Rating Service** на `ReviewAddedEvent`/`ReviewUpdatedEvent` пересчитывает агрегаты и обновляет Redis.
+7. **Клиент** при чтении получает актуальный рейтинг из кеша.
 
+---
+
+## Как это развернуть и показать "без заморочек"
+
+1. **`docker-compose.yml`** для поднятия всей инфраструктуры (RabbitMQ, PostgreSQL, MongoDB, Redis) одной командой.
+2. **Код на GitHub:** Отдельные папки для каждого микросервиса, API Gateway и общих библиотек (Domain Events, Shared Kernel).
+3. **`README.md`** с инструкцией: `docker-compose up -d` и `dotnet run` для каждого сервиса в своем терминале.
+4. **Postman-коллекция** с примерами запросов ко всем API.
 
 Вот расширенная схема и описание:
 
 ## Архитектурная схема RestoRate
 
-```
+```fundamental
                        ┌───────────────────────────────────┐    ┌─────────────────┐
                        │         API Gateway               │    │   Blazor Server │
                        │           (YARP)                  │◄──►│   Dashboard     │
@@ -232,6 +238,7 @@ builder.Services.AddMassTransit(x =>
 ## Новые компоненты
 
 ### 1. Moderation Service (`:5004`)
+
 ```csharp
 // Domain Event для модерации
 public record ReviewModerationResultEvent(
@@ -257,6 +264,7 @@ public class ModerationTask
 ```
 
 ### 2. Blazor Server Dashboard (`:5005`)
+
 ```csharp
 // Pages/Moderation.razor
 @page "/moderation"
@@ -293,7 +301,7 @@ public class ModerationTask
 
 ## Полный поток данных: Добавление и модерация отзыва
 
-```
+```fundamental
 1. Клиент ───POST /reviews───► Gateway ───► Review Service ───► MongoDB
 2. Review Service ───ReviewAddedEvent───► RabbitMQ
 3. RabbitMQ ───► Moderation Service (авто-проверка + создание задачи)
@@ -308,23 +316,26 @@ public class ModerationTask
 ## API Endpoints через Gateway
 
 ### Public API
+
 | Метод | Эндпоинт | Сервис | Описание |
-|-------|----------|---------|-----------|
+| --- | --- | --- | --- |
 | `GET` | `/api/restaurants` | Restaurant | Список ресторанов |
 | `GET` | `/api/restaurants/{id}/reviews` | Review | Рецензии ресторана |
 | `POST` | `/api/restaurants/{id}/reviews` | Review | Добавить рецензию |
 | `GET` | `/api/restaurants/{id}/rating` | Rating | Рейтинг ресторана |
 
 ### Moderation API
+
 | Метод | Эндпоинт | Сервис | Описание |
-|-------|----------|---------|-----------|
+| --- | --- | --- | --- |
 | `GET` | `/api/moderation/pending` | Moderation | Задачи на модерацию |
 | `POST` | `/api/moderation/{taskId}/approve` | Moderation | Одобрить отзыв |
 | `POST` | `/api/moderation/{taskId}/reject` | Moderation | Отклонить отзыв |
 
 ### Blazor Pages
+
 | URL | Компонент | Назначение |
-|-----|-----------|------------|
+| --- | --- | --- |
 | `/` | RestaurantCatalog.razor | Каталог ресторанов |
 | `/restaurant/{id}` | RestaurantDetail.razor | Детали ресторана + рецензии |
 | `/moderation` | Moderation.razor | Панель модерации |
@@ -411,7 +422,7 @@ public class ReviewAddedEventHandler
 }
 ```
 
-## Преимущества такой архитектуры:
+## Преимущества такой архитектуры
 
 1. **Полный стек**: От БД до UI
 2. **Реальные use cases**: Модерация, кеширование, асинхронные операции

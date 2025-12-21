@@ -33,15 +33,21 @@ public class RestaurantWebApplicationFactory
         });
     }
 
-    protected async override Task OnInitializeAsync()
+    protected override async Task<IHost> CreateHostAsync(IHostBuilder builder)
     {
-        // Set environment variable before host is built
-        ContainerEnvironmentHelpers.SetPostgresEnvironmentVariables(
-            connectionString: _postgres.GetConnectionString(),
-            connectionName: AppHostProjects.RestaurantDb
-        );
+        builder.ConfigureHostConfiguration(config =>
+        {
+            config.AddInMemoryCollection(
+                ContainerConfigurationHelpers.GetPostgresConfiguration(
+                    connectionString: _postgres.GetConnectionString(),
+                    connectionName: AppHostProjects.RestaurantDb
+                )
+            );
+        });
 
-        // Apply EF Core migrations
-        await DbMigrationRunner.RunAsync<RestaurantDbContext>(Services);
+        var host = await base.CreateHostAsync(builder);
+        await DbMigrationRunner.RunAsync<RestaurantDbContext>(host.Services);
+
+        return host;
     }
 }
