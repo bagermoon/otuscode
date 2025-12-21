@@ -39,7 +39,6 @@ jobs:
         id: changed-win-lockfiles
         uses: tj-actions/changed-files@v47
         with:
-          since_last_remote_commit: true
           files: |
             src/**/packages.win.lock.json
             tests/**/packages.win.lock.json

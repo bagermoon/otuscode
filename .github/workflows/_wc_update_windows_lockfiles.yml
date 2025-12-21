@@ -37,7 +37,6 @@ jobs:
         id: changed-linux-lockfiles
         uses: tj-actions/changed-files@v47
         with:
-          since_last_remote_commit: true
           files: |
             src/**/packages.lock.json
             tests/**/packages.lock.json
