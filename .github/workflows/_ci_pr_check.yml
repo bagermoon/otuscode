@@ -4,6 +4,9 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - main
+concurrency:
+  group: ci-pr-check-${{ github.head_ref }}
+  cancel-in-progress: true
 jobs:
   lint_docs:
     if: ${{ github.event.pull_request.draft == false }}
@@ -41,7 +44,6 @@ jobs:
     needs:
       - lint_docs
       - lint_csharp
-      - update_linux_lockfiles
     permissions:
       actions: write
       contents: write
@@ -51,11 +53,13 @@ jobs:
       environment: development      
   test_build:
     if: ${{ github.event.pull_request.draft == false && !cancelled() && !failure() }}
+    concurrency:
+      group: ci-test-build-${{ github.head_ref }}
+      cancel-in-progress: true
     needs: 
       - lint_docs
       - lint_csharp
       - update_linux_lockfiles
-      - update_windows_lockfiles
     runs-on: ubuntu-latest
     permissions:
       actions: write
@@ -65,13 +69,13 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: ${{ needs.update_windows_lockfiles.outputs.sha || github.sha }}
+          ref: ${{ needs.update_linux_lockfiles.outputs.sha || github.sha }}
       - name: Setup dotnet
         uses: actions/setup-dotnet@v5
         with:
           cache: true
           cache-dependency-path: |
-            **/packages.lock.json
+            **/packages.linux.lock.json
           global-json-file: global.json
       - name: Restore
         run: dotnet restore --locked-mode

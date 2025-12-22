@@ -52,7 +52,7 @@ jobs:
         with:
           cache: true
           cache-dependency-path: |
-            **/packages.lock.json
+            **/packages.linux.lock.json
           global-json-file: global.json
       - name: Generate linux lock files if needed
         if: ${{ steps.changed-win-lockfiles.outputs.any_changed == 'true' }}
