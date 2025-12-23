@@ -20,8 +20,8 @@
     <Project Path="src/RestoRate.ServiceDefaults/RestoRate.ServiceDefaults.csproj" />
     <Project Path="src/RestoRate.SharedKernel/RestoRate.SharedKernel.csproj" />
   </Folder>
-  <Folder Name="/src/Moderation/">
-    <Project Path="src/Moderation/RestoRate.Moderation.Api/RestoRate.Moderation.Api.csproj" />
+  <Folder Name="/src/ModerationService/">
+    <Project Path="src/ModerationService/RestoRate.ModerationService.Api/RestoRate.ModerationService.Api.csproj" />
   </Folder>
   <Folder Name="/src/RatingService/">
     <Project Path="src/RatingService/RestoRate.RatingService.Api/RestoRate.RatingService.Api.csproj" />

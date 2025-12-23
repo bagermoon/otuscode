@@ -1,4 +1,4 @@
-# Агрегаты сервиса Review
+# Агрегаты сервиса ReviewService
 
 ## Review
 
@@ -75,7 +75,7 @@ public sealed class Review : AggregateRoot<ReviewId>
 ## Интеграционные события
 
 - Публикует: `ReviewAddedEvent`, `ReviewUpdatedEvent`
-- Подписывается на: `ReviewModeratedEvent` (публикуется сервисом Moderation),
+- Подписывается на: `ReviewModeratedEvent` (публикуется сервисом ModerationService),
   `RestaurantCreatedEvent`, `RestaurantArchivedEvent`
 
 ```mermaid
@@ -170,4 +170,4 @@ sequenceDiagram
 ### Замечания по надёжности
 
 - Публикации осуществляются через outbox; потребители — идемпотентны.
-- Временные сбои в Moderation или Rating не блокируют основную операцию создания отзыва — события будут доставлены повторно.
+- Временные сбои в ModerationService или RatingService не блокируют основную операцию создания отзыва — события будут доставлены повторно.

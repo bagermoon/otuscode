@@ -67,7 +67,7 @@ scalar.WithApiReference(restaurantApi, options =>
 
 #region ServiceModerationApi
 var moderationApiBearerAudience = builder.AddParameter("moderation-api-bearer-audience", value: "restorate-moderation-api", publishValueAsDefault: true);
-var moderationApi = builder.AddProject<RestoRate_Moderation_Api>(AppHostProjects.ServiceModerationApi)
+var moderationApi = builder.AddProject<RestoRate_ModerationService_Api>(AppHostProjects.ServiceModerationApi)
     .WithReference(keycloak)
     .WithReference(rabbitmq)
     .WaitFor(keycloak).WaitFor(migrations)
