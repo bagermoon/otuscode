@@ -64,10 +64,10 @@
           "xunit.v3.mtp-v1": "[3.2.1]"
         }
       },
-      "Aspire.Dashboard.Sdk.win-x64": {
+      "Aspire.Dashboard.Sdk.linux-x64": {
         "type": "Transitive",
         "resolved": "13.0.2",
-        "contentHash": "nJaYqX5BvVZC11s1eeBgp200q6s2P9iTjURu5agdBwnDtKLM9rkGOGKpwApUr7LuiAKQO5Zx9Zfk5zfZqg4vUg=="
+        "contentHash": "nHDSbjWnTCKMPSbUUbb53BEUm7qwgG9++UshOVCcaNdPb/2dcJYwGwox466s9pRIyAA1+O44yXCuz2/1yfHn1g=="
       },
       "Aspire.Hosting": {
         "type": "Transitive",
@@ -131,10 +131,10 @@
           "System.IO.Hashing": "9.0.10"
         }
       },
-      "Aspire.Hosting.Orchestration.win-x64": {
+      "Aspire.Hosting.Orchestration.linux-x64": {
         "type": "Transitive",
         "resolved": "13.0.2",
-        "contentHash": "bHQavGeVzPJYhR+0hlZtG/RN+Fxa/TpNZDvbgbVjGTw0zNqzcZFI+LkeLzM6T7RXHs3pjyDQUYFU4Y4h1mPzLw=="
+        "contentHash": "ok07n8bIWPQDQ8c5tlAlr6DBqbhMkuW4VcDCKltWkKimXVXXGP0JBjlFHYjIKavvkjRyhrcW8CzQkEQk+bbJ6g=="
       },
       "AspNetCore.HealthChecks.MongoDb": {
         "type": "Transitive",
@@ -1148,11 +1148,11 @@
       "restorate.apphost": {
         "type": "Project",
         "dependencies": {
-          "Aspire.Dashboard.Sdk.win-x64": "[13.0.2, )",
+          "Aspire.Dashboard.Sdk.linux-x64": "[13.0.2, )",
           "Aspire.Hosting.AppHost": "[13.0.2, )",
           "Aspire.Hosting.Keycloak": "[13.0.2-preview.1.25603.5, )",
           "Aspire.Hosting.MongoDB": "[13.0.2, )",
-          "Aspire.Hosting.Orchestration.win-x64": "[13.0.2, )",
+          "Aspire.Hosting.Orchestration.linux-x64": "[13.0.2, )",
           "Aspire.Hosting.PostgreSQL": "[13.0.2, )",
           "Aspire.Hosting.RabbitMQ": "[13.0.2, )",
           "Aspire.Hosting.Redis": "[13.0.2, )",

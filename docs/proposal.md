@@ -324,13 +324,13 @@ public class ModerationTask
 | `POST` | `/api/restaurants/{id}/reviews` | Review | Добавить рецензию |
 | `GET` | `/api/restaurants/{id}/rating` | Rating | Рейтинг ресторана |
 
-### Moderation API
+### Moderation Service API
 
 | Метод | Эндпоинт | Сервис | Описание |
 | --- | --- | --- | --- |
-| `GET` | `/api/moderation/pending` | Moderation | Задачи на модерацию |
-| `POST` | `/api/moderation/{taskId}/approve` | Moderation | Одобрить отзыв |
-| `POST` | `/api/moderation/{taskId}/reject` | Moderation | Отклонить отзыв |
+| `GET` | `/api/moderation/pending` | ModerationService | Задачи на модерацию |
+| `POST` | `/api/moderation/{taskId}/approve` | ModerationService | Одобрить отзыв |
+| `POST` | `/api/moderation/{taskId}/reject` | ModerationService | Отклонить отзыв |
 
 ### Blazor Pages
 

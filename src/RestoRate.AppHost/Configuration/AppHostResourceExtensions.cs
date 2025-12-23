@@ -61,7 +61,6 @@ public static class AppHostResourceExtensions
             port: useDedicatedPorts ? 6380 : null)
             .WithImageTag(config.ImageTag)
             .WithLifetime(config.LifetimePersistent ? ContainerLifetime.Persistent : ContainerLifetime.Session);
-
         if (useVolumes)
         {
             redis.WithDataVolume();

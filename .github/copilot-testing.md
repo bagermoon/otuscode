@@ -129,7 +129,7 @@ E2E tests use real Keycloak authentication with Playwright browser automation. S
 - **Database:** MongoDB (planned)
 
 ### Rating Service
-- **API Project:** `src/RestoRate.Rating.Api` (placeholder)
+- **API Project:** `src/RestoRate.RatingService.Api` (placeholder)
 - **Cache:** Redis (planned)
 
 ## Health Checks

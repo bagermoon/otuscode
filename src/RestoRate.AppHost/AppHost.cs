@@ -67,7 +67,7 @@ scalar.WithApiReference(restaurantApi, options =>
 
 #region ServiceModerationApi
 var moderationApiBearerAudience = builder.AddParameter("moderation-api-bearer-audience", value: "restorate-moderation-api", publishValueAsDefault: true);
-var moderationApi = builder.AddProject<RestoRate_Moderation_Api>(AppHostProjects.ServiceModerationApi)
+var moderationApi = builder.AddProject<RestoRate_ModerationService_Api>(AppHostProjects.ServiceModerationApi)
     .WithReference(keycloak)
     .WithReference(rabbitmq)
     .WaitFor(keycloak).WaitFor(migrations)
@@ -83,7 +83,7 @@ scalar.WithApiReference(moderationApi, options =>
 
 #region ServiceRatingApi
 var ratingApiBearerAudience = builder.AddParameter("rating-api-bearer-audience", value: "restorate-rating-api", publishValueAsDefault: true);
-var ratingApi = builder.AddProject<RestoRate_Rating_Api>(AppHostProjects.ServiceRatingApi)
+var ratingApi = builder.AddProject<RestoRate_RatingService_Api>(AppHostProjects.ServiceRatingApi)
     .WithReference(keycloak)
     .WithReference(rabbitmq)
     .WithReference(redisCache)
