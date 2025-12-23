@@ -83,7 +83,7 @@ scalar.WithApiReference(moderationApi, options =>
 
 #region ServiceRatingApi
 var ratingApiBearerAudience = builder.AddParameter("rating-api-bearer-audience", value: "restorate-rating-api", publishValueAsDefault: true);
-var ratingApi = builder.AddProject<RestoRate_Rating_Api>(AppHostProjects.ServiceRatingApi)
+var ratingApi = builder.AddProject<RestoRate_RatingService_Api>(AppHostProjects.ServiceRatingApi)
     .WithReference(keycloak)
     .WithReference(rabbitmq)
     .WithReference(redisCache)

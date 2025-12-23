@@ -32,14 +32,10 @@
     - `RestoRate.<Context>.Application`
     - `RestoRate.<Context>.Infrastructure`
     - `RestoRate.<Context>.Api`
-  - Текущий прогресс по контекстам:
-    - `Restaurant` — все 4 слоя присутствуют.
-    - `Moderation`, `Rating` — пока есть слой `Api` (заготовки); остальные планируются.
-    - `Review` — в планах.
 - tests/
   - Юнит‑тесты домена/приложения и интеграционные тесты инфраструктуры (с Testcontainers).
 
-Примеры контекстов: `Restaurant`, `Review`, `Rating`, `Moderation`.
+Примеры контекстов: `RestaurantService`, `ReviewService`, `RatingService`, `ModerationService`.
 
 ### Зависимости между слоями (строго)
 

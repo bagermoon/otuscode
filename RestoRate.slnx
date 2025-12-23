@@ -23,8 +23,8 @@
   <Folder Name="/src/Moderation/">
     <Project Path="src/Moderation/RestoRate.Moderation.Api/RestoRate.Moderation.Api.csproj" />
   </Folder>
-  <Folder Name="/src/Rating/">
-    <Project Path="src/Rating/RestoRate.Rating.Api/RestoRate.Rating.Api.csproj" />
+  <Folder Name="/src/RatingService/">
+    <Project Path="src/RatingService/RestoRate.RatingService.Api/RestoRate.RatingService.Api.csproj" />
   </Folder>
   <Folder Name="/src/RestaurantService/">
     <Project Path="src/RestaurantService/RestoRate.RestaurantService.Api/RestoRate.RestaurantService.Api.csproj" />
