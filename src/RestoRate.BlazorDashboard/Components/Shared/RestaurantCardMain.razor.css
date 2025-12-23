@@ -1,0 +1,75 @@
+::deep .hero-image-container {
+    width: 100%;
+    height: 160px;
+}
+
+::deep .hero-image {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+}
+
+@media (min-width: 600px) {
+    ::deep .hero-image-container {
+        width: 35%;
+        min-width: 250px;
+        height: auto;
+        min-height: 200px;
+    }
+}
+
+::deep .thumbnails-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 6px;
+    padding: 4px 0;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+    ::deep .thumbnails-scroll::-webkit-scrollbar {
+        height: 3px;
+    }
+
+    ::deep .thumbnails-scroll::-webkit-scrollbar-thumb {
+        background: rgba(15, 23, 42, 0.3);
+        border-radius: 2px;
+    }
+
+::deep .thumbnail-container {
+    flex-shrink: 0;
+    cursor: pointer;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 3px solid transparent;
+    transition: all 0.2s ease;
+    width: 56px;
+    height: 42px;
+}
+
+    ::deep .thumbnail-container:hover {
+        border-color: var(--mud-palette-primary);
+        transform: scale(1.05);
+    }
+
+::deep .thumbnail-container-active {
+    border: 3px solid var(--mud-palette-primary) !important;
+    transform: scale(1.05);
+}
+
+::deep .thumbnail {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    border-radius: 6px;
+}
+
+::deep .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

@@ -1,0 +1,82 @@
+@page "/catalog"
+@using RestoRate.BlazorDashboard.Components.Shared
+@using RestoRate.BlazorDashboard.Services
+@using RestoRate.RestaurantService.Application.UseCases.Restaurants.GetAll
+@inject RestaurantWebService RestaurantService
+@inject IDialogService Dialog
+@inject NavigationManager Nav
+@rendermode InteractiveServer
+
+<PageTitle>RestoRate - Каталог</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-6">
+    <RestaurantFilters @ref="filters" OnFiltersChanged="Reload" />
+
+    @if (loading)
+    {
+        <div class="d-flex justify-center py-10">
+            <MudProgressCircular Indeterminate="true" />
+        </div>
+    }
+    else if (pagedRestaurants is not null && pagedRestaurants.Items.Any())
+    {
+        <MudGrid Spacing="3" Class="mt-4">
+            @foreach (var r in pagedRestaurants.Items)
+            {
+                <MudItem xs="12" sm="6" md="4">
+                    <RestaurantCard Restaurant="r" OnOpen="@(restaurant => ShowDetails(restaurant.RestaurantId))" />
+                </MudItem>
+            }
+        </MudGrid>
+
+        <div class="d-flex justify-center mt-6">
+            <MudPagination Selected="@currentPage"
+                           SelectedChanged="ChangePage"
+                           Count="@pagedRestaurants.TotalPages"
+                           ShowFirstButton="true"
+                           ShowLastButton="true" />
+        </div>
+    }
+    else
+    {
+        <MudText Class="py-10" Align="Align.Center">Рестораны не найдены</MudText>
+    }
+</MudContainer>
+
+@code {
+    private PagedResult<RestaurantDto>? pagedRestaurants;
+    private bool loading = true;
+    private int currentPage = 1;
+    private RestaurantFilters? filters;
+
+    protected override async Task OnInitializedAsync() => await Load();
+
+    private async Task Reload()
+    {
+        currentPage = 1;
+        await Load();
+    }
+
+    private async Task ChangePage(int page)
+    {
+        currentPage = page;
+        await Load();
+    }
+
+    private async Task Load()
+    {
+        loading = true;
+        StateHasChanged();
+
+        var f = filters?.GetFilters() ?? (null, null, null);
+        pagedRestaurants = await RestaurantService.GetRestaurantsAsync(currentPage, 12, f.SearchTerm, f.CuisineType, f.Tag);
+
+        loading = false;
+        StateHasChanged();
+    }
+
+    private void ShowDetails(Guid restaurantId)
+    {
+        Nav.NavigateTo($"/restaurant/{restaurantId}");
+    }
+}

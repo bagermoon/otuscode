@@ -1,21 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Authorization
+@using MudBlazor
+@using RestoRate.SharedKernel.Enums
 
+<!DOCTYPE html>
+<html lang="ru">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
-    <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]" />
-    <link rel="stylesheet" href="@Assets["app.css"]" />
-    <link rel="stylesheet" href="@Assets["RestoRate.BlazorDashboard.styles.css"]" />
-    <ImportMap />
-    <link rel="icon" type="image/png" href="favicon.png" />
-    <HeadOutlet />
+
+    <link rel="stylesheet" href="_content/MudBlazor/MudBlazor.min.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+
+    <HeadOutlet @rendermode="InteractiveServer" />
 </head>
 
 <body>
-    <Routes />
-    <script src="_framework/blazor.web.js"></script>
-</body>
+    <Routes @rendermode="InteractiveServer" />
 
+    <MudThemeProvider Theme="@RestoTheme" IsDarkMode="false" />
+    <MudPopoverProvider />
+    <MudDialogProvider />
+    <MudSnackbarProvider />
+
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+</body>
 </html>
+
+@code {
+    private MudTheme RestoTheme => new()
+    {
+        PaletteLight = new PaletteLight
+        {
+            Primary = "#77BEF0",
+            Secondary = "#FFCB61",
+            Background = "#f8fbff",
+            Surface = "#ffffff",
+            AppbarBackground = "rgba(255,255,255,0.8)",
+            TextPrimary = "rgba(15, 23, 42, 0.92)",
+            TextSecondary = "rgba(15, 23, 42, 0.70)",
+        }
+    };
+}

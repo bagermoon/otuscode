@@ -1,0 +1,128 @@
+@page "/"
+@page "/index"
+@rendermode InteractiveServer
+@using RestoRate.BlazorDashboard.Services
+@using RestoRate.Contracts.Restaurant.DTOs
+@using RestoRate.BlazorDashboard.Components.Shared
+@inject RestaurantWebService RestaurantWebService
+@inject NavigationManager Nav
+@implements IDisposable
+
+<PageTitle>Лучшие рестораны вашего города</PageTitle>
+
+<!-- Сделали контейнер УЗКИМ (Medium), чтобы список был по центру и не слишком широким -->
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-6">
+
+    <section class="hero mb-8">
+        <div class="hero-content text-center">
+            <h1>РестоОценка</h1>
+            <p>Найдите идеальное место</p>
+
+            <div class="search-controls mt-4">
+                <MudTextField @bind-Value="searchTerm"
+                              Placeholder="Поиск ресторанов..."
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Search"
+                              Immediate="true"
+                              Clearable="true"
+                              OnValueChanged="OnSearchChanged"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense" />
+            </div>
+        </div>
+    </section>
+
+    @if (loading)
+    {
+        <div class="d-flex justify-center py-10">
+            <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+        </div>
+    }
+    else if (restaurants?.Items?.Any() == true)
+    {
+        <!-- Spacing="4": небольшой отступ между карточками -->
+        <MudGrid Spacing="4" Class="mt-4">
+            @foreach (var r in restaurants.Items)
+            {
+                <!-- xs="12": Одна карточка на всю ширину строки -->
+                <MudItem xs="12">
+                    <RestaurantCardMain Restaurant="r" OnOpen="@(restaurant => ShowDetails(restaurant.RestaurantId))" />
+                </MudItem>
+            }
+        </MudGrid>
+
+        <div class="d-flex justify-center mt-6">
+            <MudPagination Selected="currentPage"
+                           SelectedChanged="OnPageChanged"
+                           Count="restaurants.TotalPages"
+                           ShowFirstButton="true"
+                           ShowLastButton="true"
+                           BoundaryCount="1"
+                           MiddleCount="2" />
+        </div>
+    }
+    else
+    {
+        <MudText Class="py-10" Align="Align.Center">
+            <h3>Рестораны не найдены</h3>
+        </MudText>
+    }
+</MudContainer>
+
+@code {
+    private PagedResult<RestaurantDto>? restaurants;
+    private bool loading = true;
+    private int currentPage = 1;
+    private string? searchTerm;
+    private string? selectedCuisine;
+    private string? selectedTag;
+    const int pageSize = 12;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadRestaurants();
+    }
+
+    private async Task LoadRestaurants()
+    {
+        loading = true;
+        StateHasChanged();
+
+        restaurants = await RestaurantWebService.GetRestaurantsAsync(
+            currentPage,
+            pageSize,
+            searchTerm,
+            selectedCuisine,
+            selectedTag);
+
+        loading = false;
+        StateHasChanged();
+    }
+
+    private async Task OnSearchChanged(string value)
+    {
+        searchTerm = value;
+        currentPage = 1;
+        await LoadRestaurants();
+    }
+
+    private async Task OnFilterChanged(string value)
+    {
+        selectedCuisine = value;
+        currentPage = 1;
+        await LoadRestaurants();
+    }
+
+    private async Task OnPageChanged(int page)
+    {
+        currentPage = page;
+        await LoadRestaurants();
+    }
+
+    private void ShowDetails(Guid restaurantId)
+    {
+        Nav.NavigateTo($"/restaurant/{restaurantId}");
+    }
+
+    public void Dispose() { }
+}

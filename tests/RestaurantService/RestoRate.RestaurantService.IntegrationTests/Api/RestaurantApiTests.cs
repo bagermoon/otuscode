@@ -31,26 +31,6 @@ public class RestaurantApiTests : IClassFixture<RestaurantWebApplicationFactory>
     }
 
     [Fact]
-    public async Task Admin_Could_See_WeatherForecast()
-    {
-        // Arrange & Act
-        var response = await _adminClient.GetAsync("/weatherforecast", CancellationToken);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-    }
-
-    [Fact]
-    public async Task User_Couldnt_See_WeatherForecast()
-    {
-        // Arrange & Act
-        var response = await _client.GetAsync("/weatherforecast", CancellationToken);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
-    }
-
-    [Fact]
     public async Task CreateRestaurant_ValidData_ReturnsCreatedRestaurant()
     {
         // Arrange

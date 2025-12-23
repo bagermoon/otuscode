@@ -1,0 +1,190 @@
+@using RestoRate.Contracts.Restaurant.DTOs
+@using MudBlazor
+@using RestoRate.SharedKernel.Enums
+
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Components.Web
+
+<MudPaper Class="rr-cloud rr-hover d-flex flex-column flex-sm-row overflow-hidden"
+          Style="cursor:pointer; min-height: 180px;"
+          @onclick="() => OnOpen.InvokeAsync(Restaurant)">
+
+    <div class="hero-image-container">
+        <div style="background-image: url('@CurrentImage');" class="hero-image"></div>
+    </div>
+
+    <div class="pa-4 flex-grow-1 d-flex flex-column justify-space-between">
+        <div>
+            <div class="d-flex justify-space-between align-start mb-2">
+                <MudText Typo="Typo.h5" Class="font-weight-bold lh-sm">@Restaurant.Name</MudText>
+                <MudChip T="string" Size="Size.Small" Color="@GetStatusColor()" Variant="Variant.Filled" Class="ml-2">
+                    @Restaurant.RestaurantStatus
+                </MudChip>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Restaurant.Description))
+            {
+                <MudText Typo="Typo.body1" Class="line-clamp-2 mt-2 text-secondary">
+                    @Restaurant.Description
+                </MudText>
+            }
+        </div>
+
+        <div class="mt-3">
+            @if (Restaurant.CuisineTypes?.Any() == true)
+            {
+                <div class="d-flex flex-wrap gap-1 mb-2">
+                    @foreach (var cuisine in Restaurant.CuisineTypes.Take(3))
+                    {
+                        var name = CuisineType.TryFromName(cuisine, out var cType) ? cType.Name : cuisine;
+                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary" Class="ma-0">
+                            @name
+                        </MudChip>
+                    }
+                </div>
+            }
+
+            @if (Restaurant.Tags?.Any() == true)
+            {
+                <div class="d-flex flex-wrap gap-1 mb-2">
+                    @foreach (var tag in Restaurant.Tags.Take(3))
+                    {
+                        <MudChip T="string" Size="Size.Small" Variant="Variant.Text"
+                                 Style="color: #3B9797; border-color: #3B9797;" Class="ma-0">
+                            #@tag
+                        </MudChip>
+                    }
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Restaurant.Address?.FullAddress))
+            {
+                <div class="d-flex align-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Place" Size="Size.Small" Color="Color.Secondary" Class="mr-1" />
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        @Restaurant.Address.FullAddress
+                    </MudText>
+                </div>
+            }
+        </div>
+    </div>
+</MudPaper>
+
+@if (Restaurant.Images?.Any() == true)
+{
+    <div class="thumbnails-scroll pb-1 px-3" style="gap: 6px;">
+        @foreach (var image in Restaurant.Images.OrderByDescending(i => i.IsPrimary))
+        {
+            <div class="thumbnail-container @(CurrentImage == image.Url ? "thumbnail-container-active" : "")"
+                 @onclick="@(() => SetCurrentImage(image.Url))"
+                 @onmousedown="@(() => SetCurrentImage(image.Url))">
+                <div class="thumbnail" style="background-image: url('@image.Url');"></div>
+            </div>
+        }
+    </div>
+}
+
+
+<style>
+    /* стили временно тут */
+
+    .hero-image-container {
+        width: 100%;
+        height: 160px;
+    }
+
+    .hero-image {
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+    }
+
+    @@media (min-width: 600px) {
+        .hero-image-container {
+            width: 35%;
+            min-width: 250px;
+            height: auto;
+            min-height: 200px;
+        }
+    }
+
+    .thumbnails-scroll {
+        display: flex;
+        overflow-x: auto;
+        gap: 6px;
+        padding: 4px 0;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+        .thumbnails-scroll::-webkit-scrollbar {
+            height: 3px;
+        }
+
+        .thumbnails-scroll::-webkit-scrollbar-thumb {
+            background: rgba(15, 23, 42, 0.3);
+            border-radius: 2px;
+        }
+
+    .thumbnail-container {
+        flex-shrink: 0;
+        cursor: pointer;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 3px solid transparent;
+        transition: all 0.2s ease;
+        width: 56px;
+        height: 42px;
+    }
+
+        .thumbnail-container:hover {
+            border-color: var(--mud-palette-primary);
+            transform: scale(1.05);
+        }
+
+    .thumbnail-container-active {
+        border: 3px solid var(--mud-palette-primary) !important;
+        transform: scale(1.05);
+    }
+
+    .thumbnail {
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        border-radius: 6px;
+    }
+</style>
+
+@code {
+    [Parameter] public RestaurantDto Restaurant { get; set; } = default!;
+    [Parameter] public EventCallback<RestaurantDto> OnOpen { get; set; }
+
+    private string CurrentImage { get; set; } = "";
+
+    protected override void OnInitialized()
+    {
+        var primary = Restaurant.Images?.FirstOrDefault(i => i.IsPrimary);
+        CurrentImage = primary?.Url ?? GetPlaceholderImage();
+    }
+
+    private void SetCurrentImage(string imageUrl)
+    {
+        CurrentImage = imageUrl;
+        StateHasChanged();
+    }
+
+    private string GetPlaceholderImage()
+    {
+        var seed = Restaurant.RestaurantId.GetHashCode();
+        return $"https://loremflickr.com/400/300/restaurant,dish?lock={seed}";
+    }
+
+    private Color GetStatusColor() => Restaurant.RestaurantStatus switch
+    {
+        "Published" => Color.Success,
+        "Draft" => Color.Warning,
+        _ => Color.Default
+    };
+}

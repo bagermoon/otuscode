@@ -21,7 +21,21 @@ public class TagSeeder : IDbSeeder<RestaurantDbContext>
             new TagEntity("Семейный отдых"),
             new TagEntity("Бизнес-ланч"),
             new TagEntity("Авторская кухня"),
-            new TagEntity("Детская комната")
+            new TagEntity("Детская комната"),
+            new TagEntity("Кофейня"),
+            new TagEntity("Крафтовое пиво"),
+            new TagEntity("Веганское меню"),
+            new TagEntity("Стейк-хаус"),
+            new TagEntity("Суши-бар"),
+            new TagEntity("Панорамный вид"),
+            new TagEntity("Летняя терраса"),
+            new TagEntity("Каминный зал"),
+            new TagEntity("Роскошный интерьер"),
+            new TagEntity("Спортивные трансляции"),
+            new TagEntity("Проведение банкетов"),
+            new TagEntity("Мастер-классы шефа"),
+            new TagEntity("Винная карта"),
+            new TagEntity("Бесплатная парковка")
         };
 
         await context.Set<TagEntity>().AddRangeAsync(tags, ct);
