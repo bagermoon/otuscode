@@ -15,8 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Moderation\RestoRate.Moderation.Api\RestoRate.Moderation.Api.csproj" />
-    <ProjectReference Include="..\Rating\RestoRate.Rating.Api\RestoRate.Rating.Api.csproj" />
+    <ProjectReference Include="..\ModerationService\RestoRate.ModerationService.Api\RestoRate.ModerationService.Api.csproj" />
+    <ProjectReference Include="..\RatingService\RestoRate.RatingService.Api\RestoRate.RatingService.Api.csproj" />
     <ProjectReference Include="..\RestaurantService\RestoRate.RestaurantService.Api\RestoRate.RestaurantService.Api.csproj" />
     <ProjectReference Include="..\RestoRate.BlazorDashboard\RestoRate.BlazorDashboard.csproj" />
     <ProjectReference Include="..\RestoRate.Gateway\RestoRate.Gateway.csproj" />

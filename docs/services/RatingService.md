@@ -3,7 +3,7 @@
 ## RestaurantRatingSnapshot
 
 ```csharp
-namespace RestoRate.Rating.Domain;
+namespace RestoRate.RatingService.Domain;
 
 public sealed class RestaurantRatingSnapshot : AggregateRoot<RestaurantId>
 {
@@ -56,7 +56,7 @@ public sealed class RestaurantRatingSnapshot : AggregateRoot<RestaurantId>
 ## ReviewScore и RatingSummary (вспомогательные типы)
 
 ```csharp
-namespace RestoRate.Rating.Domain;
+namespace RestoRate.RatingService.Domain;
 
 public sealed record ReviewScore(int Rating, ReviewVisibility Visibility);
 

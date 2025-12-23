@@ -1,9 +1,9 @@
-# Агрегаты сервиса Moderation
+# Агрегаты сервиса ModerationService
 
 ## ModerationTask
 
 ```csharp
-namespace RestoRate.Moderation.Domain;
+namespace RestoRate.ModerationService.Domain;
 
 public sealed class ModerationTask : AggregateRoot<ModerationTaskId>
 {
@@ -151,5 +151,5 @@ sequenceDiagram
 ### Замечания по надёжности
 
 - Все публикации/доставки подразумевают ретраи и идемпотентность обработчиков.
-- В случае сбоев Moderation Service не публикует событие до тех пор,
+- В случае сбоев ModerationService не публикует событие до тех пор,
   пока решение по задаче модерации не будет зафиксировано (outbox/транзакции на уровне инфраструктуры).
