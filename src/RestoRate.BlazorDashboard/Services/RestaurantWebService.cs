@@ -1,11 +1,12 @@
 using RestoRate.Contracts.Restaurant.DTOs;
 using RestoRate.RestaurantService.Application.UseCases.Restaurants.GetAll;
+using RestoRate.ServiceDefaults;
 
 namespace RestoRate.BlazorDashboard.Services;
 
 public class RestaurantWebService(IHttpClientFactory httpClientFactory)
 {
-    private readonly HttpClient _httpClient = httpClientFactory.CreateClient("RestaurantApi");
+    private readonly HttpClient _httpClient = httpClientFactory.CreateClient(AppHostProjects.Gateway);
 
     public async Task<PagedResult<RestaurantDto>?> GetRestaurantsAsync(
         int pageNumber = 1,
@@ -14,7 +15,7 @@ public class RestaurantWebService(IHttpClientFactory httpClientFactory)
         string? cuisineType = null,
         string? tag = null)
     {
-        var query = $"/restaurants?pageNumber={pageNumber}&pageSize={pageSize}";
+        var query = $"restaurants?pageNumber={pageNumber}&pageSize={pageSize}";
         if (!string.IsNullOrWhiteSpace(searchTerm))
             query += $"&searchTerm={Uri.EscapeDataString(searchTerm)}";
         if (!string.IsNullOrWhiteSpace(cuisineType))

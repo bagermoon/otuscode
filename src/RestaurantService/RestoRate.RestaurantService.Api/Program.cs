@@ -23,9 +23,11 @@ if (app.Environment.IsProduction())
 
 app.MapDefaultEndpoints();
 
-app.MapRestaurantsEndpoints("restaurants")
-    //.RequireAuthorization()
-    .WithTags("Restaurants");
+app
+    .MapGroup("/restaurants")
+    .WithTags("Restaurants")
+    .RequireAuthorization()
+    .MapRestaurantsEndpoints();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsProduction())

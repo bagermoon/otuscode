@@ -9,9 +9,9 @@ namespace RestoRate.RestaurantService.Api.Endpoints.Restaurants;
 
 internal static class GetRestaurantByIdEndpoint
 {
-    public static RouteGroupBuilder MapGetRestaurantById(this RouteGroupBuilder group)
+    public static RouteHandlerBuilder MapGetRestaurantById(this RouteGroupBuilder group)
     {
-        group.MapGet("/{id:Guid}", async (Guid id, ISender sender, CancellationToken ct) =>
+        return group.MapGet("/{id:Guid}", async (Guid id, ISender sender, CancellationToken ct) =>
         {
             var result = await sender.Send(new GetRestaurantByIdQuery(id), ct);
             return result.Status switch
@@ -27,7 +27,5 @@ internal static class GetRestaurantByIdEndpoint
         .Produces<RestaurantDto>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status404NotFound)
         .Produces(StatusCodes.Status400BadRequest);
-
-        return group;
     }
 }

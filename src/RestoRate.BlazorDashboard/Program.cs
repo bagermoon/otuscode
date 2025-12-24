@@ -27,11 +27,9 @@ builder.AddItentityServices();
 
 builder.Services.AddScoped<TokenHandler>();
 
-builder.Services.AddHttpClient("RestaurantApi", client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["RestaurantApiBaseUrl"]!);
-})
-.AddHttpMessageHandler<TokenHandler>();
+builder.Services.AddHttpClient(AppHostProjects.Gateway,
+    client => client.BaseAddress = new Uri($"https+http://{AppHostProjects.Gateway}/api/"))
+    .AddHttpMessageHandler<TokenHandler>();
 
 builder.Services.AddScoped<RestaurantWebService>();
 

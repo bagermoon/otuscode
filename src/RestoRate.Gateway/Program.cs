@@ -48,7 +48,7 @@ if (!app.Environment.IsProduction())
 }
 
 // Enforce the policy on proxied routes
-app.MapReverseProxy();
-//.RequireAuthorization(); пришлось убрать
+app.MapReverseProxy()
+    .RequireAuthorization();
 
 app.Run();

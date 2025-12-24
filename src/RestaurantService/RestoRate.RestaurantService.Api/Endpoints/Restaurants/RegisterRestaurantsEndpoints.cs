@@ -2,15 +2,14 @@ namespace RestoRate.RestaurantService.Api.Endpoints.Restaurants;
 
 public static class RegisterRestaurantsEndpoints
 {
-    public static RouteGroupBuilder MapRestaurantsEndpoints(this IEndpointRouteBuilder app, string routePrefix = "restaurants")
+    public static RouteGroupBuilder MapRestaurantsEndpoints(this RouteGroupBuilder group)
     {
-        var group = app.MapGroup($"/{routePrefix}");
-
         group.MapCreateRestaurant();
-        group.MapGetRestaurantById();
-        group.MapGetAllRestaurants();
         group.MapUpdateRestaurant();
         group.MapDeleteRestaurant();
+
+        group.MapGetRestaurantById().AllowAnonymous();
+        group.MapGetAllRestaurants().AllowAnonymous();
 
         return group;
     }

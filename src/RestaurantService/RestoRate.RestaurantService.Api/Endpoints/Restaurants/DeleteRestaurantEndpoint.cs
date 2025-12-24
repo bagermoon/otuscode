@@ -8,9 +8,9 @@ namespace RestoRate.RestaurantService.Api.Endpoints.Restaurants;
 
 internal static class DeleteRestaurantEndpoint
 {
-    public static RouteGroupBuilder MapDeleteRestaurant(this RouteGroupBuilder group)
+    public static RouteHandlerBuilder MapDeleteRestaurant(this RouteGroupBuilder group)
     {
-        group.MapDelete("/{id:Guid}", async (Guid id, ISender sender, CancellationToken ct) =>
+        return group.MapDelete("/{id:Guid}", async (Guid id, ISender sender, CancellationToken ct) =>
         {
             var result = await sender.Send(new DeleteRestaurantCommand(id), ct);
             return result.Status switch
@@ -26,7 +26,5 @@ internal static class DeleteRestaurantEndpoint
         .Produces(StatusCodes.Status204NoContent)
         .Produces(StatusCodes.Status404NotFound)
         .Produces(StatusCodes.Status400BadRequest);
-
-        return group;
     }
 }
