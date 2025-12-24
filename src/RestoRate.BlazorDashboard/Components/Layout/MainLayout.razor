@@ -1,6 +1,8 @@
 @inherits LayoutComponentBase
 @using MudBlazor
 @using Microsoft.AspNetCore.Components.Authorization
+@using RestoRate.Abstractions.Identity
+@inject IUserContext UserContext;
 
 <MudThemeProvider Theme="@RestoTheme" IsDarkMode="false" />
 
@@ -21,12 +23,20 @@
 
                 <AuthorizeView>
                     <Authorized>
+                        <strong>@UserContext.FullName</strong>
                         <MudButton Variant="Variant.Text" Color="Color.Primary" Href="favorites">
                             Избранное
                         </MudButton>
                         <MudButton Variant="Variant.Text" Color="Color.Primary" Href="user-claims">
                             Профиль
                         </MudButton>
+                        <form action="authentication/logout" method="post">
+                            <AntiforgeryToken />
+                            <input type="hidden" name="ReturnUrl" value="/" />
+                            <MudButton Variant="Variant.Text" Color="Color.Primary" ButtonType="ButtonType.Submit">
+                                Выход
+                            </MudButton>
+                        </form>
                     </Authorized>
                     <NotAuthorized>
                         <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="authentication/login">
