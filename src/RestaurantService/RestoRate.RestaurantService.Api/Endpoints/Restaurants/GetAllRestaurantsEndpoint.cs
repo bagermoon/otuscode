@@ -9,9 +9,9 @@ namespace RestoRate.RestaurantService.Api.Endpoints.Restaurants;
 
 internal static class GetAllRestaurantsEndpoint
 {
-    public static RouteGroupBuilder MapGetAllRestaurants(this RouteGroupBuilder group)
+    public static RouteHandlerBuilder MapGetAllRestaurants(this RouteGroupBuilder group)
     {
-        group.MapGet("/", async (
+        return group.MapGet("/", async (
             ISender sender,
             CancellationToken ct,
             int pageNumber = 1,
@@ -41,7 +41,5 @@ internal static class GetAllRestaurantsEndpoint
         .WithDescription("Получает список ресторанов с пагинацией и фильтрацией")
         .Produces<Application.UseCases.Restaurants.GetAll.PagedResult<RestaurantDto>>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status400BadRequest);
-
-        return group;
     }
 }

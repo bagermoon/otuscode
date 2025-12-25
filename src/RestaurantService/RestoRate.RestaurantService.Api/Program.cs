@@ -23,9 +23,11 @@ if (app.Environment.IsProduction())
 
 app.MapDefaultEndpoints();
 
-app.MapRestaurantsEndpoints("restaurants")
+app
+    .MapGroup("/restaurants")
+    .WithTags("Restaurants")
     .RequireAuthorization()
-    .WithTags("Restaurants");
+    .MapRestaurantsEndpoints();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsProduction())
@@ -33,31 +35,6 @@ if (!app.Environment.IsProduction())
     app.MapOpenApi();
 }
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", ([FromServices] IUserContext userContext) =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.RequireAuthorization(PolicyNames.RequireAdminRole)
-.WithName("GetWeatherForecast");
-
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
 
 public partial class Program { }

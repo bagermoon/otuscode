@@ -1,61 +1,72 @@
-﻿@using RestoRate.Abstractions.Identity
 @inherits LayoutComponentBase
-@implements IDisposable
-@inject NavigationManager Navigation
+@using MudBlazor
+@using Microsoft.AspNetCore.Components.Authorization
+@using RestoRate.Abstractions.Identity
 @inject IUserContext UserContext;
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<MudThemeProvider Theme="@RestoTheme" IsDarkMode="false" />
 
-    <main>
-        <nav class="top-row px-4">
-            <AuthorizeView>
-                <Authorized>
-                    <strong>@UserContext.FullName</strong>
-                    <form action="authentication/logout" method="post">
-                        <AntiforgeryToken />
-                        <input type="hidden" name="ReturnUrl" value="/" />
-                        <button type="submit" class="btn btn-link">Logout</button>
-                    </form>
-                </Authorized>
-                <NotAuthorized>
-                    <a href="authentication/login">Login</a>
-                    <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-                </NotAuthorized>
-            </AuthorizeView>
-        </nav>
+<MudLayout>
+    <MudAppBar Fixed="true" Elevation="0" Color="Color.Transparent" Class="rr-appbar">
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge">
+            <MudPaper Class="rr-cloud rr-topbar-inner d-flex align-center px-4 py-2" Elevation="0">
 
-        <article class="content px-4">
+                <MudButton Variant="Variant.Text" Color="Color.Primary" Href="/index" Match="NavLinkMatch.All">
+                    Главная
+                </MudButton>
+
+                <MudButton Variant="Variant.Text" Color="Color.Primary" Href="catalog">
+                    Каталог
+                </MudButton>
+
+                <MudSpacer />
+
+                <AuthorizeView>
+                    <Authorized>
+                        <strong>@UserContext.FullName</strong>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary" Href="favorites">
+                            Избранное
+                        </MudButton>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary" Href="user-claims">
+                            Профиль
+                        </MudButton>
+                        <form action="authentication/logout" method="post">
+                            <AntiforgeryToken />
+                            <input type="hidden" name="ReturnUrl" value="/" />
+                            <MudButton Variant="Variant.Text" Color="Color.Primary" ButtonType="ButtonType.Submit">
+                                Выход
+                            </MudButton>
+                        </form>
+                    </Authorized>
+                    <NotAuthorized>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="authentication/login">
+                            Войти
+                        </MudButton>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </MudPaper>
+        </MudContainer>
+    </MudAppBar>
+
+    <MudMainContent Class="rr-main text-start">
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="rr-content text-start">
             @Body
-        </article>
-    </main>
-</div>
-
-<div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
-</div>
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
 
 @code {
-    private string? currentUrl;
-
-    protected override void OnInitialized()
+    private static MudTheme RestoTheme => new()
     {
-        currentUrl = Navigation.ToBaseRelativePath(Navigation.Uri);
-        Navigation.LocationChanged += OnLocationChanged;
-    }
-
-    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
-    {
-        currentUrl = Navigation.ToBaseRelativePath(e.Location);
-        StateHasChanged();
-    }
-
-    public void Dispose()
-    {
-        Navigation.LocationChanged -= OnLocationChanged;
-    }
+        PaletteLight = new PaletteLight
+        {
+            Primary = "#77BEF0",
+            Secondary = "#FFCB61",
+            Background = "#f8fbff",
+            Surface = "#ffffff",
+            AppbarBackground = "rgba(255,255,255,0.8)",
+            TextPrimary = "rgba(15, 23, 42, 0.92)",
+            TextSecondary = "rgba(15, 23, 42, 0.70)",
+        }
+    };
 }
