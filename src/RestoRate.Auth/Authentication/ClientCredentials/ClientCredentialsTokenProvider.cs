@@ -5,10 +5,10 @@ namespace RestoRate.Auth.Authentication.ClientCredentials;
 internal sealed class ClientCredentialsTokenProvider(
     IClientCredentialsTokenClient tokenClient,
     IOptionsMonitor<OpenIdConnectOptions> oidcOptionsMonitor,
-    CachedClientTokenManager cachedClientTokenManager) : IClientCredentialsTokenProvider, IDisposable
+    CachedTokenManager cachedTokenManager) : IClientCredentialsTokenProvider, IDisposable
 {
     private static readonly SemaphoreSlim RefreshLock = new(1, 1);
-    private readonly IDisposable? _changeSubscription = oidcOptionsMonitor.OnChange((_, _) => cachedClientTokenManager.ClearAll());
+    private readonly IDisposable? _changeSubscription = oidcOptionsMonitor.OnChange((_, _) => cachedTokenManager.ClearAll());
     public void Dispose() => _changeSubscription?.Dispose();
     public async Task<string?> GetAccessTokenAsync(CancellationToken cancellationToken)
     {
@@ -20,9 +20,9 @@ internal sealed class ClientCredentialsTokenProvider(
         var config = await oidcOptions.ConfigurationManager!.GetConfigurationAsync(cancellationToken);
         var tokenEndpoint = config.TokenEndpoint ?? throw new InvalidOperationException("TokenEndpoint missing");
 
-        var cacheKey = CachedClientTokenManager.BuildCacheKey(tokenEndpoint, oidcOptions.ClientId);
+        var cacheKey = TokenCacheKeyHelper.ClientCredentialsKey(tokenEndpoint, oidcOptions.ClientId);
 
-        if (cachedClientTokenManager.TryGetToken(cacheKey, out var cachedToken))
+        if (cachedTokenManager.TryGetToken(cacheKey, out var cachedToken))
         {
             return cachedToken;
         }
@@ -30,7 +30,7 @@ internal sealed class ClientCredentialsTokenProvider(
         await RefreshLock.WaitAsync(cancellationToken);
         try
         {
-            if (cachedClientTokenManager.TryGetToken(cacheKey, out cachedToken))
+            if (cachedTokenManager.TryGetToken(cacheKey, out cachedToken))
             {
                 return cachedToken;
             }
@@ -46,7 +46,7 @@ internal sealed class ClientCredentialsTokenProvider(
                 return null;
             }
 
-            cachedClientTokenManager.SetToken(cacheKey, result.AccessToken, result.ExpiresInSeconds);
+            cachedTokenManager.SetToken(cacheKey, result.AccessToken, result.ExpiresInSeconds);
 
             return result.AccessToken;
         }

@@ -53,7 +53,7 @@ internal sealed class TokenExchangeMiddleware : IDisposable
         var options = _jwtOptions.Get(JwtBearerDefaults.AuthenticationScheme);
         var authority = options.Authority ?? throw new InvalidOperationException("Authority must be configured for token exchange.");
         var scope = JwtRegisteredClaimNames.Email;
-        var cacheKey = CachedTokenManager.BuildCacheKey(scope, incomingToken);
+        var cacheKey = TokenCacheKeyHelper.TokenExchangeKey(scope, incomingToken);
 
         if (_cachedTokenManager.TryGetToken(cacheKey, out var cachedAccessToken))
         {

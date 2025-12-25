@@ -1,3 +1,4 @@
+using RestoRate.Auth.Authentication;
 using RestoRate.Gateway.Middleware.TokenExchange;
 
 namespace RestoRate.Gateway.Configurations;

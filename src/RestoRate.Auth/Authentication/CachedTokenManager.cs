@@ -1,25 +1,13 @@
 using System.Collections.Concurrent;
-using System.Security.Cryptography;
-using System.Text;
 
 using Microsoft.Extensions.Caching.Memory;
 
-namespace RestoRate.Auth.Authentication.ClientCredentials;
+namespace RestoRate.Auth.Authentication;
 
-internal sealed class CachedClientTokenManager(
-    IMemoryCache cache
-)
+public sealed class CachedTokenManager(IMemoryCache cache)
 {
     private readonly IMemoryCache _cache = cache;
-
     private readonly ConcurrentDictionary<string, byte> _keys = new();
-
-    public static string BuildCacheKey(string tokenEndpoint, string clientId)
-    {
-        // Hash to avoid very long keys and to normalize formatting.
-        var keyHash = ComputeSha256Hex($"{tokenEndpoint}|{clientId}");
-        return $"keycloak:client-credentials:{keyHash}";
-    }
 
     public bool TryGetToken(string cacheKey, out string? accessToken)
     {
@@ -56,19 +44,5 @@ internal sealed class CachedClientTokenManager(
             _cache.Remove(key);
             _keys.TryRemove(key, out _);
         }
-    }
-
-    private static string ComputeSha256Hex(string input)
-    {
-        var bytes = Encoding.UTF8.GetBytes(input);
-        var hash = SHA256.HashData(bytes);
-
-        var sb = new StringBuilder(hash.Length * 2);
-        foreach (var b in hash)
-        {
-            sb.Append(b.ToString("x2"));
-        }
-
-        return sb.ToString();
     }
 }

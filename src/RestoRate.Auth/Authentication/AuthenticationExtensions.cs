@@ -126,7 +126,7 @@ public static class AuthenticationExtensions
     )
     {
         services.AddMemoryCache();
-        services.AddSingleton<CachedClientTokenManager>();
+        services.AddSingleton<CachedTokenManager>();
 
         services.AddHttpClient<IClientCredentialsTokenClient, KeycloakClientCredentialsTokenClient>(
             KeycloakClientCredentialsTokenClient.HttpClientName, client =>
