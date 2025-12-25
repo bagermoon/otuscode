@@ -9,7 +9,7 @@ public static class TokenCacheKeyHelper
     public static string ClientCredentialsKey(string tokenEndpoint, string clientId) =>
         $"{Prefix}:client-credentials:{Sha256HexUtf8($"{tokenEndpoint}|{clientId}")}";
 
-    
+
     public static string TokenExchangeKey(string scope, string incomingToken)
     {
         // Derive a compact token identifier: prefer iss|aud|jti, fall back to iss|aud|sub|iat, else hash the raw token.
