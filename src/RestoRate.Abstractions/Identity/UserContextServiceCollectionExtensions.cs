@@ -20,7 +20,8 @@ public static class UserContextServiceCollectionExtensions
                 .Select(p => { return p.TryGet(out var c) ? c : null; })
                 .FirstOrDefault(c => c != null);
 
-            return ctx ?? AnonymousUserContext.Instance;
+            return ctx is not null && ctx.IsAuthenticated && !string.IsNullOrEmpty(ctx.Name)
+                ? ctx : AnonymousUserContext.Instance;
         });
 
         return services;

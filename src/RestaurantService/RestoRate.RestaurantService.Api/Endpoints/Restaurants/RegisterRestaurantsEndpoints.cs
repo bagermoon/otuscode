@@ -8,8 +8,8 @@ public static class RegisterRestaurantsEndpoints
         group.MapUpdateRestaurant();
         group.MapDeleteRestaurant();
 
-        group.MapGetRestaurantById().AllowAnonymous();
-        group.MapGetAllRestaurants().AllowAnonymous();
+        group.MapGetRestaurantById();
+        group.MapGetAllRestaurants();
 
         return group;
     }

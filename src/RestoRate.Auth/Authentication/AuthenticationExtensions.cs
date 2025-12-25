@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
+using RestoRate.Auth.Authentication.ClientCredentials;
 
 namespace RestoRate.Auth.Authentication;
 
@@ -124,6 +125,14 @@ public static class AuthenticationExtensions
         Func<LinkGenerator, string> logoutPathFactory
     )
     {
+        services.AddMemoryCache();
+        services.AddSingleton<CachedTokenManager>();
+
+        services.AddHttpClient<IClientCredentialsTokenClient, KeycloakClientCredentialsTokenClient>(
+            KeycloakClientCredentialsTokenClient.HttpClientName, client =>
+                client.Timeout = TimeSpan.FromSeconds(60)
+            );
+        services.AddSingleton<IClientCredentialsTokenProvider, ClientCredentialsTokenProvider>();
         services.AddSingleton<CookieOidcRefresher>();
         services.AddOptions<CookieAuthenticationOptions>(cookieScheme)
             .Configure<CookieOidcRefresher>((cookieOptions, refresher) =>

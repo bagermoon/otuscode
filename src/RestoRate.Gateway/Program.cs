@@ -1,18 +1,19 @@
 using RestoRate.ServiceDefaults;
-using RestoRate.Gateway;
 using RestoRate.Auth.Authentication;
 using RestoRate.Auth.Authorization;
+using RestoRate.Gateway.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+builder.AddTokenExchange();
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-var keycloakSettings = new KeycloakSettingsOptions();
-builder.Configuration.GetSection(KeycloakSettingsOptions.SectionName).Bind(keycloakSettings);
+builder.Services.AddOptions<KeycloakSettingsOptions>()
+    .Bind(builder.Configuration.GetSection(KeycloakSettingsOptions.SectionName));
 
 builder.AddGatewayJwtAuthentication(AppHostProjects.Keycloak);
 
@@ -32,7 +33,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // IMPORTANT: Token exchange AFTER authentication
-app.UseMiddleware<TokenExchangeMiddleware>();
+app.UseTokenExchange();
 
 if (app.Environment.IsProduction())
 {
