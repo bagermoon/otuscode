@@ -1,5 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 
+using Microsoft.AspNetCore.Components.Server;
+
 using MudBlazor.Services;
 
 using RestoRate.Auth.Authentication;
@@ -14,6 +16,9 @@ builder.AddServiceDefaults();
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+// for blazor debugging
+builder.Services.Configure<CircuitOptions>(opts => opts.DetailedErrors = true);
 
 builder.Services.AddMudServices();
 
