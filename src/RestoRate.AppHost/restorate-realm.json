@@ -715,6 +715,20 @@
     "notBefore" : 0,
     "groups" : [ ]
   }, {
+    "id" : "1426734b-cfc3-45da-9930-ad4d50f8d3f4",
+    "username" : "service-account-restorate-dashboard",
+    "emailVerified" : false,
+    "enabled" : true,
+    "createdTimestamp" : 1766599670271,
+    "totp" : false,
+    "serviceAccountClientId" : "restorate-dashboard",
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-restorate" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
     "id" : "c17628ea-4834-47dd-b7f5-a954300c1a6d",
     "username" : "service-account-restorate-gateway",
     "emailVerified" : false,
@@ -1123,8 +1137,8 @@
     "consentRequired" : false,
     "standardFlowEnabled" : true,
     "implicitFlowEnabled" : false,
-    "directAccessGrantsEnabled" : true,
-    "serviceAccountsEnabled" : false,
+    "directAccessGrantsEnabled" : false,
+    "serviceAccountsEnabled" : true,
     "publicClient" : false,
     "frontchannelLogout" : true,
     "protocol" : "openid-connect",
@@ -1169,7 +1183,7 @@
         "userinfo.token.claim" : "false"
       }
     } ],
-    "defaultClientScopes" : [ "web-origins", "realm_roles", "acr", "profile", "basic", "email" ],
+    "defaultClientScopes" : [ "web-origins", "service_account", "realm_roles", "acr", "profile", "basic", "email" ],
     "optionalClientScopes" : [ "address", "phone", "offline_access", "organization", "roles", "microprofile-jwt" ]
   }, {
     "id" : "ab6e2f0a-c23d-416f-a59a-7b568bf46980",
@@ -2163,7 +2177,7 @@
       "subType" : "authenticated",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "oidc-sha256-pairwise-sub-mapper", "oidc-full-name-mapper", "saml-role-list-mapper", "oidc-address-mapper", "oidc-usermodel-attribute-mapper", "oidc-usermodel-property-mapper", "saml-user-property-mapper", "saml-user-attribute-mapper" ]
+        "allowed-protocol-mapper-types" : [ "saml-role-list-mapper", "saml-user-attribute-mapper", "oidc-full-name-mapper", "oidc-usermodel-attribute-mapper", "oidc-usermodel-property-mapper", "saml-user-property-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-address-mapper" ]
       }
     }, {
       "id" : "8b9a0ba6-cf94-40b6-8fc6-c3ceebd17d9b",
@@ -2189,7 +2203,7 @@
       "subType" : "anonymous",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "saml-role-list-mapper", "oidc-usermodel-attribute-mapper", "oidc-usermodel-property-mapper", "saml-user-attribute-mapper", "oidc-full-name-mapper", "saml-user-property-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-address-mapper" ]
+        "allowed-protocol-mapper-types" : [ "oidc-usermodel-property-mapper", "saml-role-list-mapper", "saml-user-property-mapper", "oidc-usermodel-attribute-mapper", "oidc-full-name-mapper", "oidc-address-mapper", "oidc-sha256-pairwise-sub-mapper", "saml-user-attribute-mapper" ]
       }
     } ],
     "org.keycloak.keys.KeyProvider" : [ {

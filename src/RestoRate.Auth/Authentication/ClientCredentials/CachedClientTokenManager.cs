@@ -2,8 +2,6 @@ using System.Collections.Concurrent;
 using System.Security.Cryptography;
 using System.Text;
 
-using Ardalis.GuardClauses;
-
 using Microsoft.Extensions.Caching.Memory;
 
 namespace RestoRate.Auth.Authentication.ClientCredentials;
