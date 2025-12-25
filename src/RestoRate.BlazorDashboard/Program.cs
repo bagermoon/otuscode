@@ -25,7 +25,7 @@ builder.Services.AddAntiforgery();
 builder.Services.AddHttpContextAccessor();
 builder.AddItentityServices();
 
-builder.Services.AddScoped<TokenHandler>();
+builder.Services.AddTransient<TokenHandler>();
 
 builder.Services.AddHttpClient(AppHostProjects.Gateway,
     client => client.BaseAddress = new Uri($"https+http://{AppHostProjects.Gateway}/api/"))

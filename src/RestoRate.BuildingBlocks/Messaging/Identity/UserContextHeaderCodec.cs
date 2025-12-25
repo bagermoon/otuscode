@@ -114,7 +114,7 @@ public static class UserContextHeaderCodec
 
         return false;
     }
-    private record UserContextHeaderDto(
+    private sealed record UserContextHeaderDto(
         Guid UserId,
         string? Name,
         string? FullName,

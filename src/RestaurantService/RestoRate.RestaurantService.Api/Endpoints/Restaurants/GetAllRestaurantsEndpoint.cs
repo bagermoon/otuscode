@@ -2,6 +2,9 @@ using Ardalis.Result;
 
 using Mediator;
 
+using Microsoft.AspNetCore.Mvc;
+
+using RestoRate.Abstractions.Identity;
 using RestoRate.Contracts.Restaurant.DTOs;
 using RestoRate.RestaurantService.Application.UseCases.Restaurants.GetAll;
 
@@ -14,6 +17,7 @@ internal static class GetAllRestaurantsEndpoint
         return group.MapGet("/", async (
             ISender sender,
             CancellationToken ct,
+            [FromServices] IUserContext userContext,
             int pageNumber = 1,
             int pageSize = 20,
             string? searchTerm = null,

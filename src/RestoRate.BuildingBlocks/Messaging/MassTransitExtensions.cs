@@ -19,7 +19,7 @@ public static class MassTransitExtensions
     {
         var connectionString = builder.Configuration.GetConnectionString(connectionName);
 
-        builder.Services.AddScoped<IUserContextProvider, MassTransitUserContextProvider>();
+        builder.Services.AddTransient<IUserContextProvider, MassTransitUserContextProvider>();
         builder.Services.AddUserContext();
 
         builder.Services.AddMassTransit(x =>
