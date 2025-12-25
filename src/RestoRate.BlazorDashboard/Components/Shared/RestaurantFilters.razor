@@ -1,6 +1,9 @@
+@using RestoRate.RestaurantService.Application.UseCases.Tags
 @using RestoRate.SharedKernel.Enums
 @using MudBlazor
 @using RestoRate.Contracts.Restaurant.DTOs
+@using RestoRate.BlazorDashboard.Services
+@inject RestaurantWebService RestaurantService
 
 <MudPaper Class="rr-cloud pa-6 mb-6" Elevation="2">
     <MudGrid Spacing="3">
@@ -8,13 +11,14 @@
         <MudItem xs="12" lg="5">
             <MudAutocomplete T="string"
                              Label="Поиск по названию..."
-                             @bind-Value="searchTerm"
+                             Value="searchTerm"
+                             TextChanged="OnSearchChanged"
                              SearchFunc="@SearchRestaurants"
                              ResetValueOnEmptyText="true"
                              Clearable="true"
                              Variant="Variant.Filled"
                              AdornmentIcon="@Icons.Material.Filled.Search"
-                             DebounceInterval="300"
+                             DebounceInterval="500"
                              MaxItems="10"
                              Class="filter-input" />
         </MudItem>
@@ -22,31 +26,42 @@
         <MudItem xs="12" lg="3">
             <MudSelect T="string"
                        Label="Кухня"
-                       @bind-Value="selectedCuisineName"
+                       Value="selectedCuisineName"
+                       ValueChanged="OnCuisineChanged"
                        Variant="Variant.Filled"
                        Clearable="true"
                        AnchorOrigin="Origin.BottomCenter">
                 <MudSelectItem T="string" Value="@(null)">Все кухни</MudSelectItem>
-                @foreach (var cuisine in CuisineType.List.OrderBy(c => c.Name))
+                @foreach (var cuisine in CuisineType.List.OrderBy(c => c.RussianName))
                 {
-                    <MudSelectItem T="string" Value="@cuisine.Name">@cuisine.Name</MudSelectItem>
+                    <MudSelectItem T="string" Value="@cuisine.Name">@cuisine.RussianName</MudSelectItem>
                 }
             </MudSelect>
         </MudItem>
 
         <MudItem xs="12" lg="3">
-            <MudSelect T="string"
-                       Label="Тэги"
-                       @bind-Value="selectedTag"
-                       Variant="Variant.Filled"
-                       Clearable="true"
-                       AnchorOrigin="Origin.BottomCenter">
-                <MudSelectItem T="string" Value="@(null)">Все тэги</MudSelectItem>
-                <MudSelectItem T="string" Value="@("Живая музыка")">🎸 Живая музыка</MudSelectItem>
-                <MudSelectItem T="string" Value="@("Уютное место")">🏠 Уютное место</MudSelectItem>
-                <MudSelectItem T="string" Value="@("Бизнес-ланч")">💼 Бизнес-ланч</MudSelectItem>
-                <MudSelectItem T="string" Value="@("Для детей")">👶 Для детей</MudSelectItem>
-            </MudSelect>
+            @if (_tags == null)
+            {
+                <MudSkeleton Width="100%" Height="56px" />
+            }
+            else
+            {
+                <MudSelect T="string"
+                           Label="Тэги"
+                           Value="selectedTag"
+                           ValueChanged="OnTagChanged"
+                           Variant="Variant.Filled"
+                           Clearable="true"
+                           AnchorOrigin="Origin.BottomCenter">
+
+                    <MudSelectItem T="string" Value="@((string?)null)">Все тэги</MudSelectItem>
+
+                    @foreach (var tag in _tags)
+                    {
+                        <MudSelectItem T="string" Value="@tag.Name">@tag.Name</MudSelectItem>
+                    }
+                </MudSelect>
+            }
         </MudItem>
 
         <MudItem xs="12" lg="1" Class="d-flex align-center justify-end">
@@ -65,13 +80,43 @@
     private string? searchTerm;
     private string? selectedCuisineName;
     private string? selectedTag;
+    private List<TagDto>? _tags;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _tags = await RestaurantService.GetTagsAsync();
+        }
+        catch
+        {
+            _tags = new();
+        }
+    }
 
     private Task<IEnumerable<string>> SearchRestaurants(string value, CancellationToken token)
     {
         if (string.IsNullOrWhiteSpace(value))
             return Task.FromResult<IEnumerable<string>>(Array.Empty<string>());
-
         return Task.FromResult<IEnumerable<string>>(new[] { value });
+    }
+
+    private async Task OnSearchChanged(string value)
+    {
+        searchTerm = value;
+        await OnFiltersChanged.InvokeAsync();
+    }
+
+    private async Task OnCuisineChanged(string value)
+    {
+        selectedCuisineName = value;
+        await OnFiltersChanged.InvokeAsync();
+    }
+
+    private async Task OnTagChanged(string? value)
+    {
+        selectedTag = value;
+        await OnFiltersChanged.InvokeAsync();
     }
 
     private async Task ResetFilters()

@@ -28,4 +28,12 @@ public class RestaurantWebService(IHttpClientFactory httpClientFactory)
 
         return await response.Content.ReadFromJsonAsync<PagedResult<RestaurantDto>>();
     }
+
+    public async Task<List<TagDto>> GetTagsAsync()
+    {
+        var response = await _httpClient.GetAsync("restaurants/tags");
+
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<List<TagDto>>() ?? new();
+    }
 }

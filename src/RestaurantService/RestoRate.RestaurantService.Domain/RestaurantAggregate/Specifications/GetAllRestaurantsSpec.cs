@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 using Ardalis.Specification;
 
+using Microsoft.EntityFrameworkCore;
+
+using RestoRate.SharedKernel.Enums;
+
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace RestoRate.RestaurantService.Domain.RestaurantAggregate.Specifications;
@@ -29,15 +33,16 @@ public sealed class GetAllRestaurantsSpec : Specification<Restaurant>
             .OrderBy(r => r.Name);
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
-            Query.Search(r => r.Name, $"%{searchTerm}%");
+            Query.Where(r => r.Name.ToLower().Contains(searchTerm.Trim().ToLower()));
 
         if (!string.IsNullOrWhiteSpace(cuisineType))
-            Query.Where(r => r.CuisineTypes.Any(ct => ct.CuisineType.Name == cuisineType));
+            if (CuisineType.TryFromName(cuisineType, true, out var cuisineEnum))
+                Query.Where(r => r.CuisineTypes.Any(ct => ct.CuisineType.Equals(cuisineEnum)));
 
         if (!string.IsNullOrWhiteSpace(tag))
         {
             var normalizedTag = tag.Trim().ToLower();
-            Query.Where(r => r.Tags.Any(t => t.Tag.Name.Equals(normalizedTag, StringComparison.InvariantCultureIgnoreCase)));
+            Query.Where(r => r.Tags.Any(t => t.Tag.NormalizedName == normalizedTag));
         }
     }
 }

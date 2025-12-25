@@ -10,7 +10,6 @@
 
 <PageTitle>Лучшие рестораны вашего города</PageTitle>
 
-<!-- Сделали контейнер УЗКИМ (Medium), чтобы список был по центру и не слишком широким -->
 <MudContainer MaxWidth="MaxWidth.Medium" Class="py-6">
 
     <section class="hero mb-8">
@@ -19,13 +18,13 @@
             <p>Найдите идеальное место</p>
 
             <div class="search-controls mt-4">
-                <MudTextField @bind-Value="searchTerm"
+                <MudTextField Value="searchTerm"
                               Placeholder="Поиск ресторанов..."
+                              TextChanged="OnSearchChanged"
                               Adornment="Adornment.Start"
                               AdornmentIcon="@Icons.Material.Filled.Search"
                               Immediate="true"
                               Clearable="true"
-                              OnValueChanged="OnSearchChanged"
                               Variant="Variant.Outlined"
                               Margin="Margin.Dense" />
             </div>
@@ -40,11 +39,9 @@
     }
     else if (restaurants?.Items?.Any() == true)
     {
-        <!-- Spacing="4": небольшой отступ между карточками -->
         <MudGrid Spacing="4" Class="mt-4">
             @foreach (var r in restaurants.Items)
             {
-                <!-- xs="12": Одна карточка на всю ширину строки -->
                 <MudItem xs="12">
                     <RestaurantCardMain Restaurant="r" OnOpen="@(restaurant => ShowDetails(restaurant.RestaurantId))" />
                 </MudItem>
