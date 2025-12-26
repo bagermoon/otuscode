@@ -1,9 +1,9 @@
-::deep .hero-image-container {
+.hero-image-container {
     width: 100%;
     height: 160px;
 }
 
-::deep .hero-image {
+.hero-image {
     width: 100%;
     height: 100%;
     background-size: cover;
@@ -11,7 +11,7 @@
 }
 
 @media (min-width: 600px) {
-    ::deep .hero-image-container {
+    .hero-image-container {
         width: 35%;
         min-width: 250px;
         height: auto;
@@ -19,7 +19,7 @@
     }
 }
 
-::deep .thumbnails-scroll {
+.thumbnails-scroll {
     display: flex;
     overflow-x: auto;
     gap: 6px;
@@ -28,16 +28,16 @@
     -ms-overflow-style: none;
 }
 
-    ::deep .thumbnails-scroll::-webkit-scrollbar {
+    .thumbnails-scroll::-webkit-scrollbar {
         height: 3px;
     }
 
-    ::deep .thumbnails-scroll::-webkit-scrollbar-thumb {
+    .thumbnails-scroll::-webkit-scrollbar-thumb {
         background: rgba(15, 23, 42, 0.3);
         border-radius: 2px;
     }
 
-::deep .thumbnail-container {
+.thumbnail-container {
     flex-shrink: 0;
     cursor: pointer;
     border-radius: 8px;
@@ -48,17 +48,17 @@
     height: 42px;
 }
 
-    ::deep .thumbnail-container:hover {
+    .thumbnail-container:hover {
         border-color: var(--mud-palette-primary);
         transform: scale(1.05);
     }
 
-::deep .thumbnail-container-active {
+.thumbnail-container-active {
     border: 3px solid var(--mud-palette-primary) !important;
     transform: scale(1.05);
 }
 
-::deep .thumbnail {
+.thumbnail {
     width: 100%;
     height: 100%;
     background-size: cover;
@@ -66,7 +66,7 @@
     border-radius: 6px;
 }
 
-::deep .line-clamp-2 {
+.line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;

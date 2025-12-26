@@ -4,6 +4,7 @@ using RestoRate.Abstractions.Identity;
 using RestoRate.Auth.Authorization;
 using RestoRate.Auth.OpenApi;
 using RestoRate.RestaurantService.Api.Endpoints.Restaurants;
+using RestoRate.RestaurantService.Api.Endpoints.Tags;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,12 @@ app
     .WithTags("Restaurants")
     .RequireAuthorization()
     .MapRestaurantsEndpoints();
+
+app
+    .MapGroup("/restaurants/tags")
+    .WithTags("Tags")
+    .RequireAuthorization()
+    .MapListTags();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsProduction())
