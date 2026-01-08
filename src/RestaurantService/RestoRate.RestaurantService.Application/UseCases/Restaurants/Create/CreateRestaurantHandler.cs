@@ -114,7 +114,7 @@ public sealed class CreateRestaurantHandler(
             );
 
             logger.LogInformation("Ресторан создан успешно: ID {RestaurantId}", result.Value);
-            return Result<RestaurantDto>.Success(dto);
+            return Result<RestaurantDto>.Created(dto);
         }
         catch (Exception ex)
         {

@@ -36,7 +36,7 @@ public sealed class DeleteRestaurantHandler(
             }
 
             logger.LogInformation("Ресторан удален успешно: ID {RestaurantId}", request.RestaurantId);
-            return result;
+            return Result.NoContent();
         }
         catch (Exception ex)
         {

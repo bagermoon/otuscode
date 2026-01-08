@@ -15,13 +15,7 @@ internal static class CreateRestaurantEndpoint
         return group.MapPost("/", async (CreateRestaurantDto dto, ISender sender, CancellationToken ct) =>
         {
             var result = await sender.Send(new CreateRestaurantCommand(dto), ct);
-            return result.Status switch
-            {
-                ResultStatus.Ok => Results.CreatedAtRoute("GetRestaurantById", new { id = result.Value.RestaurantId }, result.Value),
-                ResultStatus.Invalid => Results.BadRequest(result.Errors),
-                ResultStatus.NotFound => Results.NotFound(),
-                _ => Results.Problem(string.Join(";", result.Errors))
-            };
+            return result;
         })
         .WithName("CreateRestaurant")
         .WithSummary("Создать ресторан")

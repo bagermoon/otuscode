@@ -31,7 +31,7 @@
 - Просмотр trace после теста:
 
   ```pwsh
-  pwsh ./playwright.ps1 show-trace .\artifacts\bin\RestoRate.E2ETests\debug\playwright-traces\IntegrationTest1.DashboardIsLoaded.zip
+  pwsh ./playwright.ps1 show-trace .\artifacts\bin\RestoRate.E2ETests\debug\playwright-traces\AdminDashboardTests.AuthorizedUser_SeesLogoutButton.zip
   ```
 
 ### Запуск E2E тестов

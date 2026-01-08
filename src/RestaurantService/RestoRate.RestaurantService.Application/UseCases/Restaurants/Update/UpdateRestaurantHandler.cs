@@ -87,7 +87,7 @@ public sealed class UpdateRestaurantHandler(
             }
 
             logger.LogInformation("Ресторан обновлен успешно: ID {RestaurantId}", request.Dto.RestaurantId);
-            return Result.Success();
+            return Result.NoContent();
         }
         catch (Exception ex)
         {

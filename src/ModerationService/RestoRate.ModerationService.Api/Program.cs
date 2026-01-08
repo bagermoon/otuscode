@@ -1,9 +1,11 @@
 using RestoRate.ServiceDefaults;
 using RestoRate.Auth.Authentication;
+using RestoRate.ServiceDefaults.EndpointFilters;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+builder.Services.AddProblemDetailsDefaults();
 builder.AddJwtAuthentication(AppHostProjects.Keycloak);
 
 builder.Services.AddAuthorizationBuilder()
@@ -22,22 +24,27 @@ app.UseAuthorization();
 if (app.Environment.IsProduction())
 {
     app.UseHttpsRedirection();
+    app.UseExceptionHandler();
 }
+else
+{
+    app.MapOpenApi();
+    app.UseDeveloperExceptionPage();
+}
+
+app.UseStatusCodePages();
 
 app.MapDefaultEndpoints();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsProduction())
-{
-    app.MapOpenApi();
-}
+var api = app.MapGroup("/")
+    .AddEndpointFilter<ResultEndpointFilter>();
 
 var summaries = new[]
 {
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 
-app.MapGet("/weatherforecast", () =>
+api.MapGet("/weatherforecast", () =>
 {
     var forecast = Enumerable.Range(1, 5).Select(index =>
         new WeatherForecast

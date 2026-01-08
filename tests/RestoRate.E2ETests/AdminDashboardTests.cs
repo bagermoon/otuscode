@@ -8,6 +8,6 @@ public class AdminDashboardTests(AspireAppHost appHost) : BasePageTest(appHost)
     {
         await Page.GotoAsync("/");
         // Assert: Logout button is visible by form action URL
-        await Expect(Page.GetByRole(AriaRole.Button, new() { Name = "Logout" })).ToBeVisibleAsync();
+        await Expect(Page.GetByRole(AriaRole.Button, new() { Name = "Выход" })).ToBeVisibleAsync();
     }
 }

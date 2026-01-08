@@ -16,13 +16,7 @@ internal static class UpdateRestaurantEndpoint
             // Ensure path ID is authoritative
             var dto = body with { RestaurantId = id };
             var result = await sender.Send(new UpdateRestaurantCommand(dto), ct);
-            return result.Status switch
-            {
-                ResultStatus.Ok => Results.NoContent(),
-                ResultStatus.NotFound => Results.NotFound(),
-                ResultStatus.Invalid => Results.BadRequest(result.Errors),
-                _ => Results.Problem(string.Join(";", result.Errors))
-            };
+            return result;
         })
         .WithName("UpdateRestaurant")
         .WithSummary("Обновить ресторан")
