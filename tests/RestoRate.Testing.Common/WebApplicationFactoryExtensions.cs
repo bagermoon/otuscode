@@ -21,20 +21,37 @@ public static class WebApplicationFactoryExtensions
             });
         }
 
+        var _factory = WithUser(factory, user);
+
+        return _factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false,
+        });
+    }
+
+    public static WebApplicationFactory<TEntryPoint> WithUser<TEntryPoint>(
+        this WebApplicationFactory<TEntryPoint> factory,
+        TestUser user
+        ) where TEntryPoint : class
+    {
+        if (user == TestUser.Anonymous) return factory;
+
         return factory.WithWebHostBuilder(builder =>
         {
             builder.ConfigureTestServices(services =>
             {
                 services.AddAuthentication("TestScheme")
-                    .AddScheme<TestAuthOptions, TestAuthHandler>("TestScheme", options =>
-                    {
-                        options.User = user;
-                    });
+                    .AddScheme<TestAuthOptions, TestAuthHandler>("TestScheme", o => o.User = user);
             });
-        })
-        .CreateClient(new WebApplicationFactoryClientOptions
-        {
-            AllowAutoRedirect = false,
         });
+    }
+
+    public static (WebApplicationFactory<TEntryPoint> Factory, HttpClient Client) CreateFactoryAndClientWithUser<TEntryPoint>(
+        this WebApplicationFactory<TEntryPoint> factory,
+        TestUser user
+        ) where TEntryPoint : class
+    {
+        var f = factory.WithUser(user);
+        return (f, f.CreateClient(new() { AllowAutoRedirect = false }));
     }
 }

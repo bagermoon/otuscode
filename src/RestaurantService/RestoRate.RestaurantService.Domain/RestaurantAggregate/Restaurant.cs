@@ -4,6 +4,7 @@ using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
 using RestoRate.RestaurantService.Domain.RestaurantAggregate.Events;
 using RestoRate.RestaurantService.Domain.TagAggregate;
+using Ardalis.Result;
 
 namespace RestoRate.RestaurantService.Domain.RestaurantAggregate;
 
@@ -237,37 +238,43 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
                 _tags.Add(new RestaurantTag(Id, newTag.Id));
     }
 
-    public void SendToModeration()
+    public Result SendToModeration()
     {
         if (RestaurantStatus != RestaurantStatus.Draft && RestaurantStatus != RestaurantStatus.Rejected)
-            return;
+            return Result.Error("Only draft or rejected restaurants can be sent to moderation.");
 
         RestaurantStatus = RestaurantStatus.OnModeration;
         RegisterDomainEvent(new RestaurantUpdatedEvent(this));
+
+        return Result.Success();
     }
 
-    public void Publish()
+    public Result Publish()
     {
         if (RestaurantStatus != RestaurantStatus.OnModeration)
-            return;
+            return Result.Error("Only restaurants under moderation can be published.");
 
         RestaurantStatus = RestaurantStatus.Published;
         RegisterDomainEvent(new RestaurantCreatedEvent(this));
+
+        return Result.Success();
     }
 
-    public void Reject()
+    public Result Reject()
     {
         if (RestaurantStatus != RestaurantStatus.OnModeration)
-            return;
+            return Result.Error("Only restaurants under moderation can be rejected.");
 
         RestaurantStatus = RestaurantStatus.Rejected;
         RegisterDomainEvent(new RestaurantUpdatedEvent(this));
+
+        return Result.Success();
     }
 
-    public void MarkDeleted()
+    public Result MarkDeleted()
     {
         if (RestaurantStatus == RestaurantStatus.Archived)
-            return;
+            return Result.Error("Restaurant is already deleted.");
 
         RestaurantStatus = RestaurantStatus.Archived;
 
@@ -276,15 +283,22 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
             RegisterDomainEvent(new RestaurantDeletedEvent(this));
             _deletedEventQueued = true;
         }
+
+        return Result.Success();
     }
 
-    public void Restore()
+    public Result UpdateStatus(RestaurantStatus status)
     {
-        if (RestaurantStatus != RestaurantStatus.Archived)
-            return;
+        if (RestaurantStatus.IsDeleted())
+            return Result.Error("Cannot change status of a deleted restaurant.");
 
-        RestaurantStatus = RestaurantStatus.Draft;
-        RegisterDomainEvent(new RestaurantUpdatedEvent(this));
+        return status.Name switch
+        {
+            nameof(RestaurantStatus.Published) => Publish(),
+            nameof(RestaurantStatus.Rejected) => Reject(),
+            nameof(RestaurantStatus.OnModeration) => SendToModeration(),
+            _ => Result.Error($"Invalid status transition to {status.Name}"),
+        };
     }
 
     public new void ClearDomainEvents()

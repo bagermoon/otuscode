@@ -42,7 +42,7 @@ public sealed class CreateRestaurantHandler(
                 .ToList();
 
             var restaurantTags = await tagsService.ConvertToTagsAsync(
-                request.Dto.Tags ?? Array.Empty<string>(), cancellationToken);
+                request.Dto.Tags ?? [], cancellationToken);
 
             var images = request.Dto.Images?
                 .Select(img => (img.Url, img.AltText, img.IsPrimary));

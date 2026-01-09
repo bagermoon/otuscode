@@ -39,7 +39,7 @@ public sealed class UpdateRestaurantHandler(
                 .ToList();
 
             var restaurantTags = await tagsService.ConvertToTagsAsync(
-                request.Dto.Tags ?? Array.Empty<string>(), cancellationToken);
+                request.Dto.Tags ?? [], cancellationToken);
 
             var result = await restaurantService.UpdateRestaurantAsync(
                 request.Dto.RestaurantId,

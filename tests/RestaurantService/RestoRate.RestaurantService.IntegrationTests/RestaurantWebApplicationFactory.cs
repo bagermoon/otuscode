@@ -5,6 +5,7 @@ using MassTransit;
 using Microsoft.AspNetCore.TestHost;
 
 using RestoRate.BuildingBlocks.Data.Migrations;
+using RestoRate.BuildingBlocks.Messaging;
 using RestoRate.RestaurantService.Infrastructure.Data;
 using RestoRate.ServiceDefaults;
 
@@ -29,6 +30,11 @@ public class RestaurantWebApplicationFactory
             {
                 // Register your consumers here
                 // You can configure sagas, activities, etc. as needed
+                cfg.UsingInMemory((context, busCfg) =>
+                {
+                    busCfg.UseConsumeFilter(typeof(ConsumeUserContextFilter<>), context);
+                    busCfg.ConfigureEndpoints(context);
+                });
             });
         });
     }

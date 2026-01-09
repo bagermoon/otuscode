@@ -1,8 +1,10 @@
 using FluentAssertions;
 
 using RestoRate.Contracts.Restaurant.DTOs;
+using RestoRate.Contracts.Restaurant.DTOs.CRUD;
 using RestoRate.RestaurantService.IntegrationTests.Helpers;
-using RestoRate.SharedKernel.Enums;
+using ContractRestaurantStatus = RestoRate.Contracts.Restaurant.RestaurantStatus;
+using DomainRestaurantStatus = RestoRate.SharedKernel.Enums.RestaurantStatus;
 
 namespace RestoRate.RestaurantService.IntegrationTests.Api;
 
@@ -12,7 +14,6 @@ public class RestaurantApiTests : IClassFixture<RestaurantWebApplicationFactory>
     private readonly ITestContextAccessor _testContextAccessor;
     private readonly RestaurantWebApplicationFactory _factory;
     private readonly HttpClient _client;
-    private readonly HttpClient _adminClient;
     private readonly ITestOutputHelper _output;
     private readonly List<Guid> _createdRestaurantIds = new();
     private CancellationToken CancellationToken => _testContextAccessor.Current.CancellationToken;
@@ -27,7 +28,6 @@ public class RestaurantApiTests : IClassFixture<RestaurantWebApplicationFactory>
         _testContextAccessor = testContextAccessor;
 
         _client = _factory.CreateClientWithUser(TestUser.User);
-        _adminClient = _factory.CreateClientWithUser(TestUser.Admin);
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public class RestaurantApiTests : IClassFixture<RestaurantWebApplicationFactory>
         restaurant.Should().NotBeNull();
         restaurant!.RestaurantId.Should().NotBeEmpty();
         restaurant.Name.Should().Be(request.Name);
-        restaurant.RestaurantStatus.Should().Be(RestaurantStatus.Draft.Name);
+        restaurant.RestaurantStatus.Should().Be(DomainRestaurantStatus.Draft.Name);
 
         _createdRestaurantIds.Add(restaurant.RestaurantId);
         _output.WriteLine($"Созданный ресторан с ID: {restaurant.RestaurantId}");
@@ -141,7 +141,74 @@ public class RestaurantApiTests : IClassFixture<RestaurantWebApplicationFactory>
 
         var archivedRestaurant = await getResponse.Content.ReadFromJsonAsync<RestaurantDto>(CancellationToken);
         archivedRestaurant.Should().NotBeNull();
-        archivedRestaurant!.RestaurantStatus.Should().Be(RestaurantStatus.Archived.Name);
+        archivedRestaurant!.RestaurantStatus.Should().Be(DomainRestaurantStatus.Archived.Name);
+    }
+
+    [Fact]
+    public async Task ModerateRestaurant_ExistingRestaurant_ValidTransition_ReturnsNoContent()
+    {
+        // Arrange - create restaurant
+        var createRequest = RestaurantTestData.CreateValidRestaurantRequest();
+        var createResponse = await _client.PostAsJsonAsync("/restaurants", createRequest, CancellationToken);
+        createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+        var created = await createResponse.Content.ReadFromJsonAsync<RestaurantDto>(CancellationToken);
+        created.Should().NotBeNull();
+
+        var dto = new ModerationRestaurantDto
+        {
+            Status = ContractRestaurantStatus.OnModeration,
+            Reason = null
+        };
+
+        // Act
+        var response = await _client.PatchAsJsonAsync($"/restaurants/moderate/{created!.RestaurantId}", dto, CancellationToken);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+        var getResponse = await _client.GetAsync($"/restaurants/{created.RestaurantId}", CancellationToken);
+        getResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var updated = await getResponse.Content.ReadFromJsonAsync<RestaurantDto>(CancellationToken);
+        updated!.RestaurantStatus.Should().Be(DomainRestaurantStatus.OnModeration.Name);
+    }
+
+    [Fact]
+    public async Task ModerateRestaurant_InvalidTransition_ReturnsUnprocessable()
+    {
+        // Arrange - create restaurant
+        var createRequest = RestaurantTestData.CreateValidRestaurantRequest();
+        var createResponse = await _client.PostAsJsonAsync("/restaurants", createRequest, CancellationToken);
+        createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+        var created = await createResponse.Content.ReadFromJsonAsync<RestaurantDto>(CancellationToken);
+        created.Should().NotBeNull();
+
+        var dto = new ModerationRestaurantDto
+        {
+            Status = ContractRestaurantStatus.Published, // invalid from Draft
+            Reason = null
+        };
+
+        // Act
+        var response = await _client.PatchAsJsonAsync($"/restaurants/moderate/{created!.RestaurantId}", dto, CancellationToken);
+
+        // Assert
+        response.StatusCode.Should().Be((HttpStatusCode)StatusCodes.Status422UnprocessableEntity);
+    }
+
+    [Fact]
+    public async Task ModerateRestaurant_NonExistingRestaurant_ReturnsNotFound()
+    {
+        var dto = new ModerationRestaurantDto
+        {
+            Status = ContractRestaurantStatus.OnModeration,
+            Reason = null
+        };
+
+        // Act
+        var response = await _client.PatchAsJsonAsync($"/restaurants/moderate/{Guid.NewGuid()}", dto, CancellationToken);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
