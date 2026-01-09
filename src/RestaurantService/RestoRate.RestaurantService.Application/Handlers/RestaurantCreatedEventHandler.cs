@@ -19,5 +19,5 @@ public sealed class RestaurantCreatedEventHandler(
                 RestaurantId: domainEvent.RestaurantId,
                 Status: domainEvent.RestaurantStatus.ToContract()
             ), cancellationToken);
-}
+    }
 }

@@ -85,8 +85,8 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
             return this;
 
         int displayOrder = 0;
-            foreach (var (url, altText, isPrimary) in images)
-                AddImage(url, altText, displayOrder++, isPrimary);
+        foreach (var (url, altText, isPrimary) in images)
+            AddImage(url, altText, displayOrder++, isPrimary);
         return this;
     }
 
