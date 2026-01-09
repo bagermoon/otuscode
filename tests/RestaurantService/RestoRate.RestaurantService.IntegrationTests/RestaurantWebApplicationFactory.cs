@@ -23,20 +23,7 @@ public class RestaurantWebApplicationFactory
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.ConfigureTestServices(services =>
-        {
-            // Add MassTransit In-Memory Test Harness
-            services.AddMassTransitTestHarness(cfg =>
-            {
-                // Register your consumers here
-                // You can configure sagas, activities, etc. as needed
-                cfg.UsingInMemory((context, busCfg) =>
-                {
-                    busCfg.UseConsumeFilter(typeof(ConsumeUserContextFilter<>), context);
-                    busCfg.ConfigureEndpoints(context);
-                });
-            });
-        });
+        builder.AddMassTransitInMemoryTestHarness();
     }
 
     protected override async Task<IHost> CreateHostAsync(IHostBuilder builder)

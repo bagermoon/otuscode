@@ -1,7 +1,15 @@
+using MassTransit;
+
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
+using RestoRate.Abstractions.Identity;
+using RestoRate.Abstractions.Messaging;
+using RestoRate.BuildingBlocks.Messaging;
+using RestoRate.BuildingBlocks.Messaging.Identity;
 using RestoRate.Testing.Common.Auth;
 
 namespace RestoRate.Testing.Common;
@@ -54,4 +62,34 @@ public static class WebApplicationFactoryExtensions
         var f = factory.WithUser(user);
         return (f, f.CreateClient(new() { AllowAutoRedirect = false }));
     }
+
+    public static IWebHostBuilder AddMassTransitInMemoryTestHarness(
+        this IWebHostBuilder builder
+        )
+    {
+        builder.ConfigureTestServices(services =>
+        {
+            // Add MassTransit In-Memory Test Harness
+            services.AddMassTransitTestHarness(cfg =>
+            {
+                cfg.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter(includeNamespace: true));
+                cfg.UsingInMemory((context, busCfg) =>
+                {
+                    busCfg.UseConsumeFilter(typeof(ConsumeUserContextFilter<>), context);
+                    busCfg.ConfigureEndpoints(context);
+                });
+            });
+
+            // TestHarness doesn't know about our application abstraction. Ensure publishes go through MassTransit.
+            services.RemoveAll<IIntegrationEventBus>();
+            services.AddScoped<IIntegrationEventBus, MassTransitEventBus>();
+
+            // Ensure IUserContext is resolvable in publishing/consuming scopes.
+            services.TryAddTransient<IUserContextProvider, MassTransitUserContextProvider>();
+            services.AddUserContext();
+        });
+
+        return builder;
+    }
 }
+
