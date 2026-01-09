@@ -1,11 +1,12 @@
 using Ardalis.Result;
 using Ardalis.SharedKernel;
+
 using Mediator;
+
 using Microsoft.Extensions.Logging;
+
 using RestoRate.Abstractions.Messaging;
-using RestoRate.Contracts.Restaurant.Events;
 using RestoRate.RestaurantService.Domain.Interfaces;
-using RestoRate.Contracts.Restaurant;
 using RestoRate.RestaurantService.Domain.TagAggregate;
 using RestoRate.RestaurantService.Domain.TagAggregate.Specifications;
 using RestoRate.SharedKernel.Enums;
@@ -16,7 +17,7 @@ namespace RestoRate.RestaurantService.Application.UseCases.Restaurants.Create;
 
 public sealed class CreateRestaurantHandler(
     IRestaurantService restaurantService,
-    IRepository<Tag> tagRepository,
+    ITagsService tagsService,
     IIntegrationEventBus integrationEventBus,
     ILogger<CreateRestaurantHandler> logger)
     : ICommandHandler<CreateRestaurantCommand, Result<RestaurantDto>>
@@ -40,33 +41,13 @@ public sealed class CreateRestaurantHandler(
                 .Select(ct => CuisineType.FromName(ct))
                 .ToList();
 
-            var restaurantTags = new List<Tag>();
-            if (request.Dto.Tags != null && request.Dto.Tags.Count != 0)
-            {
-                var uniqueTags = request.Dto.Tags.Distinct(StringComparer.OrdinalIgnoreCase);
-
-                foreach (var tagName in uniqueTags)
-                {
-                    var spec = new TagByNameSpec(tagName);
-                    var existingTag = await tagRepository.FirstOrDefaultAsync(spec, cancellationToken);
-
-                    if (existingTag != null)
-                    {
-                        restaurantTags.Add(existingTag);
-                    }
-                    else
-                    {
-                        var newTag = new Tag(tagName);
-                        await tagRepository.AddAsync(newTag, cancellationToken);
-                        restaurantTags.Add(newTag);
-                    }
-                }
-            }
+            var restaurantTags = await tagsService.ConvertToTagsAsync(
+                request.Dto.Tags ?? Array.Empty<string>(), cancellationToken);
 
             var images = request.Dto.Images?
                 .Select(img => (img.Url, img.AltText, img.IsPrimary));
 
-            var result = await restaurantService.CreateRestaurant(
+            var result = await restaurantService.CreateRestaurantAsync(
                 request.Dto.Name,
                 request.Dto.Description,
                 phoneNumber,
@@ -87,13 +68,6 @@ public sealed class CreateRestaurantHandler(
 
             Guid restaurantId = result.Value;
 
-            await integrationEventBus.PublishAsync(new RestaurantCreatedEvent
-                (
-                    RestaurantId: restaurantId,
-                    Status: RestaurantStatus.Draft
-                ),
-                cancellationToken);
-
             var dto = new RestaurantDto(
                 restaurantId,
                 request.Dto.Name,
@@ -107,7 +81,7 @@ public sealed class CreateRestaurantHandler(
                     openHours.OpenTime,
                     openHours.CloseTime),
                 new MoneyDto(averageCheck.Amount, averageCheck.Currency),
-                RestaurantStatus: Status.Draft.Name,
+                RestaurantStatus: RestaurantStatus.Draft.Name,
                 cuisineTypes.Select(ct => ct.Name).ToList(),
                 restaurantTags.Select(t => t.Name).ToList(),
                 Array.Empty<RestaurantImageDto>() // изображения тут по сути не нужны

@@ -17,7 +17,7 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
     public Location Location { get; private set; } = default!;
     public OpenHours OpenHours { get; private set; } = default!;
     public Money AverageCheck { get; private set; } = default!;
-    public Status RestaurantStatus { get; private set; } = Status.Draft;
+    public RestaurantStatus RestaurantStatus { get; private set; } = RestaurantStatus.Draft;
 
     private readonly List<RestaurantImage> _images = new();
     private readonly List<RestaurantCuisineType> _cuisineTypes = new();
@@ -50,9 +50,44 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
         Location = Guard.Against.Null(location, nameof(location));
         OpenHours = Guard.Against.Null(openHours, nameof(openHours));
         AverageCheck = Guard.Against.Null(averageCheck, nameof(averageCheck));
-        RestaurantStatus = Status.Draft;
+        RestaurantStatus = RestaurantStatus.Draft;
+    }
 
-        RegisterDomainEvent(new RestaurantCreatedEvent(this));
+    public static Restaurant Create(
+        string name,
+        string description,
+        PhoneNumber phoneNumber,
+        Email email,
+        Address address,
+        Location location,
+        OpenHours openHours,
+        Money averageCheck
+    )
+    {
+        var restaurant = new Restaurant(
+            name,
+            description,
+            phoneNumber,
+            email,
+            address,
+            location,
+            openHours,
+            averageCheck);
+
+        restaurant.RegisterDomainEvent(new RestaurantCreatedEvent(restaurant));
+
+        return restaurant;
+    }
+
+    public Restaurant AddImages(IEnumerable<(string Url, string? AltText, bool IsPrimary)>? images)
+    {
+        if (images == null)
+            return this;
+
+        int displayOrder = 0;
+            foreach (var (url, altText, isPrimary) in images)
+                AddImage(url, altText, displayOrder++, isPrimary);
+        return this;
     }
 
     public RestaurantImage AddImage(string url, string? altText = null, int displayOrder = 0, bool isPrimary = false)
@@ -78,6 +113,14 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
         targetImage.MarkAsPrimary();
     }
 
+    public Restaurant AddCuisineTypes(IEnumerable<CuisineType> cuisineTypes)
+    {
+        foreach (var ct in cuisineTypes)
+            AddCuisineType(ct);
+
+        return this;
+    }
+
     public void AddCuisineType(CuisineType cuisineType)
     {
         Guard.Against.Null(cuisineType, nameof(cuisineType));
@@ -86,6 +129,14 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
             return;
 
         _cuisineTypes.Add(new RestaurantCuisineType(Id, cuisineType));
+    }
+
+    public Restaurant AddTags(IEnumerable<Tag> tags)
+    {
+        foreach (var tag in tags)
+            AddTag(tag);
+
+        return this;
     }
 
     public void AddTag(Tag tag)
@@ -188,37 +239,37 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
 
     public void SendToModeration()
     {
-        if (RestaurantStatus != Status.Draft && RestaurantStatus != Status.Rejected)
+        if (RestaurantStatus != RestaurantStatus.Draft && RestaurantStatus != RestaurantStatus.Rejected)
             return;
 
-        RestaurantStatus = Status.OnModeration;
+        RestaurantStatus = RestaurantStatus.OnModeration;
         RegisterDomainEvent(new RestaurantUpdatedEvent(this));
     }
 
     public void Publish()
     {
-        if (RestaurantStatus != Status.OnModeration)
+        if (RestaurantStatus != RestaurantStatus.OnModeration)
             return;
 
-        RestaurantStatus = Status.Published;
-        RegisterDomainEvent(new RestaurantUpdatedEvent(this));
+        RestaurantStatus = RestaurantStatus.Published;
+        RegisterDomainEvent(new RestaurantCreatedEvent(this));
     }
 
     public void Reject()
     {
-        if (RestaurantStatus != Status.OnModeration)
+        if (RestaurantStatus != RestaurantStatus.OnModeration)
             return;
 
-        RestaurantStatus = Status.Rejected;
+        RestaurantStatus = RestaurantStatus.Rejected;
         RegisterDomainEvent(new RestaurantUpdatedEvent(this));
     }
 
     public void MarkDeleted()
     {
-        if (RestaurantStatus == Status.Archived)
+        if (RestaurantStatus == RestaurantStatus.Archived)
             return;
 
-        RestaurantStatus = Status.Archived;
+        RestaurantStatus = RestaurantStatus.Archived;
 
         if (!_deletedEventQueued)
         {
@@ -229,10 +280,10 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
 
     public void Restore()
     {
-        if (RestaurantStatus != Status.Archived)
+        if (RestaurantStatus != RestaurantStatus.Archived)
             return;
 
-        RestaurantStatus = Status.Draft;
+        RestaurantStatus = RestaurantStatus.Draft;
         RegisterDomainEvent(new RestaurantUpdatedEvent(this));
     }
 

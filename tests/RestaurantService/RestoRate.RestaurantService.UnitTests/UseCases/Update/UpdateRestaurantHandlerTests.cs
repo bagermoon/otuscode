@@ -24,7 +24,7 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Update;
 public class UpdateRestaurantHandlerTests
 {
     private readonly IRestaurantService _restaurantService;
-    private readonly IRepository<Tag> _tagRepository;
+    private readonly ITagsService _tagsService;
     private readonly ILogger<UpdateRestaurantHandler> _logger;
     private readonly UpdateRestaurantHandler _handler;
     private readonly ITestOutputHelper _output;
@@ -33,9 +33,9 @@ public class UpdateRestaurantHandlerTests
     {
         _output = output;
         _restaurantService = Substitute.For<IRestaurantService>();
-        _tagRepository = Substitute.For<IRepository<Tag>>();
+        _tagsService = Substitute.For<ITagsService>();
         _logger = Substitute.For<ILogger<UpdateRestaurantHandler>>();
-        _handler = new UpdateRestaurantHandler(_restaurantService, _tagRepository, _logger);
+        _handler = new UpdateRestaurantHandler(_restaurantService, _tagsService, _logger);
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public class UpdateRestaurantHandlerTests
         var command = new UpdateRestaurantCommand(dto);
 
         _restaurantService
-            .UpdateRestaurant(
+            .UpdateRestaurantAsync(
                 restaurantId,
                 Arg.Any<string>(),
                 Arg.Any<string?>(),
@@ -69,7 +69,7 @@ public class UpdateRestaurantHandlerTests
 
         await _restaurantService
             .Received(1)
-            .UpdateRestaurant(
+            .UpdateRestaurantAsync(
                 restaurantId,
                 dto.Name,
                 dto.Description,
@@ -92,7 +92,7 @@ public class UpdateRestaurantHandlerTests
         var command = new UpdateRestaurantCommand(dto);
 
         _restaurantService
-            .UpdateRestaurant(
+            .UpdateRestaurantAsync(
                 Arg.Any<Guid>(),
                 Arg.Any<string>(),
                 Arg.Any<string?>(),
@@ -125,7 +125,7 @@ public class UpdateRestaurantHandlerTests
         var command = new UpdateRestaurantCommand(dto);
 
         _restaurantService
-            .UpdateRestaurant(
+            .UpdateRestaurantAsync(
                 Arg.Any<Guid>(),
                 Arg.Any<string>(),
                 Arg.Any<string?>(),
@@ -147,7 +147,7 @@ public class UpdateRestaurantHandlerTests
 
         await _restaurantService
             .Received(1)
-            .UpdateRestaurant(
+            .UpdateRestaurantAsync(
                 restaurantId,
                 Arg.Any<string>(),
                 Arg.Any<string?>(),
@@ -171,7 +171,7 @@ public class UpdateRestaurantHandlerTests
         var errorMessage = "Ошибка обновления";
 
         _restaurantService
-            .UpdateRestaurant(
+            .UpdateRestaurantAsync(
                 Arg.Any<Guid>(),
                 Arg.Any<string>(),
                 Arg.Any<string?>(),

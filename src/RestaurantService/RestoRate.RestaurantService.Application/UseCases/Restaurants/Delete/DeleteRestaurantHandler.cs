@@ -17,30 +17,19 @@ public sealed class DeleteRestaurantHandler(
         DeleteRestaurantCommand request,
         CancellationToken cancellationToken)
     {
-        logger.LogInformation("Обработка команды удаления ресторана: ID {RestaurantId}", request.RestaurantId);
-
         try
         {
-            var result = await restaurantService.DeleteRestaurant(request.RestaurantId);
+            var result = await restaurantService.DeleteRestaurantAsync(request.RestaurantId);
 
-            if (result.Status == ResultStatus.NotFound)
+            return result.Status switch
             {
-                logger.LogWarning("Ресторан не найден: ID {RestaurantId}", request.RestaurantId);
-                return Result.NotFound();
-            }
-
-            if (result.Status != ResultStatus.Ok)
-            {
-                logger.LogWarning("Не удалось удалить ресторан");
-                return Result.Error(result.Errors.FirstOrDefault() ?? "Неизвестная ошибка");
-            }
-
-            logger.LogInformation("Ресторан удален успешно: ID {RestaurantId}", request.RestaurantId);
-            return Result.NoContent();
+                ResultStatus.NotFound => Result.NotFound(),
+                ResultStatus.Ok => Result.NoContent(),
+                _ => Result.Error(result.Errors.FirstOrDefault() ?? "Неизвестная ошибка")
+            };
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Ошибка при удалении ресторана");
             return Result.Error(ex.Message);
         }
     }

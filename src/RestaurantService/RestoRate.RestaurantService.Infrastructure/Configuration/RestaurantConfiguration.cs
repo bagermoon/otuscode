@@ -60,7 +60,7 @@ public class RestaurantConfiguration : IEntityTypeConfiguration<Domain.Restauran
         builder.Property(r => r.RestaurantStatus)
             .HasConversion(
                 p => p.Value,
-                p => Status.FromValue(p));
+                p => RestaurantStatus.FromValue(p));
 
         builder.HasMany(r => r.CuisineTypes)
             .WithOne()

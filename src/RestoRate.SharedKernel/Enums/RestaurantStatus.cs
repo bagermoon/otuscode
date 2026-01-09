@@ -1,22 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Ardalis.SmartEnum;
 
 namespace RestoRate.SharedKernel.Enums;
 
-public sealed class Status : SmartEnum<Status>
+public sealed class RestaurantStatus : SmartEnum<RestaurantStatus>
 {
-    public static readonly Status Draft = new(nameof(Draft), 1);
-    public static readonly Status OnModeration = new(nameof(OnModeration), 2);
-    public static readonly Status Published = new(nameof(Published), 3);
-    public static readonly Status Rejected = new(nameof(Rejected), 4);
-    public static readonly Status Archived = new(nameof(Archived), 5);
+    public static readonly RestaurantStatus Draft = new(nameof(Draft), 1);
+    public static readonly RestaurantStatus OnModeration = new(nameof(OnModeration), 2);
+    public static readonly RestaurantStatus Published = new(nameof(Published), 3);
+    public static readonly RestaurantStatus Rejected = new(nameof(Rejected), 4);
+    public static readonly RestaurantStatus Archived = new(nameof(Archived), 5);
 
-    private Status(string name, int value) : base(name, value) { }
+    private RestaurantStatus(string name, int value) : base(name, value) { }
 
     /// <summary> Описание статуса </summary>
     public string GetDescription() => Name switch

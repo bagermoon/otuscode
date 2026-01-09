@@ -1,6 +1,6 @@
 using Mediator;
 
-using RestoRate.Contracts.Restaurant.DTOs;
+using RestoRate.Contracts.Common.Dtos;
 
 namespace RestoRate.RestaurantService.Application.UseCases.Tags;
 

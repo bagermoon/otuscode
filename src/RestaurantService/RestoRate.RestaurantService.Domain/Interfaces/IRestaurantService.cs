@@ -9,7 +9,7 @@ namespace RestoRate.RestaurantService.Domain.Interfaces;
 
 public interface IRestaurantService
 {
-    Task<Result<Guid>> CreateRestaurant(
+    Task<Result<Guid>> CreateRestaurantAsync(
         string name,
         string description,
         PhoneNumber phoneNumber,
@@ -22,7 +22,7 @@ public interface IRestaurantService
         IEnumerable<Tag> tags,
         IEnumerable<(string Url, string? AltText, bool IsPrimary)>? images = null);
 
-    Task<Result> UpdateRestaurant(
+    Task<Result> UpdateRestaurantAsync(
         Guid restaurantId,
         string name,
         string description,
@@ -35,9 +35,9 @@ public interface IRestaurantService
         IEnumerable<CuisineType> cuisineTypes,
         IEnumerable<Tag> tags);
 
-    Task<Result> DeleteRestaurant(Guid restaurantId);
+    Task<Result> DeleteRestaurantAsync(Guid restaurantId);
 
-    Task<Result> AddRestaurantImage(Guid restaurantId, string url, string? altText = null, bool isPrimary = false);
-    Task<Result> RemoveRestaurantImage(Guid restaurantId, Guid imageId);
-    Task<Result> SetPrimaryImage(Guid restaurantId, Guid imageId);
+    Task<Result> AddRestaurantImageAsync(Guid restaurantId, string url, string? altText = null, bool isPrimary = false);
+    Task<Result> RemoveRestaurantImageAsync(Guid restaurantId, Guid imageId);
+    Task<Result> SetPrimaryImageAsync(Guid restaurantId, Guid imageId);
 }

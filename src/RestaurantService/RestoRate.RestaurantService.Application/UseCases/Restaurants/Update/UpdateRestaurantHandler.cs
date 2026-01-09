@@ -15,7 +15,7 @@ namespace RestoRate.RestaurantService.Application.UseCases.Restaurants.Update;
 
 public sealed class UpdateRestaurantHandler(
     IRestaurantService restaurantService,
-    IRepository<Tag> tagRepository,
+    ITagsService tagsService,
     ILogger<UpdateRestaurantHandler> logger)
     : ICommandHandler<UpdateRestaurantCommand, Result>
 {
@@ -38,30 +38,10 @@ public sealed class UpdateRestaurantHandler(
                 .Select(ct => CuisineType.FromName(ct))
                 .ToList();
 
-            var restaurantTags = new List<Tag>();
-            if (request.Dto.Tags != null && request.Dto.Tags.Count != 0)
-            {
-                var uniqueTags = request.Dto.Tags.Distinct(StringComparer.OrdinalIgnoreCase);
+            var restaurantTags = await tagsService.ConvertToTagsAsync(
+                request.Dto.Tags ?? Array.Empty<string>(), cancellationToken);
 
-                foreach (var tagName in uniqueTags)
-                {
-                    var spec = new TagByNameSpec(tagName);
-                    var existingTag = await tagRepository.FirstOrDefaultAsync(spec, cancellationToken);
-
-                    if (existingTag != null)
-                    {
-                        restaurantTags.Add(existingTag);
-                    }
-                    else
-                    {
-                        var newTag = new Tag(tagName);
-                        await tagRepository.AddAsync(newTag, cancellationToken);
-                        restaurantTags.Add(newTag);
-                    }
-                }
-            }
-
-            var result = await restaurantService.UpdateRestaurant(
+            var result = await restaurantService.UpdateRestaurantAsync(
                 request.Dto.RestaurantId,
                 request.Dto.Name,
                 request.Dto.Description,

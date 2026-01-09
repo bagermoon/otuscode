@@ -5,5 +5,7 @@ public enum RestaurantStatus
     Unknown,
     Draft,
     Published,
+    Rejected,
+    OnModeration,
     Archived
 }

@@ -1,5 +1,7 @@
 using Ardalis.SharedKernel;
 
+using RestoRate.SharedKernel.Enums;
+
 namespace RestoRate.RestaurantService.Domain.RestaurantAggregate.Events;
 
 public sealed class RestaurantCreatedEvent(Restaurant restaurant) : DomainEventBase
@@ -7,5 +9,5 @@ public sealed class RestaurantCreatedEvent(Restaurant restaurant) : DomainEventB
     public Restaurant Restaurant { get; } = restaurant;
     public Guid RestaurantId => Restaurant.Id;
     public string Name => Restaurant.Name;
-    public string RestaurantStatus => Restaurant.RestaurantStatus.Name;
+    public RestaurantStatus RestaurantStatus => Restaurant.RestaurantStatus;
 }

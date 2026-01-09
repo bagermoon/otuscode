@@ -33,7 +33,7 @@ public class DeleteRestaurantHandlerTests
         var command = new DeleteRestaurantCommand(restaurantId);
 
         _restaurantService
-            .DeleteRestaurant(restaurantId)
+            .DeleteRestaurantAsync(restaurantId)
             .Returns(Task.FromResult(Result.Success()));
 
         // Act
@@ -44,7 +44,7 @@ public class DeleteRestaurantHandlerTests
 
         await _restaurantService
             .Received(1)
-            .DeleteRestaurant(restaurantId);
+            .DeleteRestaurantAsync(restaurantId);
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public class DeleteRestaurantHandlerTests
         var command = new DeleteRestaurantCommand(restaurantId);
 
         _restaurantService
-            .DeleteRestaurant(restaurantId)
+            .DeleteRestaurantAsync(restaurantId)
             .Returns(Task.FromResult(Result.NotFound()));
 
         // Act
@@ -75,7 +75,7 @@ public class DeleteRestaurantHandlerTests
         var errorMessage = "Ошибка базы данных";
 
         _restaurantService
-            .DeleteRestaurant(restaurantId)
+            .DeleteRestaurantAsync(restaurantId)
             .Returns(Task.FromException<Result>(new Exception(errorMessage)));
 
         // Act
@@ -96,7 +96,7 @@ public class DeleteRestaurantHandlerTests
         var command = new DeleteRestaurantCommand(restaurantId);
 
         _restaurantService
-            .DeleteRestaurant(restaurantId)
+            .DeleteRestaurantAsync(restaurantId)
             .Returns(Task.FromResult(Result.Success()));
 
         // Act
@@ -105,6 +105,6 @@ public class DeleteRestaurantHandlerTests
         // Assert
         await _restaurantService
             .Received(1)
-            .DeleteRestaurant(restaurantId);
+            .DeleteRestaurantAsync(restaurantId);
     }
 }

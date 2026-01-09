@@ -48,7 +48,7 @@ public class RestaurantApiTests : IClassFixture<RestaurantWebApplicationFactory>
         restaurant.Should().NotBeNull();
         restaurant!.RestaurantId.Should().NotBeEmpty();
         restaurant.Name.Should().Be(request.Name);
-        restaurant.RestaurantStatus.Should().Be(Status.Draft.Name);
+        restaurant.RestaurantStatus.Should().Be(RestaurantStatus.Draft.Name);
 
         _createdRestaurantIds.Add(restaurant.RestaurantId);
         _output.WriteLine($"Созданный ресторан с ID: {restaurant.RestaurantId}");
@@ -141,7 +141,7 @@ public class RestaurantApiTests : IClassFixture<RestaurantWebApplicationFactory>
 
         var archivedRestaurant = await getResponse.Content.ReadFromJsonAsync<RestaurantDto>(CancellationToken);
         archivedRestaurant.Should().NotBeNull();
-        archivedRestaurant!.RestaurantStatus.Should().Be(Status.Archived.Name);
+        archivedRestaurant!.RestaurantStatus.Should().Be(RestaurantStatus.Archived.Name);
     }
 
     [Fact]
