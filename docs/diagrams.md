@@ -234,6 +234,7 @@
 
         %% Domain Events
         class RestaurantCreatedEvent
+        class RestaurantUpdatedEvent
         class RestaurantRatingUpdatedEvent
         class RestaurantAverageCheckUpdatedEvent
         class ReviewAddedEvent
@@ -247,6 +248,7 @@
 
         %% Event Sources
         Restaurant --> RestaurantCreatedEvent
+        Restaurant --> RestaurantUpdatedEvent
         Restaurant --> RestaurantRatingUpdatedEvent
         Restaurant --> RestaurantAverageCheckUpdatedEvent
         Review --> ReviewAddedEvent

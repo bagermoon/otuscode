@@ -28,7 +28,7 @@
 
 3. **Связь между сервисами:**
     * **События (RabbitMQ):**
-        * `RestaurantCreatedEvent` (от Restaurant Service).
+        * `RestaurantCreatedEvent`, `RestaurantUpdatedEvent`, `RestaurantArchivedEvent` (от Restaurant Service).
         * `ReviewAddedEvent`, `ReviewUpdatedEvent` (от Review Service).
         * `ReviewModeratedEvent` (от Moderation Service).
     * **Синхронные вызовы (минимально):**
