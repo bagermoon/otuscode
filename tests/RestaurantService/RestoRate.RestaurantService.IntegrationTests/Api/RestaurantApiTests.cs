@@ -3,6 +3,7 @@ using FluentAssertions;
 using RestoRate.Contracts.Restaurant.DTOs;
 using RestoRate.Contracts.Restaurant.DTOs.CRUD;
 using RestoRate.RestaurantService.IntegrationTests.Helpers;
+
 using ContractRestaurantStatus = RestoRate.Contracts.Restaurant.RestaurantStatus;
 using DomainRestaurantStatus = RestoRate.SharedKernel.Enums.RestaurantStatus;
 

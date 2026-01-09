@@ -2,9 +2,6 @@ using FluentAssertions;
 
 using MassTransit.Testing;
 
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
-
 using RestoRate.Contracts.Restaurant.DTOs;
 using RestoRate.RestaurantService.IntegrationTests.Helpers;
 using RestoRate.Contracts.Restaurant.Events;
@@ -12,6 +9,7 @@ using RestoRate.Contracts.Restaurant.DTOs.CRUD;
 
 using ContractRestaurantStatus = RestoRate.Contracts.Restaurant.RestaurantStatus;
 using DomainRestaurantStatus = RestoRate.SharedKernel.Enums.RestaurantStatus;
+
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace RestoRate.RestaurantService.IntegrationTests.Api;
