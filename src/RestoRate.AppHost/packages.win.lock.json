@@ -1088,7 +1088,8 @@
           "Ardalis.SharedKernel": "[4.1.0, )",
           "Ardalis.SmartEnum": "[8.2.0, )",
           "Ardalis.Specification": "[9.3.1, )",
-          "Ardalis.Specification.EntityFrameworkCore": "[9.3.1, )"
+          "Ardalis.Specification.EntityFrameworkCore": "[9.3.1, )",
+          "NodaMoney": "[2.6.0, )"
         }
       },
       "Ardalis.GuardClauses": {
@@ -1256,6 +1257,12 @@
           "Microsoft.Extensions.Http": "9.0.11",
           "Microsoft.Extensions.ServiceDiscovery.Abstractions": "10.1.0"
         }
+      },
+      "NodaMoney": {
+        "type": "CentralTransitive",
+        "requested": "[2.6.0, )",
+        "resolved": "2.6.0",
+        "contentHash": "ZUkdhGmQYKkbto8nWX+3ooTKrIVxZG1hRS4IBctD3cEq9mqT23mq2JQS4mqBbWDgf+U8uoHXvwjtMsJyRehuFw=="
       },
       "OpenTelemetry.Exporter.OpenTelemetryProtocol": {
         "type": "CentralTransitive",

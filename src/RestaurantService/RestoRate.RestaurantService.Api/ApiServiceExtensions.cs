@@ -10,7 +10,9 @@ internal static class ApiServiceExtensions
     {
         builder.ConfigureAuthentication();
         builder.Services.AddRestaurantApplication();
-        builder.AddRestaurantInfrastructure();
+        builder.AddRestaurantInfrastructure(
+            consumersAssembly: typeof(ApiServiceExtensions).Assembly
+        );
 
         return builder;
     }
