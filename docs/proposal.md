@@ -84,15 +84,15 @@ public record Rating
 
 public record Money
 {
-    public long AmountMinor { get; private init; }
+    public decimal Amount { get; private init; }
     public string Currency { get; private init; }
     private Money() { }
-    public Money(long amount, string currency = "RUB")
+    public Money(decimal amount, string currency = "RUB")
     {
-        AmountMinor = amount;
+        Amount = amount;
         Currency = currency;
     }
-    public override string ToString() => $"{AmountMinor} {Currency}";
+    public override string ToString() => $"{Amount} {Currency}";
 }
 
 // Restaurant Aggregate

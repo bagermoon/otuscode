@@ -39,6 +39,19 @@
           "Microsoft.Extensions.ServiceDiscovery.Abstractions": "10.1.0"
         }
       },
+      "NodaMoney.DependencyInjection": {
+        "type": "Direct",
+        "requested": "[2.6.0, )",
+        "resolved": "2.6.0",
+        "contentHash": "sQr3Bnj12Nm5Fx+rhc7JenBIDSKq9AcoQOzDAF5urUxqUwSo1hMLzU/V7qMc/ayV2hi+e4EKVFgQ8ip5UlC/lg==",
+        "dependencies": {
+          "Microsoft.Extensions.Configuration.Abstractions": "5.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "5.0.0",
+          "Microsoft.Extensions.Options": "5.0.0",
+          "Microsoft.Extensions.Options.ConfigurationExtensions": "5.0.0",
+          "NodaMoney": "2.6.0"
+        }
+      },
       "OpenTelemetry.Exporter.OpenTelemetryProtocol": {
         "type": "Direct",
         "requested": "[1.14.0, )",

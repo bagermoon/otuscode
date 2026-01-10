@@ -1,14 +1,14 @@
 using RestoRate.Contracts.Restaurant.DTOs;
 using RestoRate.Contracts.Restaurant.DTOs.CRUD;
 
-using RestoRate.RestaurantService.Domain.RestaurantAggregate;
-using RestoRate.RestaurantService.Domain.TagAggregate;
+using NodaMoney;
 
 using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
 
 using RestaurantEntity = RestoRate.RestaurantService.Domain.RestaurantAggregate.Restaurant;
 using TagEntity = RestoRate.RestaurantService.Domain.TagAggregate.Tag;
+using RestoRate.Contracts.Common.Dtos;
 
 namespace RestoRate.RestaurantService.UnitTests.Helpers;
 
@@ -132,7 +132,7 @@ public static class TestDataBuilder
         var address = new Address("ул. Тестовая", "д. 1");
         var location = new Location(55.7558, 37.6173);
         var openHours = new OpenHours(DayOfWeek.Monday, new TimeOnly(9, 0), new TimeOnly(22, 0));
-        var averageCheck = new Money(1500, "RUB");
+        var averageCheck = new Money(1500m, Currency.FromCode("RUB"));
 
         var restaurant = new RestaurantEntity(
             name,

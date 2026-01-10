@@ -6,15 +6,14 @@ using Mediator;
 using Microsoft.Extensions.Logging;
 
 using RestoRate.Contracts.Restaurant.DTOs;
+using RestoRate.RestaurantService.Domain.RestaurantAggregate;
 using RestoRate.RestaurantService.Domain.RestaurantAggregate.Specifications;
-using RestoRate.SharedKernel.Enums;
-
-using RestaurantEntity = RestoRate.RestaurantService.Domain.RestaurantAggregate.Restaurant;
+using RestoRate.RestaurantService.Application.Mappings;
 
 namespace RestoRate.RestaurantService.Application.UseCases.Restaurants.GetById;
 
 public sealed class GetRestaurantByIdHandler(
-    IReadRepository<RestaurantEntity> readRepository,
+    IReadRepository<Restaurant> readRepository,
     ILogger<GetRestaurantByIdHandler> logger)
     : IQueryHandler<GetRestaurantByIdQuery, Result<RestaurantDto>>
 {
@@ -22,7 +21,7 @@ public sealed class GetRestaurantByIdHandler(
         GetRestaurantByIdQuery request,
         CancellationToken cancellationToken)
     {
-        logger.LogInformation("Обработка запроса получения ресторана: ID {RestaurantId}", request.RestaurantId);
+        logger.LogGettingById(request.RestaurantId);
 
         try
         {
@@ -31,38 +30,18 @@ public sealed class GetRestaurantByIdHandler(
 
             if (restaurant == null)
             {
-                logger.LogWarning("Ресторан не найден: ID {RestaurantId}", request.RestaurantId);
+                logger.LogRestaurantNotFound(request.RestaurantId);
                 return Result.NotFound();
             }
 
-            var dto = new RestaurantDto(
-                restaurant.Id,
-                restaurant.Name,
-                restaurant.Description,
-                restaurant.PhoneNumber.ToString(),
-                restaurant.Email.Address,
-                new AddressDto(restaurant.Address.FullAddress, restaurant.Address.House),
-                new LocationDto(restaurant.Location.Latitude, restaurant.Location.Longitude),
-                new OpenHoursDto(restaurant.OpenHours.DayOfWeek, restaurant.OpenHours.OpenTime, restaurant.OpenHours.CloseTime),
-                new MoneyDto(restaurant.AverageCheck.Amount, restaurant.AverageCheck.Currency),
-                restaurant.RestaurantStatus.Name,
-                restaurant.CuisineTypes.Select(ct => ct.CuisineType.Name).ToList(),
-                restaurant.Tags.Select(t => t.Tag.Name).ToList(),
-                restaurant.Images.Select(img => new RestaurantImageDto(
-                    img.Id,
-                    img.Url,
-                    img.AltText,
-                    img.DisplayOrder,
-                    img.IsPrimary
-                )).ToList()
-            );
+            var dto = restaurant.ToDto();
 
-            logger.LogInformation("Ресторан найден успешно: ID {RestaurantId}", request.RestaurantId);
+            logger.LogFound(request.RestaurantId);
             return Result<RestaurantDto>.Success(dto);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Ошибка при получении ресторана");
+            logger.LogGetError(ex);
             return Result<RestaurantDto>.Error(ex.Message);
         }
     }

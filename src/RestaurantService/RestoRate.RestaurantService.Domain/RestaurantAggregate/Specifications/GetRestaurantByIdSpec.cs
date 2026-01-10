@@ -8,6 +8,7 @@ public sealed class GetRestaurantByIdSpec : Specification<Restaurant>
     {
         Query
             .Where(r => r.Id == restaurantId)
+            .Include(r => r.Rating)
             .Include(r => r.Images)
             .Include(r => r.CuisineTypes)
             .Include(r => r.Tags)

@@ -5,6 +5,8 @@ using Mediator;
 
 using Microsoft.Extensions.Logging;
 
+using NodaMoney;
+
 using RestoRate.RestaurantService.Domain.Interfaces;
 using RestoRate.RestaurantService.Domain.RestaurantAggregate.Specifications;
 using RestoRate.RestaurantService.Domain.TagAggregate;
@@ -20,7 +22,7 @@ public class RestaurantSvc(
     IMediator mediator,
     ILogger<RestaurantSvc> logger) : IRestaurantService
 {
-    public async Task<Result<Guid>> CreateRestaurantAsync(
+    public async Task<Result<RestaurantEntity>> CreateRestaurantAsync(
         string name,
         string description,
         PhoneNumber phoneNumber,
@@ -54,7 +56,7 @@ public class RestaurantSvc(
         await repository.AddAsync(restaurant);
 
         logger.LogCreateRestaurantCompleted(name, restaurant.Id);
-        return Result<Guid>.Success(restaurant.Id);
+        return Result<RestaurantEntity>.Success(restaurant);
     }
 
     public async Task<Result> UpdateRestaurantAsync(

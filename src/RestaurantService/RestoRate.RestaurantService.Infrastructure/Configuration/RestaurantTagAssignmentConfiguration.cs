@@ -1,14 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using RestoRate.RestaurantService.Domain.RestaurantAggregate;
-using RestoRate.SharedKernel.Enums;
 
 namespace RestoRate.RestaurantService.Infrastructure.Configuration;
 
@@ -20,7 +13,7 @@ public class RestaurantTagConfiguration : IEntityTypeConfiguration<RestaurantTag
 
         builder.HasKey(i => i.Id);
 
-        builder.HasOne<Domain.RestaurantAggregate.Restaurant>()
+        builder.HasOne<Restaurant>()
             .WithMany(r => r.Tags)
             .HasForeignKey(rt => rt.RestaurantId)
             .OnDelete(DeleteBehavior.Cascade);

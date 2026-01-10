@@ -1,5 +1,7 @@
 using Ardalis.Result;
 
+using NodaMoney;
+
 using RestoRate.RestaurantService.Domain.RestaurantAggregate;
 using RestoRate.RestaurantService.Domain.TagAggregate;
 using RestoRate.SharedKernel.Enums;
@@ -9,7 +11,7 @@ namespace RestoRate.RestaurantService.Domain.Interfaces;
 
 public interface IRestaurantService
 {
-    Task<Result<Guid>> CreateRestaurantAsync(
+    Task<Result<Restaurant>> CreateRestaurantAsync(
         string name,
         string description,
         PhoneNumber phoneNumber,

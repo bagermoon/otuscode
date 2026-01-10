@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 
+using NodaMoney;
+
 using RestoRate.BuildingBlocks.Data.Migrations;
 using RestoRate.RestaurantService.Domain.RestaurantAggregate;
 using RestoRate.RestaurantService.Infrastructure.Data;
@@ -29,7 +31,7 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
             new Address("г. Москва, ул. Ленина, 10", "10"),
             new Location(55.751244, 37.618423),
             new OpenHours(DayOfWeek.Monday, new TimeOnly(10, 0), new TimeOnly(23, 59)),
-            new Money(2500, "RUB")
+            new Money(2500m, Currency.FromCode("RUB"))
         );
         firstRestaurant.AddCuisineType(CuisineType.Italian);
 
@@ -57,6 +59,7 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
 
         firstRestaurant.SendToModeration();
         firstRestaurant.Publish();
+        AddRatings(firstRestaurant);
         restaurants.Add(firstRestaurant);
 
         var secondRestaurant = new Restaurant(
@@ -67,7 +70,7 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
             new Address("г. Москва, пр. Мира, 5", "5"),
             new Location(55.776123, 37.632111),
             new OpenHours(DayOfWeek.Monday, new TimeOnly(12, 0), new TimeOnly(23, 59)),
-            new Money(1800, "RUB")
+            new Money(1800m, Currency.FromCode("RUB"))
         );
         secondRestaurant.AddCuisineType(CuisineType.Georgian);
 
@@ -100,7 +103,7 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
             new Address("г. Санкт-Петербург, пр. Невский, 15", "45"),
             new Location(55.776123, 37.632111),
             new OpenHours(DayOfWeek.Monday, new TimeOnly(12, 0), new TimeOnly(23, 59)),
-            new Money(1800, "RUB")
+            new Money(1800m, Currency.FromCode("RUB"))
         );
         thirdRestaurant.AddCuisineType(CuisineType.Russian);
 
@@ -130,6 +133,7 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
 
         thirdRestaurant.SendToModeration();
         thirdRestaurant.Publish();
+        AddRatings(thirdRestaurant, 4m, 200);
         restaurants.Add(thirdRestaurant);
 
         var fourthRestaurant = new Restaurant(
@@ -140,7 +144,7 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
             new Address("г. Казань, ул. Ленина, 19", "17"),
             new Location(55.776123, 37.632111),
             new OpenHours(DayOfWeek.Monday, new TimeOnly(12, 0), new TimeOnly(23, 59)),
-            new Money(1800, "RUB")
+            new Money(1800m, Currency.FromCode("RUB"))
         );
         fourthRestaurant.AddCuisineType(CuisineType.Japanese);
 
@@ -163,6 +167,7 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
 
         fourthRestaurant.SendToModeration();
         fourthRestaurant.Publish();
+        AddRatings(fourthRestaurant, 1.0m, 5);
         restaurants.Add(fourthRestaurant);
 
         await context.Restaurants.AddRangeAsync(restaurants, ct);
@@ -177,5 +182,23 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
         var tag = availableTags.FirstOrDefault(t => t.Name == tagName);
         if (tag != null)
             restaurant.AddTag(tag);
+    }
+
+    private Restaurant AddRatings(
+        Restaurant restaurant,
+        decimal approvedAverageRating = 4.5m,
+        int approvedReviewsCount = 120
+    )
+    {
+        restaurant.UpdateRatings(
+            approvedAverageRating: approvedAverageRating,
+            approvedReviewsCount: approvedReviewsCount,
+            approvedAverageCheck: restaurant.AverageCheck,
+            provisionalAverageRating: 4.3m,
+            provisionalReviewsCount: 30,
+            provisionalAverageCheck: Money.Zero
+        );
+
+        return restaurant;
     }
 }

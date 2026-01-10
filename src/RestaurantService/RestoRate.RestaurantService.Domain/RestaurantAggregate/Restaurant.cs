@@ -1,10 +1,11 @@
 using Ardalis.GuardClauses;
 using Ardalis.SharedKernel;
+using NodaMoney;
 using RestoRate.SharedKernel.Enums;
-using RestoRate.SharedKernel.ValueObjects;
 using RestoRate.RestaurantService.Domain.RestaurantAggregate.Events;
 using RestoRate.RestaurantService.Domain.TagAggregate;
 using Ardalis.Result;
+using RestoRate.SharedKernel.ValueObjects;
 
 namespace RestoRate.RestaurantService.Domain.RestaurantAggregate;
 
@@ -17,9 +18,9 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
     public Address Address { get; private set; } = default!;
     public Location Location { get; private set; } = default!;
     public OpenHours OpenHours { get; private set; } = default!;
-    public Money AverageCheck { get; private set; } = default!;
+    public Money AverageCheck { get; private set; }
     public RestaurantStatus RestaurantStatus { get; private set; } = RestaurantStatus.Draft;
-
+    public RatingSnapshot Rating { get; private set; } = default!;
     private readonly List<RestaurantImage> _images = new();
     private readonly List<RestaurantCuisineType> _cuisineTypes = new();
     private readonly List<RestaurantTag> _tags = new();
@@ -27,8 +28,6 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
     public IReadOnlyCollection<RestaurantImage> Images => _images.AsReadOnly();
     public IReadOnlyCollection<RestaurantCuisineType> CuisineTypes => _cuisineTypes.AsReadOnly();
     public IReadOnlyCollection<RestaurantTag> Tags => _tags.AsReadOnly();
-
-    private bool _updatedEventQueued;
     private bool _deletedEventQueued;
 
     private Restaurant() { }
@@ -50,8 +49,10 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
         Address = Guard.Against.Null(address, nameof(address));
         Location = Guard.Against.Null(location, nameof(location));
         OpenHours = Guard.Against.Null(openHours, nameof(openHours));
-        AverageCheck = Guard.Against.Null(averageCheck, nameof(averageCheck));
+        Guard.Against.Negative(averageCheck.Amount, nameof(averageCheck));
+        AverageCheck = averageCheck;
         RestaurantStatus = RestaurantStatus.Draft;
+        Rating = new RatingSnapshot(Id);
     }
 
     public static Restaurant Create(
@@ -210,7 +211,8 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
 
     public void UpdateAverageCheck(Money averageCheck)
     {
-        AverageCheck = Guard.Against.Null(averageCheck, nameof(averageCheck));
+        Guard.Against.Negative(averageCheck.Amount, nameof(averageCheck));
+        AverageCheck = averageCheck;
     }
 
     public void UpdateCuisineTypes(IEnumerable<CuisineType> cuisineTypes)
@@ -304,7 +306,28 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
     public new void ClearDomainEvents()
     {
         base.ClearDomainEvents();
-        _updatedEventQueued = false;
         _deletedEventQueued = false;
+    }
+
+    public void UpdateRatings(
+        decimal approvedAverageRating,
+        int approvedReviewsCount,
+        Money approvedAverageCheck,
+        decimal provisionalAverageRating,
+        int provisionalReviewsCount,
+        Money provisionalAverageCheck
+        )
+    {
+        Rating
+            .ApplyApproved(
+                approvedAverageRating,
+                approvedReviewsCount,
+                approvedAverageCheck
+            )
+            .ApplyProvisional(
+                provisionalAverageRating,
+                provisionalReviewsCount,
+                provisionalAverageCheck
+            );
     }
 }

@@ -12,6 +12,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 
 using NSubstitute;
+using NodaMoney;
 
 using RestoRate.RestaurantService.Application.UseCases.Restaurants.Update;
 using RestoRate.RestaurantService.Domain.Interfaces;
@@ -56,7 +57,7 @@ public class UpdateRestaurantHandlerTests
                 Arg.Any<Address>(),
                 Arg.Any<Location>(),
                 Arg.Any<OpenHours>(),
-                Arg.Any<Money>(),
+                    Arg.Any<Money>(),
                 Arg.Any<IEnumerable<CuisineType>>(),
                 Arg.Any<IEnumerable<Tag>>())
             .Returns(Task.FromResult(Result.Success()));
@@ -101,7 +102,7 @@ public class UpdateRestaurantHandlerTests
                 Arg.Any<Address>(),
                 Arg.Any<Location>(),
                 Arg.Any<OpenHours>(),
-                Arg.Any<Money>(),
+                    Arg.Any<Money>(),
                 Arg.Any<IEnumerable<CuisineType>>(),
                 Arg.Any<IEnumerable<Tag>>())
             .Returns(Task.FromResult(Result.NotFound()));

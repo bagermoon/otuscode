@@ -478,6 +478,7 @@
           "Ardalis.Result.FluentValidation": "[10.1.0, )",
           "Microsoft.Extensions.Http.Resilience": "[10.1.0, )",
           "Microsoft.Extensions.ServiceDiscovery": "[10.1.0, )",
+          "NodaMoney.DependencyInjection": "[2.6.0, )",
           "OpenTelemetry.Exporter.OpenTelemetryProtocol": "[1.14.0, )",
           "OpenTelemetry.Extensions.Hosting": "[1.14.0, )",
           "OpenTelemetry.Instrumentation.AspNetCore": "[1.14.0, )",
@@ -649,6 +650,19 @@
         "requested": "[2.6.0, )",
         "resolved": "2.6.0",
         "contentHash": "ZUkdhGmQYKkbto8nWX+3ooTKrIVxZG1hRS4IBctD3cEq9mqT23mq2JQS4mqBbWDgf+U8uoHXvwjtMsJyRehuFw=="
+      },
+      "NodaMoney.DependencyInjection": {
+        "type": "CentralTransitive",
+        "requested": "[2.6.0, )",
+        "resolved": "2.6.0",
+        "contentHash": "sQr3Bnj12Nm5Fx+rhc7JenBIDSKq9AcoQOzDAF5urUxqUwSo1hMLzU/V7qMc/ayV2hi+e4EKVFgQ8ip5UlC/lg==",
+        "dependencies": {
+          "Microsoft.Extensions.Configuration.Abstractions": "5.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "5.0.0",
+          "Microsoft.Extensions.Options": "5.0.0",
+          "Microsoft.Extensions.Options.ConfigurationExtensions": "5.0.0",
+          "NodaMoney": "2.6.0"
+        }
       },
       "OpenTelemetry.Exporter.OpenTelemetryProtocol": {
         "type": "CentralTransitive",

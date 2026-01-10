@@ -1,3 +1,5 @@
+using RestoRate.Contracts.Common.Dtos;
+
 namespace RestoRate.Contracts.Restaurant.DTOs.CRUD;
 
 public record UpdateRestaurantDto(

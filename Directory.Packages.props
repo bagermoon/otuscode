@@ -46,6 +46,7 @@
     <PackageVersion Include="MongoDB.EntityFrameworkCore" Version="9.0.3" />
     <PackageVersion Include="MudBlazor" Version="8.15.0" />
     <PackageVersion Include="NodaMoney" Version="2.6.0" />
+    <PackageVersion Include="NodaMoney.DependencyInjection" Version="2.6.0" />
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.14.0" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.14.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.14.0" />
