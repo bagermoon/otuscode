@@ -14,7 +14,7 @@ public class RatingSnapshot : EntityBase<Guid>
     public Money ProvisionalAverageCheck { get; private set; }
     public int ProvisionalReviewCount { get; private set; }
     public DateTime UpdatedAt { get; private set; }
-    
+
     private RatingSnapshot() { }
 
     internal RatingSnapshot(Guid restaurantId)

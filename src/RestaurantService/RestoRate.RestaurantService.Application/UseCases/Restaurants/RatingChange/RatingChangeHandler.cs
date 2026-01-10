@@ -42,7 +42,7 @@ public sealed class RatingChangeHandler(
             logger.LogRatingUpdateFailed(ex, command.RestaurantId, ex.Message);
             return Result.Error($"Ошибка при обновлении рейтинга ресторана: {ex.Message}");
         }
-        
+
         return Result.NoContent();
     }
 }
