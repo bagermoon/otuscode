@@ -81,8 +81,10 @@ public static class WebApplicationFactoryExtensions
             });
 
             // TestHarness doesn't know about our application abstraction. Ensure publishes go through MassTransit.
+            // Register a lazy adapter that resolves MassTransit publish endpoint per-call to avoid resolving scoped
+            // MassTransit services from the root provider during startup.
             services.RemoveAll<IIntegrationEventBus>();
-            services.AddScoped<IIntegrationEventBus, MassTransitEventBus>();
+            services.AddScoped<IIntegrationEventBus, LazyMassTransitEventBus>();
 
             // Ensure IUserContext is resolvable in publishing/consuming scopes.
             services.TryAddTransient<IUserContextProvider, MassTransitUserContextProvider>();

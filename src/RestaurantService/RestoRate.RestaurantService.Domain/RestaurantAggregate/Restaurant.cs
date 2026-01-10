@@ -309,7 +309,7 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
         _deletedEventQueued = false;
     }
 
-    public void UpdateRatings(
+    public Result UpdateRatings(
         decimal approvedAverageRating,
         int approvedReviewsCount,
         Money approvedAverageCheck,
@@ -318,6 +318,9 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
         Money provisionalAverageCheck
         )
     {
+        if (Rating == null)
+            return Result.Error("Rating snapshot is not initialized.");
+
         Rating
             .ApplyApproved(
                 approvedAverageRating,
@@ -329,5 +332,7 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
                 provisionalReviewsCount,
                 provisionalAverageCheck
             );
+
+        return Result.Success();
     }
 }
