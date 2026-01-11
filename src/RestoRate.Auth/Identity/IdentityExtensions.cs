@@ -9,7 +9,7 @@ namespace RestoRate.Auth.Identity;
 
 public static class IdentityExtensions
 {
-    public static TBuilder AddItentityServices<TBuilder>(
+    public static TBuilder AddIdentityServices<TBuilder>(
         this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
         builder.Services.AddHttpContextAccessor();
