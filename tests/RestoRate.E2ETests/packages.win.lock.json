@@ -4,13 +4,13 @@
     "net9.0": {
       "Aspire.Hosting.Testing": {
         "type": "Direct",
-        "requested": "[13.0.2, )",
-        "resolved": "13.0.2",
-        "contentHash": "Dc+IvCUqBoXlWmQs//Ay0EsGhgJx1xUdcJgd4efHlTTx3lWue7TsMVpdcczhOh9DS/0Kb6kkM3sS+65nYnYknQ==",
+        "requested": "[13.1.0, )",
+        "resolved": "13.1.0",
+        "contentHash": "nipLltgiwXayUwF3sv6iYnvSJe5LqucisdHjzK1hdiFFg9PHBc4Fq+MmrNBWo/JrcrIBABSbtvM40i/EpVovqg==",
         "dependencies": {
           "AspNetCore.HealthChecks.Uris": "9.0.0",
-          "Aspire.Hosting": "13.0.2",
-          "Aspire.Hosting.AppHost": "13.0.2",
+          "Aspire.Hosting": "13.1.0",
+          "Aspire.Hosting.AppHost": "13.1.0",
           "Google.Protobuf": "3.33.0",
           "Grpc.AspNetCore": "2.71.0",
           "Grpc.Net.ClientFactory": "2.71.0",
@@ -21,12 +21,13 @@
           "Microsoft.Extensions.Configuration.Abstractions": "9.0.11",
           "Microsoft.Extensions.Configuration.Binder": "9.0.11",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.11",
-          "Microsoft.Extensions.DependencyInjection.AutoActivation": "10.0.0",
+          "Microsoft.Extensions.DependencyInjection.AutoActivation": "10.1.0",
           "Microsoft.Extensions.Diagnostics.HealthChecks": "9.0.11",
+          "Microsoft.Extensions.FileSystemGlobbing": "10.0.1",
           "Microsoft.Extensions.Hosting": "9.0.11",
           "Microsoft.Extensions.Hosting.Abstractions": "9.0.11",
           "Microsoft.Extensions.Http": "9.0.11",
-          "Microsoft.Extensions.Http.Resilience": "10.0.0",
+          "Microsoft.Extensions.Http.Resilience": "10.1.0",
           "Microsoft.Extensions.Logging.Abstractions": "9.0.11",
           "Microsoft.Extensions.Options": "9.0.11",
           "Microsoft.Extensions.Primitives": "9.0.11",
@@ -66,8 +67,8 @@
       },
       "Aspire.Dashboard.Sdk.win-x64": {
         "type": "Transitive",
-        "resolved": "13.0.2",
-        "contentHash": "nJaYqX5BvVZC11s1eeBgp200q6s2P9iTjURu5agdBwnDtKLM9rkGOGKpwApUr7LuiAKQO5Zx9Zfk5zfZqg4vUg=="
+        "resolved": "13.1.0",
+        "contentHash": "rrcsI8cankYCiUlj4Ev+os9uKcutUCv+9kvHQt85RiUX/ewXsloFZy0/depKWrzdJkdJuoTbYFRlSe43TKq6aQ=="
       },
       "Aspire.Hosting": {
         "type": "Transitive",
@@ -102,11 +103,11 @@
       },
       "Aspire.Hosting.AppHost": {
         "type": "Transitive",
-        "resolved": "13.0.2",
-        "contentHash": "YOPNND7qr6Ik8Ej1Z9P0TlLyA1VRnRr02J+nEVh0Wk8nB0GA/RelsmrfqNoHw8Wc4aj5vgxmkvOkQDEJs47zGA==",
+        "resolved": "13.1.0",
+        "contentHash": "mjE/g+r/copJNVWBk/SytyfekaNbp7QB/hj5G3tcaFm138rnNK6jkBYCbk8MZDdGflL4FYoqN656yhLDiH9faQ==",
         "dependencies": {
           "AspNetCore.HealthChecks.Uris": "9.0.0",
-          "Aspire.Hosting": "13.0.2",
+          "Aspire.Hosting": "13.1.0",
           "Google.Protobuf": "3.33.0",
           "Grpc.AspNetCore": "2.71.0",
           "Grpc.Net.ClientFactory": "2.71.0",
@@ -118,6 +119,7 @@
           "Microsoft.Extensions.Configuration.Binder": "9.0.11",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.11",
           "Microsoft.Extensions.Diagnostics.HealthChecks": "9.0.11",
+          "Microsoft.Extensions.FileSystemGlobbing": "10.0.1",
           "Microsoft.Extensions.Hosting": "9.0.11",
           "Microsoft.Extensions.Hosting.Abstractions": "9.0.11",
           "Microsoft.Extensions.Http": "9.0.11",
@@ -133,8 +135,8 @@
       },
       "Aspire.Hosting.Orchestration.win-x64": {
         "type": "Transitive",
-        "resolved": "13.0.2",
-        "contentHash": "bHQavGeVzPJYhR+0hlZtG/RN+Fxa/TpNZDvbgbVjGTw0zNqzcZFI+LkeLzM6T7RXHs3pjyDQUYFU4Y4h1mPzLw=="
+        "resolved": "13.1.0",
+        "contentHash": "3w2UahEauTq719LPJ/BCySh31kz26sfjuOkRF5E4VYy1Q3xLRV43+OIGI3C5sy8feUHjrYz+DDq3DQn/2fu+4g=="
       },
       "AspNetCore.HealthChecks.MongoDb": {
         "type": "Transitive",
@@ -193,18 +195,18 @@
       },
       "Docker.DotNet.Enhanced": {
         "type": "Transitive",
-        "resolved": "3.130.0",
-        "contentHash": "LQpn/tmB4TPInO9ILgFg98ivcr5QsLBm6sUltqOjgU/FKDU4SW3mbR9QdmYgBJlE6PtKmSffDdSyVYMyUYyEjA==",
+        "resolved": "3.131.1",
+        "contentHash": "hGLHCNUsQbT2Ab/HUznRnNqYZQs40zInXa3eLwYjeNyfUYbw1pqqDGqcOLl5uGepS8IuigEYakEdAcVT/2ezYg==",
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "8.0.3"
         }
       },
       "Docker.DotNet.Enhanced.X509": {
         "type": "Transitive",
-        "resolved": "3.130.0",
-        "contentHash": "stAlaM/h5u8bIqqXQVR4tgJgsN8CDC0ynjmCYZFy4alXs2VJdIoRZwJJmgmmYYrAdMwWJC8lWWe0ilxPqc8Wkg==",
+        "resolved": "3.131.1",
+        "contentHash": "8FU7zmttFQzp0xb0EPupxQ0nGtC2cTpukgh3jMxMT8luj5TSDyzIKTnroDpXCjpg9P2fV+6JIvC+IetsMEfyBA==",
         "dependencies": {
-          "Docker.DotNet.Enhanced": "3.130.0"
+          "Docker.DotNet.Enhanced": "3.131.1"
         }
       },
       "Fractions": {
@@ -1248,26 +1250,26 @@
       "restorate.apphost": {
         "type": "Project",
         "dependencies": {
-          "Aspire.Dashboard.Sdk.win-x64": "[13.0.2, )",
-          "Aspire.Hosting.AppHost": "[13.0.2, )",
-          "Aspire.Hosting.Keycloak": "[13.0.2-preview.1.25603.5, )",
-          "Aspire.Hosting.MongoDB": "[13.0.2, )",
-          "Aspire.Hosting.Orchestration.win-x64": "[13.0.2, )",
-          "Aspire.Hosting.PostgreSQL": "[13.0.2, )",
-          "Aspire.Hosting.RabbitMQ": "[13.0.2, )",
-          "Aspire.Hosting.Redis": "[13.0.2, )",
+          "Aspire.Dashboard.Sdk.win-x64": "[13.1.0, )",
+          "Aspire.Hosting.AppHost": "[13.1.0, )",
+          "Aspire.Hosting.Keycloak": "[13.1.0-preview.1.25616.3, )",
+          "Aspire.Hosting.MongoDB": "[13.1.0, )",
+          "Aspire.Hosting.Orchestration.win-x64": "[13.1.0, )",
+          "Aspire.Hosting.PostgreSQL": "[13.1.0, )",
+          "Aspire.Hosting.RabbitMQ": "[13.1.0, )",
+          "Aspire.Hosting.Redis": "[13.1.0, )",
           "RestoRate.ServiceDefaults": "[1.0.0, )",
-          "Scalar.Aspire": "[0.8.8, )"
+          "Scalar.Aspire": "[0.8.13, )"
         }
       },
       "restorate.buildingblocks": {
         "type": "Project",
         "dependencies": {
-          "Aspire.MongoDB.Driver": "[13.0.2, )",
-          "Aspire.Npgsql.EntityFrameworkCore.PostgreSQL": "[13.0.2, )",
+          "Aspire.MongoDB.Driver": "[13.1.0, )",
+          "Aspire.Npgsql.EntityFrameworkCore.PostgreSQL": "[13.1.0, )",
           "EFCore.NamingConventions": "[9.0.0, )",
-          "MassTransit": "[8.5.7, )",
-          "MassTransit.RabbitMQ": "[8.5.7, )",
+          "MassTransit": "[8.5.7, 9.0.0)",
+          "MassTransit.RabbitMQ": "[8.5.7, 9.0.0)",
           "Microsoft.EntityFrameworkCore": "[9.0.11, )",
           "Microsoft.EntityFrameworkCore.Relational": "[9.0.11, )",
           "MongoDB.EntityFrameworkCore": "[9.0.3, )",
@@ -1310,7 +1312,7 @@
           "Microsoft.AspNetCore.Mvc.Testing": "[9.0.11, )",
           "Microsoft.AspNetCore.OpenApi": "[9.0.11, )",
           "RestoRate.BuildingBlocks": "[1.0.0, )",
-          "TestContainers": "[4.9.0, )",
+          "TestContainers": "[4.10.0, )",
           "xunit.v3.extensibility.core": "[3.2.1, )"
         }
       },
@@ -1373,12 +1375,12 @@
       },
       "Aspire.Hosting.Keycloak": {
         "type": "CentralTransitive",
-        "requested": "[13.0.2-preview.1.25603.5, )",
-        "resolved": "13.0.2-preview.1.25603.5",
-        "contentHash": "PMyNu3UAe52PYHloX1o1GXymJGNKnv57lF9zh/3xVuXbaMzbEguBGFpKb2Vvt1LhwRzSybna+LMHCnN0Gj59yg==",
+        "requested": "[13.1.0-preview.1.25616.3, )",
+        "resolved": "13.1.0-preview.1.25616.3",
+        "contentHash": "t5vArEs7xSUb8wm/AeUog8rCj4wminWCZJK4fqftC/a7jly0NWoCTPjys8OLP8wicCpOODcz0OSQ7fmqL94YxQ==",
         "dependencies": {
           "AspNetCore.HealthChecks.Uris": "9.0.0",
-          "Aspire.Hosting": "13.0.2",
+          "Aspire.Hosting": "13.1.0",
           "Google.Protobuf": "3.33.0",
           "Grpc.AspNetCore": "2.71.0",
           "Grpc.Net.ClientFactory": "2.71.0",
@@ -1390,6 +1392,7 @@
           "Microsoft.Extensions.Configuration.Binder": "8.0.2",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2",
           "Microsoft.Extensions.Diagnostics.HealthChecks": "8.0.22",
+          "Microsoft.Extensions.FileSystemGlobbing": "10.0.1",
           "Microsoft.Extensions.Hosting": "8.0.1",
           "Microsoft.Extensions.Hosting.Abstractions": "8.0.1",
           "Microsoft.Extensions.Http": "8.0.1",
@@ -1405,13 +1408,13 @@
       },
       "Aspire.Hosting.MongoDB": {
         "type": "CentralTransitive",
-        "requested": "[13.0.2, )",
-        "resolved": "13.0.2",
-        "contentHash": "zIuISpAnull0Ht8p9prQl/f1NxQoxX/GuolMLlD/cnIfJwrmdnK9O+2MOCONOesV+I52sm6S0WsbtOkDmJitgw==",
+        "requested": "[13.1.0, )",
+        "resolved": "13.1.0",
+        "contentHash": "AcMgMsoP5Etr1bsm2WpsojZA2C+D+Mrttc4t9MNq36Q1p0P9zjmUoV0RgHxNZsq1KN3/CIJRAVW4I5UkbIipsw==",
         "dependencies": {
           "AspNetCore.HealthChecks.MongoDb": "9.0.0",
           "AspNetCore.HealthChecks.Uris": "9.0.0",
-          "Aspire.Hosting": "13.0.2",
+          "Aspire.Hosting": "13.1.0",
           "DnsClient": "1.8.0",
           "Google.Protobuf": "3.33.0",
           "Grpc.AspNetCore": "2.71.0",
@@ -1424,6 +1427,7 @@
           "Microsoft.Extensions.Configuration.Binder": "8.0.2",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2",
           "Microsoft.Extensions.Diagnostics.HealthChecks": "8.0.22",
+          "Microsoft.Extensions.FileSystemGlobbing": "10.0.1",
           "Microsoft.Extensions.Hosting": "8.0.1",
           "Microsoft.Extensions.Hosting.Abstractions": "8.0.1",
           "Microsoft.Extensions.Http": "8.0.1",
@@ -1440,13 +1444,13 @@
       },
       "Aspire.Hosting.PostgreSQL": {
         "type": "CentralTransitive",
-        "requested": "[13.0.2, )",
-        "resolved": "13.0.2",
-        "contentHash": "Rl2uuZmMw5ndKfLHnHMf8V5YxjwSouy5bpY9czbHjKJMvVKJH4BcHyIyS47xQ4ZV8i8RYZz6pLVFs3vVuTuLGQ==",
+        "requested": "[13.1.0, )",
+        "resolved": "13.1.0",
+        "contentHash": "PxGe4UXh/Gcfr69m/IicL01nicv8n5k6T/l2NVoyosk2/xt6yGNfTwUyU4fIRmvnLpFl+ow1lZs7R4GYY37dLw==",
         "dependencies": {
           "AspNetCore.HealthChecks.NpgSql": "9.0.0",
           "AspNetCore.HealthChecks.Uris": "9.0.0",
-          "Aspire.Hosting": "13.0.2",
+          "Aspire.Hosting": "13.1.0",
           "Google.Protobuf": "3.33.0",
           "Grpc.AspNetCore": "2.71.0",
           "Grpc.Net.ClientFactory": "2.71.0",
@@ -1458,6 +1462,7 @@
           "Microsoft.Extensions.Configuration.Binder": "8.0.2",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2",
           "Microsoft.Extensions.Diagnostics.HealthChecks": "8.0.22",
+          "Microsoft.Extensions.FileSystemGlobbing": "10.0.1",
           "Microsoft.Extensions.Hosting": "8.0.1",
           "Microsoft.Extensions.Hosting.Abstractions": "8.0.1",
           "Microsoft.Extensions.Http": "8.0.1",
@@ -1473,13 +1478,13 @@
       },
       "Aspire.Hosting.RabbitMQ": {
         "type": "CentralTransitive",
-        "requested": "[13.0.2, )",
-        "resolved": "13.0.2",
-        "contentHash": "zMnKjzpTPG1AmW5lutdcK8WR/UCEalIFNJRRXq6zxrL8D87srgtwBbQ+akZ+e13581RyBozu5JJXbyAUT4OUmg==",
+        "requested": "[13.1.0, )",
+        "resolved": "13.1.0",
+        "contentHash": "l0z9RLJiBozfekysJaBShZgVrtfXAxsb4T3AUYqGDUAip5Wbpyfh+FH3OaUP3qO+bVOZ+gZVxRWfi7rwhsN3FQ==",
         "dependencies": {
           "AspNetCore.HealthChecks.Rabbitmq": "9.0.0",
           "AspNetCore.HealthChecks.Uris": "9.0.0",
-          "Aspire.Hosting": "13.0.2",
+          "Aspire.Hosting": "13.1.0",
           "Google.Protobuf": "3.33.0",
           "Grpc.AspNetCore": "2.71.0",
           "Grpc.Net.ClientFactory": "2.71.0",
@@ -1491,6 +1496,7 @@
           "Microsoft.Extensions.Configuration.Binder": "8.0.2",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2",
           "Microsoft.Extensions.Diagnostics.HealthChecks": "8.0.22",
+          "Microsoft.Extensions.FileSystemGlobbing": "10.0.1",
           "Microsoft.Extensions.Hosting": "8.0.1",
           "Microsoft.Extensions.Hosting.Abstractions": "8.0.1",
           "Microsoft.Extensions.Http": "8.0.1",
@@ -1507,13 +1513,13 @@
       },
       "Aspire.Hosting.Redis": {
         "type": "CentralTransitive",
-        "requested": "[13.0.2, )",
-        "resolved": "13.0.2",
-        "contentHash": "c8aPhpzF9BSNNMyqbwWDgddwroGgju+DTrQ32dPZQSKuI/N1gqURNz7Wzuc6TedQK+RVNiObnBTy64aJVQWhPg==",
+        "requested": "[13.1.0, )",
+        "resolved": "13.1.0",
+        "contentHash": "UNRS9btygxg2T9JxiPp4HaUCAJDw/YwhlZvdCV+6tblWd+pqwFckGhiJSy78DTy7nulaLVWpfpfma0KMHrVLzQ==",
         "dependencies": {
           "AspNetCore.HealthChecks.Redis": "9.0.0",
           "AspNetCore.HealthChecks.Uris": "9.0.0",
-          "Aspire.Hosting": "13.0.2",
+          "Aspire.Hosting": "13.1.0",
           "Google.Protobuf": "3.33.0",
           "Grpc.AspNetCore": "2.71.0",
           "Grpc.Net.ClientFactory": "2.71.0",
@@ -1525,6 +1531,7 @@
           "Microsoft.Extensions.Configuration.Binder": "8.0.2",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2",
           "Microsoft.Extensions.Diagnostics.HealthChecks": "8.0.22",
+          "Microsoft.Extensions.FileSystemGlobbing": "10.0.1",
           "Microsoft.Extensions.Hosting": "8.0.1",
           "Microsoft.Extensions.Hosting.Abstractions": "8.0.1",
           "Microsoft.Extensions.Http": "8.0.1",
@@ -1541,9 +1548,9 @@
       },
       "Aspire.MongoDB.Driver": {
         "type": "CentralTransitive",
-        "requested": "[13.0.2, )",
-        "resolved": "13.0.2",
-        "contentHash": "BqAChVfwWADfFSCprFan3NVfI5HfCYReg6jr3aHkVREMx5iufy/1bavVwboRKESxv3dxBQo5Vff6cZXMBrMObQ==",
+        "requested": "[13.1.0, )",
+        "resolved": "13.1.0",
+        "contentHash": "9lXY0eFfZhTrDAmlPrfT1SUQDhdLkSQmPQXPmHLaXXiYJVByv+dBxlxKXsp855SqYt2iuIe0Tfa6no1C2Abw3Q==",
         "dependencies": {
           "AspNetCore.HealthChecks.MongoDb": "9.0.0",
           "DnsClient": "1.8.0",
@@ -1557,14 +1564,14 @@
           "Microsoft.Extensions.Primitives": "9.0.11",
           "MongoDB.Driver": "3.5.0",
           "MongoDB.Driver.Core.Extensions.DiagnosticSources": "2.1.0",
-          "OpenTelemetry.Extensions.Hosting": "1.9.0"
+          "OpenTelemetry.Extensions.Hosting": "1.14.0"
         }
       },
       "Aspire.Npgsql.EntityFrameworkCore.PostgreSQL": {
         "type": "CentralTransitive",
-        "requested": "[13.0.2, )",
-        "resolved": "13.0.2",
-        "contentHash": "4dVj+SxFoKohaMFv8w8occHRGcJp60td2VKNW82Ualy8XFAy1fSo29t+lxGxtS7VntIlS25zxRn0eQl41gig3g==",
+        "requested": "[13.1.0, )",
+        "resolved": "13.1.0",
+        "contentHash": "gc/tmvMUyF74jFIb6f2wDtCoDskOL2EDFz4xT86mhrLCc3HNkIx2MPTnz+Bj1NOEHtLtf7lo/JKpjBb6PAfCzw==",
         "dependencies": {
           "Microsoft.Extensions.Caching.Memory": "9.0.11",
           "Microsoft.Extensions.Configuration.Abstractions": "9.0.11",
@@ -1579,7 +1586,7 @@
           "Npgsql.DependencyInjection": "9.0.4",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "9.0.4",
           "Npgsql.OpenTelemetry": "9.0.4",
-          "OpenTelemetry.Extensions.Hosting": "1.9.0"
+          "OpenTelemetry.Extensions.Hosting": "1.14.0"
         }
       },
       "EFCore.NamingConventions": {
@@ -1611,7 +1618,7 @@
       },
       "MassTransit": {
         "type": "CentralTransitive",
-        "requested": "[8.5.7, )",
+        "requested": "[8.5.7, 9.0.0)",
         "resolved": "8.5.7",
         "contentHash": "ZMJAhl7EHBhHvH1c/Jc6FZdV2sNgf5DETfxVq1Wm7i0By6o8LvrVQakBAvC7GK2ZHMJB2kmeD5YM3JPSGvT3HA==",
         "dependencies": {
@@ -1625,7 +1632,7 @@
       },
       "MassTransit.RabbitMQ": {
         "type": "CentralTransitive",
-        "requested": "[8.5.7, )",
+        "requested": "[8.5.7, 9.0.0)",
         "resolved": "8.5.7",
         "contentHash": "EgT/5pBsDiSqktP+eHE7ssLW6FTfQ0Cd6Kt2Ug/VwM+VSJx7Ua/8/Hyi+HPpt3/qt40qQI5j2/s9xDOrbAkU3w==",
         "dependencies": {
@@ -1825,21 +1832,21 @@
       },
       "Scalar.Aspire": {
         "type": "CentralTransitive",
-        "requested": "[0.8.8, )",
-        "resolved": "0.8.8",
-        "contentHash": "LEvJbvJtCuAB1OaPdF/fnDbrZzYdRFox83W1636Gf8dGhKklSwu9Gv/3r/R/7eWJtrXPieoXyC0GxL1b4eAYPw==",
+        "requested": "[0.8.13, )",
+        "resolved": "0.8.13",
+        "contentHash": "PAs86Ozzcg4hTANZFpC0/ItU2EEF/g2WKrhk8OfeXxQueaQIxHcHo8TyVNNNRYg79mfvTJk4yOsf1UZwlcih4w==",
         "dependencies": {
           "Aspire.Hosting": "13.1.0"
         }
       },
       "Testcontainers": {
         "type": "CentralTransitive",
-        "requested": "[4.9.0, )",
-        "resolved": "4.9.0",
-        "contentHash": "OmU6x91OozhCRVOt7ISQDdaHACaKQImrN6fWDJJnvMAwMv/iJ95Q4cr7K1FU+nAYLDDIMDbSS8SOCzKkERsoIw==",
+        "requested": "[4.10.0, )",
+        "resolved": "4.10.0",
+        "contentHash": "a7tH+s9IRME6QEeMRgl/mTqQyudgtGNJmJRPn1+LwW8w/2L11cJzRJd7Io0QoSrP+i6lAOETX2SRY7cLbElcdQ==",
         "dependencies": {
-          "Docker.DotNet.Enhanced": "3.130.0",
-          "Docker.DotNet.Enhanced.X509": "3.130.0",
+          "Docker.DotNet.Enhanced": "3.131.1",
+          "Docker.DotNet.Enhanced.X509": "3.131.1",
           "Microsoft.Extensions.Logging.Abstractions": "8.0.3",
           "SSH.NET": "2025.1.0",
           "SharpZipLib": "1.4.2"

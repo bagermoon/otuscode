@@ -608,7 +608,7 @@
         "type": "Project",
         "dependencies": {
           "Ardalis.GuardClauses": "[5.0.0, )",
-          "Aspire.Keycloak.Authentication": "[13.0.2-preview.1.25603.5, )",
+          "Aspire.Keycloak.Authentication": "[13.1.0-preview.1.25616.3, )",
           "Microsoft.AspNetCore.OpenApi": "[9.0.11, )",
           "Microsoft.Extensions.ServiceDiscovery": "[10.1.0, )",
           "RestoRate.Abstractions": "[1.0.0, )",
@@ -618,11 +618,11 @@
       "restorate.buildingblocks": {
         "type": "Project",
         "dependencies": {
-          "Aspire.MongoDB.Driver": "[13.0.2, )",
-          "Aspire.Npgsql.EntityFrameworkCore.PostgreSQL": "[13.0.2, )",
+          "Aspire.MongoDB.Driver": "[13.1.0, )",
+          "Aspire.Npgsql.EntityFrameworkCore.PostgreSQL": "[13.1.0, )",
           "EFCore.NamingConventions": "[9.0.0, )",
-          "MassTransit": "[8.5.7, )",
-          "MassTransit.RabbitMQ": "[8.5.7, )",
+          "MassTransit": "[8.5.7, 9.0.0)",
+          "MassTransit.RabbitMQ": "[8.5.7, 9.0.0)",
           "Microsoft.EntityFrameworkCore": "[9.0.11, )",
           "Microsoft.EntityFrameworkCore.Relational": "[9.0.11, )",
           "MongoDB.EntityFrameworkCore": "[9.0.3, )",
@@ -748,9 +748,9 @@
       },
       "Aspire.Keycloak.Authentication": {
         "type": "CentralTransitive",
-        "requested": "[13.0.2-preview.1.25603.5, )",
-        "resolved": "13.0.2-preview.1.25603.5",
-        "contentHash": "s4wE6+ucsEGF31tWbPlyc7fFRwIY5AtA3kUM1Isz1GsHpHD6p1OllPK+5h2Yx7TyeR+pScrRaL+7e5eSQFmyoQ==",
+        "requested": "[13.1.0-preview.1.25616.3, )",
+        "resolved": "13.1.0-preview.1.25616.3",
+        "contentHash": "dh6McYpOyoPnn8vHLqWLr4i3VX+TQoAnctZh3fuOY9+nJAPoPvdxtlgeCIPAFxJ3ObTPCvZD3ec29b8fggzdlQ==",
         "dependencies": {
           "Microsoft.AspNetCore.Authentication.JwtBearer": "9.0.11",
           "Microsoft.AspNetCore.Authentication.OpenIdConnect": "9.0.11"
@@ -758,9 +758,9 @@
       },
       "Aspire.MongoDB.Driver": {
         "type": "CentralTransitive",
-        "requested": "[13.0.2, )",
-        "resolved": "13.0.2",
-        "contentHash": "BqAChVfwWADfFSCprFan3NVfI5HfCYReg6jr3aHkVREMx5iufy/1bavVwboRKESxv3dxBQo5Vff6cZXMBrMObQ==",
+        "requested": "[13.1.0, )",
+        "resolved": "13.1.0",
+        "contentHash": "9lXY0eFfZhTrDAmlPrfT1SUQDhdLkSQmPQXPmHLaXXiYJVByv+dBxlxKXsp855SqYt2iuIe0Tfa6no1C2Abw3Q==",
         "dependencies": {
           "AspNetCore.HealthChecks.MongoDb": "9.0.0",
           "DnsClient": "1.8.0",
@@ -774,14 +774,14 @@
           "Microsoft.Extensions.Primitives": "9.0.11",
           "MongoDB.Driver": "3.5.0",
           "MongoDB.Driver.Core.Extensions.DiagnosticSources": "2.1.0",
-          "OpenTelemetry.Extensions.Hosting": "1.9.0"
+          "OpenTelemetry.Extensions.Hosting": "1.14.0"
         }
       },
       "Aspire.Npgsql.EntityFrameworkCore.PostgreSQL": {
         "type": "CentralTransitive",
-        "requested": "[13.0.2, )",
-        "resolved": "13.0.2",
-        "contentHash": "4dVj+SxFoKohaMFv8w8occHRGcJp60td2VKNW82Ualy8XFAy1fSo29t+lxGxtS7VntIlS25zxRn0eQl41gig3g==",
+        "requested": "[13.1.0, )",
+        "resolved": "13.1.0",
+        "contentHash": "gc/tmvMUyF74jFIb6f2wDtCoDskOL2EDFz4xT86mhrLCc3HNkIx2MPTnz+Bj1NOEHtLtf7lo/JKpjBb6PAfCzw==",
         "dependencies": {
           "Microsoft.Extensions.Caching.Memory": "9.0.11",
           "Microsoft.Extensions.Configuration.Abstractions": "9.0.11",
@@ -796,7 +796,7 @@
           "Npgsql.DependencyInjection": "9.0.4",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "9.0.4",
           "Npgsql.OpenTelemetry": "9.0.4",
-          "OpenTelemetry.Extensions.Hosting": "1.9.0"
+          "OpenTelemetry.Extensions.Hosting": "1.14.0"
         }
       },
       "EFCore.NamingConventions": {
@@ -828,7 +828,7 @@
       },
       "MassTransit": {
         "type": "CentralTransitive",
-        "requested": "[8.5.7, )",
+        "requested": "[8.5.7, 9.0.0)",
         "resolved": "8.5.7",
         "contentHash": "ZMJAhl7EHBhHvH1c/Jc6FZdV2sNgf5DETfxVq1Wm7i0By6o8LvrVQakBAvC7GK2ZHMJB2kmeD5YM3JPSGvT3HA==",
         "dependencies": {
@@ -842,7 +842,7 @@
       },
       "MassTransit.RabbitMQ": {
         "type": "CentralTransitive",
-        "requested": "[8.5.7, )",
+        "requested": "[8.5.7, 9.0.0)",
         "resolved": "8.5.7",
         "contentHash": "EgT/5pBsDiSqktP+eHE7ssLW6FTfQ0Cd6Kt2Ug/VwM+VSJx7Ua/8/Hyi+HPpt3/qt40qQI5j2/s9xDOrbAkU3w==",
         "dependencies": {

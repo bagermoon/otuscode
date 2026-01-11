@@ -10,9 +10,9 @@
       },
       "Aspire.Keycloak.Authentication": {
         "type": "Direct",
-        "requested": "[13.0.2-preview.1.25603.5, )",
-        "resolved": "13.0.2-preview.1.25603.5",
-        "contentHash": "s4wE6+ucsEGF31tWbPlyc7fFRwIY5AtA3kUM1Isz1GsHpHD6p1OllPK+5h2Yx7TyeR+pScrRaL+7e5eSQFmyoQ==",
+        "requested": "[13.1.0-preview.1.25616.3, )",
+        "resolved": "13.1.0-preview.1.25616.3",
+        "contentHash": "dh6McYpOyoPnn8vHLqWLr4i3VX+TQoAnctZh3fuOY9+nJAPoPvdxtlgeCIPAFxJ3ObTPCvZD3ec29b8fggzdlQ==",
         "dependencies": {
           "Microsoft.AspNetCore.Authentication.JwtBearer": "9.0.11",
           "Microsoft.AspNetCore.Authentication.OpenIdConnect": "9.0.11"
