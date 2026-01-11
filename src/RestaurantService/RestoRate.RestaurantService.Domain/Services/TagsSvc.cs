@@ -22,7 +22,6 @@ public class TagsSvc : ITagsService
             return result;
         }
 
-        var tagsToAdd = new List<Tag>();
         var uniqueTags = names
             .Select(name => name.Trim())
             .Distinct(StringComparer.OrdinalIgnoreCase);

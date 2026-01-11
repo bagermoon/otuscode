@@ -35,16 +35,11 @@ internal static class ProblemDetailsDefaults
         // or <c>return Problem("some-problem", 422)</c> and have the response have consistent fields.
         if (problemDetails.Status is null)
         {
-            if (statusCode is not null)
-            {
-                problemDetails.Status = statusCode;
-            }
-            else
-            {
-                problemDetails.Status = problemDetails is HttpValidationProblemDetails ?
+            problemDetails.Status = statusCode ?? (
+                problemDetails is HttpValidationProblemDetails ?
                     StatusCodes.Status400BadRequest :
-                    StatusCodes.Status500InternalServerError;
-            }
+                    StatusCodes.Status500InternalServerError
+                );
         }
 
         var status = problemDetails.Status.GetValueOrDefault();

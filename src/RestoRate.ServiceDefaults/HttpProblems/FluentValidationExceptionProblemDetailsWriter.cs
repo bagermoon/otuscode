@@ -10,7 +10,6 @@ public sealed class FluentValidationExceptionProblemDetailsWriter : IExceptionPr
 
     public void Write(ProblemDetailsContext context, Exception exception)
     {
-        var httpContext = context.HttpContext;
         var validationException = (ValidationException)exception;
 
         context.ProblemDetails.Status = StatusCodes.Status400BadRequest;

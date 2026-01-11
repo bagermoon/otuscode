@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Net;
 
 using FluentAssertions;
 
@@ -12,7 +11,6 @@ using RestoRate.Contracts.Rating.Events;
 using RestoRate.RestaurantService.IntegrationTests.Helpers;
 
 using Microsoft.AspNetCore.Mvc.Testing;
-using MassTransit;
 
 namespace RestoRate.RestaurantService.IntegrationTests.Api;
 
