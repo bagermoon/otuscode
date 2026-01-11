@@ -28,7 +28,7 @@ builder.Services.AddAuthorizationBuilder();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddAntiforgery();
 builder.Services.AddHttpContextAccessor();
-builder.AddItentityServices();
+builder.AddIdentityServices();
 
 builder.Services.AddTransient<TokenHandler>();
 

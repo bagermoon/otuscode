@@ -17,6 +17,7 @@ public static class ApplicationServiceExtensions
         services.AddMediatorConfigs();
 
         services.AddScoped<IRestaurantService, RestaurantSvc>();
+        services.AddScoped<ITagsService, TagsSvc>();
         return services;
     }
 }

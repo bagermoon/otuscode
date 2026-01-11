@@ -1,13 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using NodaMoney;
+
+using RestoRate.RestaurantService.Domain.RestaurantAggregate;
 using RestoRate.SharedKernel.Enums;
 
 namespace RestoRate.RestaurantService.Infrastructure.Configuration;
 
-public class RestaurantConfiguration : IEntityTypeConfiguration<Domain.RestaurantAggregate.Restaurant>
+public class RestaurantConfiguration : IEntityTypeConfiguration<Restaurant>
 {
-    public void Configure(EntityTypeBuilder<Domain.RestaurantAggregate.Restaurant> builder)
+    public void Configure(EntityTypeBuilder<Restaurant> builder)
     {
         builder.HasKey(r => r.Id);
 
@@ -51,16 +54,25 @@ public class RestaurantConfiguration : IEntityTypeConfiguration<Domain.Restauran
             l.Property(loc => loc.IsClosed);
         });
 
-        builder.OwnsOne(r => r.AverageCheck, ac =>
+        builder.ComplexProperty(r => r.AverageCheck, ac =>
         {
-            ac.Property(m => m.Amount);
-            ac.Property(m => m.Currency);
+            ac.Property(m => m.Amount)
+                .HasColumnName("average_check_amount")
+                .HasPrecision(18, 2);
+
+            ac.Property(m => m.Currency)
+                .HasConversion(
+                    c => c.Code,
+                    code => Currency.FromCode(code))
+                .HasColumnName("average_check_currency")
+                .IsRequired()
+                .HasMaxLength(3);
         });
 
         builder.Property(r => r.RestaurantStatus)
             .HasConversion(
                 p => p.Value,
-                p => Status.FromValue(p));
+                p => RestaurantStatus.FromValue(p));
 
         builder.HasMany(r => r.CuisineTypes)
             .WithOne()

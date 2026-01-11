@@ -505,7 +505,9 @@
         "type": "Project",
         "dependencies": {
           "Ardalis.GuardClauses": "[5.0.0, )",
+          "Ardalis.Result.FluentValidation": "[10.1.0, )",
           "FluentValidation": "[12.1.1, )",
+          "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "Mediator.Abstractions": "[3.0.1, )",
           "Microsoft.Extensions.Logging.Abstractions": "[9.0.11, )",
           "RestoRate.SharedKernel": "[1.0.0, )"
@@ -514,11 +516,11 @@
       "restorate.buildingblocks": {
         "type": "Project",
         "dependencies": {
-          "Aspire.MongoDB.Driver": "[13.0.2, )",
-          "Aspire.Npgsql.EntityFrameworkCore.PostgreSQL": "[13.0.2, )",
+          "Aspire.MongoDB.Driver": "[13.1.0, )",
+          "Aspire.Npgsql.EntityFrameworkCore.PostgreSQL": "[13.1.0, )",
           "EFCore.NamingConventions": "[9.0.0, )",
-          "MassTransit": "[8.5.7, )",
-          "MassTransit.RabbitMQ": "[8.5.7, )",
+          "MassTransit": "[8.5.7, 9.0.0)",
+          "MassTransit.RabbitMQ": "[8.5.7, 9.0.0)",
           "Microsoft.EntityFrameworkCore": "[9.0.11, )",
           "Microsoft.EntityFrameworkCore.Relational": "[9.0.11, )",
           "MongoDB.EntityFrameworkCore": "[9.0.3, )",
@@ -536,13 +538,17 @@
       "restorate.servicedefaults": {
         "type": "Project",
         "dependencies": {
+          "Ardalis.Result": "[10.1.0, )",
+          "Ardalis.Result.FluentValidation": "[10.1.0, )",
           "Microsoft.Extensions.Http.Resilience": "[10.1.0, )",
           "Microsoft.Extensions.ServiceDiscovery": "[10.1.0, )",
+          "NodaMoney.DependencyInjection": "[2.6.0, )",
           "OpenTelemetry.Exporter.OpenTelemetryProtocol": "[1.14.0, )",
           "OpenTelemetry.Extensions.Hosting": "[1.14.0, )",
           "OpenTelemetry.Instrumentation.AspNetCore": "[1.14.0, )",
           "OpenTelemetry.Instrumentation.Http": "[1.14.0, )",
-          "OpenTelemetry.Instrumentation.Runtime": "[1.14.0, )"
+          "OpenTelemetry.Instrumentation.Runtime": "[1.14.0, )",
+          "RestoRate.Abstractions": "[1.0.0, )"
         }
       },
       "restorate.sharedkernel": {
@@ -554,8 +560,7 @@
           "Ardalis.SmartEnum": "[8.2.0, )",
           "Ardalis.Specification": "[9.3.1, )",
           "Ardalis.Specification.EntityFrameworkCore": "[9.3.1, )",
-          "FluentValidation": "[12.1.1, )",
-          "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )"
+          "NodaMoney": "[2.6.0, )"
         }
       },
       "Ardalis.GuardClauses": {
@@ -569,6 +574,16 @@
         "requested": "[10.1.0, )",
         "resolved": "10.1.0",
         "contentHash": "+WgsXh+JRm0d8BZPlBUc5w0+FTda4vbWRa/IF2q4zDoRsU5BXr8w4rTbYEklZIMNgQQZTcNouR/QfBV5I/4XYQ=="
+      },
+      "Ardalis.Result.FluentValidation": {
+        "type": "CentralTransitive",
+        "requested": "[10.1.0, )",
+        "resolved": "10.1.0",
+        "contentHash": "OXfIq2LVnc8YjvpDqud1gJGVaoqOTznA2iSCFA1Ee0ScocXVvXmORWKiABCe3MfGyTg748V+Z7bdiQEXBCFoSQ==",
+        "dependencies": {
+          "Ardalis.Result": "10.1.0",
+          "FluentValidation": "11.9.2"
+        }
       },
       "Ardalis.SharedKernel": {
         "type": "CentralTransitive",
@@ -607,9 +622,9 @@
       },
       "Aspire.MongoDB.Driver": {
         "type": "CentralTransitive",
-        "requested": "[13.0.2, )",
-        "resolved": "13.0.2",
-        "contentHash": "BqAChVfwWADfFSCprFan3NVfI5HfCYReg6jr3aHkVREMx5iufy/1bavVwboRKESxv3dxBQo5Vff6cZXMBrMObQ==",
+        "requested": "[13.1.0, )",
+        "resolved": "13.1.0",
+        "contentHash": "9lXY0eFfZhTrDAmlPrfT1SUQDhdLkSQmPQXPmHLaXXiYJVByv+dBxlxKXsp855SqYt2iuIe0Tfa6no1C2Abw3Q==",
         "dependencies": {
           "AspNetCore.HealthChecks.MongoDb": "9.0.0",
           "DnsClient": "1.8.0",
@@ -623,14 +638,14 @@
           "Microsoft.Extensions.Primitives": "9.0.11",
           "MongoDB.Driver": "3.5.0",
           "MongoDB.Driver.Core.Extensions.DiagnosticSources": "2.1.0",
-          "OpenTelemetry.Extensions.Hosting": "1.9.0"
+          "OpenTelemetry.Extensions.Hosting": "1.14.0"
         }
       },
       "Aspire.Npgsql.EntityFrameworkCore.PostgreSQL": {
         "type": "CentralTransitive",
-        "requested": "[13.0.2, )",
-        "resolved": "13.0.2",
-        "contentHash": "4dVj+SxFoKohaMFv8w8occHRGcJp60td2VKNW82Ualy8XFAy1fSo29t+lxGxtS7VntIlS25zxRn0eQl41gig3g==",
+        "requested": "[13.1.0, )",
+        "resolved": "13.1.0",
+        "contentHash": "gc/tmvMUyF74jFIb6f2wDtCoDskOL2EDFz4xT86mhrLCc3HNkIx2MPTnz+Bj1NOEHtLtf7lo/JKpjBb6PAfCzw==",
         "dependencies": {
           "Microsoft.Extensions.Caching.Memory": "9.0.11",
           "Microsoft.Extensions.Configuration.Abstractions": "9.0.11",
@@ -645,7 +660,7 @@
           "Npgsql.DependencyInjection": "9.0.4",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "9.0.4",
           "Npgsql.OpenTelemetry": "9.0.4",
-          "OpenTelemetry.Extensions.Hosting": "1.9.0"
+          "OpenTelemetry.Extensions.Hosting": "1.14.0"
         }
       },
       "EFCore.NamingConventions": {
@@ -677,7 +692,7 @@
       },
       "MassTransit": {
         "type": "CentralTransitive",
-        "requested": "[8.5.7, )",
+        "requested": "[8.5.7, 9.0.0)",
         "resolved": "8.5.7",
         "contentHash": "ZMJAhl7EHBhHvH1c/Jc6FZdV2sNgf5DETfxVq1Wm7i0By6o8LvrVQakBAvC7GK2ZHMJB2kmeD5YM3JPSGvT3HA==",
         "dependencies": {
@@ -691,7 +706,7 @@
       },
       "MassTransit.RabbitMQ": {
         "type": "CentralTransitive",
-        "requested": "[8.5.7, )",
+        "requested": "[8.5.7, 9.0.0)",
         "resolved": "8.5.7",
         "contentHash": "EgT/5pBsDiSqktP+eHE7ssLW6FTfQ0Cd6Kt2Ug/VwM+VSJx7Ua/8/Hyi+HPpt3/qt40qQI5j2/s9xDOrbAkU3w==",
         "dependencies": {
@@ -770,6 +785,25 @@
         "dependencies": {
           "Microsoft.EntityFrameworkCore": "9.0.9",
           "MongoDB.Driver": "3.5.0"
+        }
+      },
+      "NodaMoney": {
+        "type": "CentralTransitive",
+        "requested": "[2.6.0, )",
+        "resolved": "2.6.0",
+        "contentHash": "ZUkdhGmQYKkbto8nWX+3ooTKrIVxZG1hRS4IBctD3cEq9mqT23mq2JQS4mqBbWDgf+U8uoHXvwjtMsJyRehuFw=="
+      },
+      "NodaMoney.DependencyInjection": {
+        "type": "CentralTransitive",
+        "requested": "[2.6.0, )",
+        "resolved": "2.6.0",
+        "contentHash": "sQr3Bnj12Nm5Fx+rhc7JenBIDSKq9AcoQOzDAF5urUxqUwSo1hMLzU/V7qMc/ayV2hi+e4EKVFgQ8ip5UlC/lg==",
+        "dependencies": {
+          "Microsoft.Extensions.Configuration.Abstractions": "5.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "5.0.0",
+          "Microsoft.Extensions.Options": "5.0.0",
+          "Microsoft.Extensions.Options.ConfigurationExtensions": "5.0.0",
+          "NodaMoney": "2.6.0"
         }
       },
       "OpenTelemetry.Exporter.OpenTelemetryProtocol": {

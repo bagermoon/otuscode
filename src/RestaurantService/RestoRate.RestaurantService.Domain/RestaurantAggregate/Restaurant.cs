@@ -1,9 +1,11 @@
 using Ardalis.GuardClauses;
 using Ardalis.SharedKernel;
+using NodaMoney;
 using RestoRate.SharedKernel.Enums;
-using RestoRate.SharedKernel.ValueObjects;
 using RestoRate.RestaurantService.Domain.RestaurantAggregate.Events;
 using RestoRate.RestaurantService.Domain.TagAggregate;
+using Ardalis.Result;
+using RestoRate.SharedKernel.ValueObjects;
 
 namespace RestoRate.RestaurantService.Domain.RestaurantAggregate;
 
@@ -16,9 +18,9 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
     public Address Address { get; private set; } = default!;
     public Location Location { get; private set; } = default!;
     public OpenHours OpenHours { get; private set; } = default!;
-    public Money AverageCheck { get; private set; } = default!;
-    public Status RestaurantStatus { get; private set; } = Status.Draft;
-
+    public Money AverageCheck { get; private set; }
+    public RestaurantStatus RestaurantStatus { get; private set; } = RestaurantStatus.Draft;
+    public RatingSnapshot Rating { get; private set; } = default!;
     private readonly List<RestaurantImage> _images = new();
     private readonly List<RestaurantCuisineType> _cuisineTypes = new();
     private readonly List<RestaurantTag> _tags = new();
@@ -26,8 +28,6 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
     public IReadOnlyCollection<RestaurantImage> Images => _images.AsReadOnly();
     public IReadOnlyCollection<RestaurantCuisineType> CuisineTypes => _cuisineTypes.AsReadOnly();
     public IReadOnlyCollection<RestaurantTag> Tags => _tags.AsReadOnly();
-
-    private bool _updatedEventQueued;
     private bool _deletedEventQueued;
 
     private Restaurant() { }
@@ -49,10 +49,47 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
         Address = Guard.Against.Null(address, nameof(address));
         Location = Guard.Against.Null(location, nameof(location));
         OpenHours = Guard.Against.Null(openHours, nameof(openHours));
-        AverageCheck = Guard.Against.Null(averageCheck, nameof(averageCheck));
-        RestaurantStatus = Status.Draft;
+        Guard.Against.Negative(averageCheck.Amount, nameof(averageCheck));
+        AverageCheck = averageCheck;
+        RestaurantStatus = RestaurantStatus.Draft;
+        Rating = new RatingSnapshot(Id);
+    }
 
-        RegisterDomainEvent(new RestaurantCreatedEvent(this));
+    public static Restaurant Create(
+        string name,
+        string description,
+        PhoneNumber phoneNumber,
+        Email email,
+        Address address,
+        Location location,
+        OpenHours openHours,
+        Money averageCheck
+    )
+    {
+        var restaurant = new Restaurant(
+            name,
+            description,
+            phoneNumber,
+            email,
+            address,
+            location,
+            openHours,
+            averageCheck);
+
+        restaurant.RegisterDomainEvent(new RestaurantCreatedEvent(restaurant));
+
+        return restaurant;
+    }
+
+    public Restaurant AddImages(IEnumerable<(string Url, string? AltText, bool IsPrimary)>? images)
+    {
+        if (images == null)
+            return this;
+
+        int displayOrder = 0;
+        foreach (var (url, altText, isPrimary) in images)
+            AddImage(url, altText, displayOrder++, isPrimary);
+        return this;
     }
 
     public RestaurantImage AddImage(string url, string? altText = null, int displayOrder = 0, bool isPrimary = false)
@@ -78,6 +115,14 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
         targetImage.MarkAsPrimary();
     }
 
+    public Restaurant AddCuisineTypes(IEnumerable<CuisineType> cuisineTypes)
+    {
+        foreach (var ct in cuisineTypes)
+            AddCuisineType(ct);
+
+        return this;
+    }
+
     public void AddCuisineType(CuisineType cuisineType)
     {
         Guard.Against.Null(cuisineType, nameof(cuisineType));
@@ -86,6 +131,14 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
             return;
 
         _cuisineTypes.Add(new RestaurantCuisineType(Id, cuisineType));
+    }
+
+    public Restaurant AddTags(IEnumerable<Tag> tags)
+    {
+        foreach (var tag in tags)
+            AddTag(tag);
+
+        return this;
     }
 
     public void AddTag(Tag tag)
@@ -158,7 +211,8 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
 
     public void UpdateAverageCheck(Money averageCheck)
     {
-        AverageCheck = Guard.Against.Null(averageCheck, nameof(averageCheck));
+        Guard.Against.Negative(averageCheck.Amount, nameof(averageCheck));
+        AverageCheck = averageCheck;
     }
 
     public void UpdateCuisineTypes(IEnumerable<CuisineType> cuisineTypes)
@@ -186,60 +240,99 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
                 _tags.Add(new RestaurantTag(Id, newTag.Id));
     }
 
-    public void SendToModeration()
+    public Result SendToModeration()
     {
-        if (RestaurantStatus != Status.Draft && RestaurantStatus != Status.Rejected)
-            return;
+        if (RestaurantStatus != RestaurantStatus.Draft && RestaurantStatus != RestaurantStatus.Rejected)
+            return Result.Error("Only draft or rejected restaurants can be sent to moderation.");
 
-        RestaurantStatus = Status.OnModeration;
+        RestaurantStatus = RestaurantStatus.OnModeration;
         RegisterDomainEvent(new RestaurantUpdatedEvent(this));
+
+        return Result.Success();
     }
 
-    public void Publish()
+    public Result Publish()
     {
-        if (RestaurantStatus != Status.OnModeration)
-            return;
+        if (RestaurantStatus != RestaurantStatus.OnModeration)
+            return Result.Error("Only restaurants under moderation can be published.");
 
-        RestaurantStatus = Status.Published;
-        RegisterDomainEvent(new RestaurantUpdatedEvent(this));
+        RestaurantStatus = RestaurantStatus.Published;
+        RegisterDomainEvent(new RestaurantCreatedEvent(this));
+
+        return Result.Success();
     }
 
-    public void Reject()
+    public Result Reject()
     {
-        if (RestaurantStatus != Status.OnModeration)
-            return;
+        if (RestaurantStatus != RestaurantStatus.OnModeration)
+            return Result.Error("Only restaurants under moderation can be rejected.");
 
-        RestaurantStatus = Status.Rejected;
+        RestaurantStatus = RestaurantStatus.Rejected;
         RegisterDomainEvent(new RestaurantUpdatedEvent(this));
+
+        return Result.Success();
     }
 
-    public void MarkDeleted()
+    public Result MarkDeleted()
     {
-        if (RestaurantStatus == Status.Archived)
-            return;
+        if (RestaurantStatus == RestaurantStatus.Archived)
+            return Result.Error("Restaurant is already deleted.");
 
-        RestaurantStatus = Status.Archived;
+        RestaurantStatus = RestaurantStatus.Archived;
 
         if (!_deletedEventQueued)
         {
             RegisterDomainEvent(new RestaurantDeletedEvent(this));
             _deletedEventQueued = true;
         }
+
+        return Result.Success();
     }
 
-    public void Restore()
+    public Result UpdateStatus(RestaurantStatus status)
     {
-        if (RestaurantStatus != Status.Archived)
-            return;
+        if (RestaurantStatus.IsDeleted())
+            return Result.Error("Cannot change status of a deleted restaurant.");
 
-        RestaurantStatus = Status.Draft;
-        RegisterDomainEvent(new RestaurantUpdatedEvent(this));
+        return status.Name switch
+        {
+            nameof(RestaurantStatus.Published) => Publish(),
+            nameof(RestaurantStatus.Rejected) => Reject(),
+            nameof(RestaurantStatus.OnModeration) => SendToModeration(),
+            _ => Result.Error($"Invalid status transition to {status.Name}"),
+        };
     }
 
     public new void ClearDomainEvents()
     {
         base.ClearDomainEvents();
-        _updatedEventQueued = false;
         _deletedEventQueued = false;
+    }
+
+    public Result UpdateRatings(
+        decimal approvedAverageRating,
+        int approvedReviewsCount,
+        Money approvedAverageCheck,
+        decimal provisionalAverageRating,
+        int provisionalReviewsCount,
+        Money provisionalAverageCheck
+        )
+    {
+        if (Rating == null)
+            return Result.Error("Rating snapshot is not initialized.");
+
+        Rating
+            .ApplyApproved(
+                approvedAverageRating,
+                approvedReviewsCount,
+                approvedAverageCheck
+            )
+            .ApplyProvisional(
+                provisionalAverageRating,
+                provisionalReviewsCount,
+                provisionalAverageCheck
+            );
+
+        return Result.Success();
     }
 }

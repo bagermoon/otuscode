@@ -5,6 +5,8 @@ using Mediator;
 
 using Microsoft.Extensions.Logging;
 
+using NodaMoney;
+
 using RestoRate.RestaurantService.Domain.Interfaces;
 using RestoRate.RestaurantService.Domain.RestaurantAggregate.Specifications;
 using RestoRate.RestaurantService.Domain.TagAggregate;
@@ -20,7 +22,7 @@ public class RestaurantSvc(
     IMediator mediator,
     ILogger<RestaurantSvc> logger) : IRestaurantService
 {
-    public async Task<Result<Guid>> CreateRestaurant(
+    public async Task<Result<RestaurantEntity>> CreateRestaurantAsync(
         string name,
         string description,
         PhoneNumber phoneNumber,
@@ -35,36 +37,29 @@ public class RestaurantSvc(
     {
         logger.LogCreateRestaurantStart(name);
 
-        var restaurant = new RestaurantEntity(
-            name,
-            description,
-            phoneNumber,
-            email,
-            address,
-            location,
-            openHours,
-            averageCheck);
+        var restaurant = RestaurantEntity.Create(
+                name,
+                description,
+                phoneNumber,
+                email,
+                address,
+                location,
+                openHours,
+                averageCheck
+            );
 
-        foreach (var cuisineType in cuisineTypes)
-            restaurant.AddCuisineType(cuisineType);
-
-        foreach (var tag in tags)
-            restaurant.AddTag(tag);
-
-        if (images != null)
-        {
-            int displayOrder = 0;
-            foreach (var (url, altText, isPrimary) in images)
-                restaurant.AddImage(url, altText, displayOrder++, isPrimary);
-        }
+        restaurant
+            .AddCuisineTypes(cuisineTypes)
+            .AddTags(tags)
+            .AddImages(images);
 
         await repository.AddAsync(restaurant);
 
         logger.LogCreateRestaurantCompleted(name, restaurant.Id);
-        return Result<Guid>.Success(restaurant.Id);
+        return Result<RestaurantEntity>.Success(restaurant);
     }
 
-    public async Task<Result> UpdateRestaurant(
+    public async Task<Result> UpdateRestaurantAsync(
         Guid restaurantId,
         string name,
         string description,
@@ -77,13 +72,13 @@ public class RestaurantSvc(
         IEnumerable<CuisineType> cuisineTypes,
         IEnumerable<Tag> tags)
     {
-        logger.LogInformation("Обновление ресторана {RestaurantId}", restaurantId);
+        logger.LogUpdateRestaurantStart(restaurantId);
 
         var spec = new GetRestaurantByIdSpec(restaurantId);
         var restaurant = await repository.FirstOrDefaultAsync(spec);
         if (restaurant == null)
         {
-            logger.LogWarning("Ресторан {RestaurantId} не найден", restaurantId);
+            logger.LogRestaurantNotFound(restaurantId);
             return Result.NotFound();
         }
 
@@ -100,11 +95,11 @@ public class RestaurantSvc(
 
         await repository.UpdateAsync(restaurant);
 
-        logger.LogInformation("Ресторан {RestaurantId} обновлен", restaurantId);
+        logger.LogUpdateRestaurantCompleted(restaurantId);
         return Result.Success();
     }
 
-    public async Task<Result> DeleteRestaurant(Guid restaurantId)
+    public async Task<Result> DeleteRestaurantAsync(Guid restaurantId)
     {
         logger.LogDeleteRestaurantStart(restaurantId);
 
@@ -128,7 +123,7 @@ public class RestaurantSvc(
         return Result.Success();
     }
 
-    public async Task<Result> AddRestaurantImage(
+    public async Task<Result> AddRestaurantImageAsync(
         Guid restaurantId,
         string url,
         string? altText = null,
@@ -144,7 +139,7 @@ public class RestaurantSvc(
         return Result.Success();
     }
 
-    public async Task<Result> RemoveRestaurantImage(Guid restaurantId, Guid imageId)
+    public async Task<Result> RemoveRestaurantImageAsync(Guid restaurantId, Guid imageId)
     {
         var restaurant = await repository.GetByIdAsync(restaurantId);
         if (restaurant == null)
@@ -156,7 +151,7 @@ public class RestaurantSvc(
         return Result.Success();
     }
 
-    public async Task<Result> SetPrimaryImage(Guid restaurantId, Guid imageId)
+    public async Task<Result> SetPrimaryImageAsync(Guid restaurantId, Guid imageId)
     {
         var restaurant = await repository.GetByIdAsync(restaurantId);
         if (restaurant == null)

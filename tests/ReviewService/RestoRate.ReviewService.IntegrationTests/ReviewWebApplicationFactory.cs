@@ -4,6 +4,7 @@ using MongoDB.Driver;
 using RestoRate.ServiceDefaults;
 using Testcontainers.MongoDb;
 using DotNet.Testcontainers.Containers;
+using RestoRate.BuildingBlocks.Messaging;
 
 namespace RestoRate.ReviewService.IntegrationTests;
 
@@ -37,12 +38,6 @@ public class ReviewWebApplicationFactory
     }
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.ConfigureTestServices(services =>
-        {
-            services.AddMassTransitTestHarness(cfg =>
-            {
-                cfg.AddConsumers(typeof(Program).Assembly);
-            });
-        });
+        builder.AddMassTransitInMemoryTestHarness();
     }
 }

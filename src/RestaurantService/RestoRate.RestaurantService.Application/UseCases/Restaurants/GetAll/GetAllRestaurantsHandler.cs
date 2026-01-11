@@ -1,21 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Ardalis.Result;
 using Ardalis.SharedKernel;
 
 using Mediator;
 
 using Microsoft.Extensions.Logging;
-
 using RestoRate.Contracts.Restaurant.DTOs;
 using RestoRate.RestaurantService.Domain.RestaurantAggregate.Specifications;
-using RestoRate.SharedKernel.Enums;
 
 using RestaurantEntity = RestoRate.RestaurantService.Domain.RestaurantAggregate.Restaurant;
+using RestoRate.RestaurantService.Application.Mappings;
 
 namespace RestoRate.RestaurantService.Application.UseCases.Restaurants.GetAll;
 
@@ -28,11 +21,7 @@ public sealed class GetAllRestaurantsHandler(
         GetAllRestaurantsQuery request,
         CancellationToken cancellationToken)
     {
-        logger.LogInformation(
-            "Получение списка ресторанов: страница {Page}, размер {Size}, поиск: {Search}",
-            request.PageNumber,
-            request.PageSize,
-            request.SearchTerm);
+        logger.LogGettingList(request.PageNumber, request.PageSize, request.SearchTerm);
 
         try
         {
@@ -47,32 +36,7 @@ public sealed class GetAllRestaurantsHandler(
             var restaurants = await readRepository.ListAsync(spec, cancellationToken);
             var totalCount = await readRepository.CountAsync(spec, cancellationToken);
 
-            var dtos = restaurants.Select(restaurant => new RestaurantDto(
-                restaurant.Id,
-                restaurant.Name,
-                restaurant.Description,
-                restaurant.PhoneNumber.ToString(),
-                restaurant.Email.Address,
-                new AddressDto(restaurant.Address.FullAddress, restaurant.Address.House),
-                new LocationDto(restaurant.Location.Latitude, restaurant.Location.Longitude),
-                new OpenHoursDto(
-                    restaurant.OpenHours.DayOfWeek,
-                    restaurant.OpenHours.OpenTime,
-                    restaurant.OpenHours.CloseTime),
-                new MoneyDto(restaurant.AverageCheck.Amount, restaurant.AverageCheck.Currency),
-                restaurant.RestaurantStatus.Name,
-                restaurant.CuisineTypes.Select(ct => ct.CuisineType.Name).ToList(),
-                restaurant.Tags.Select(t => t.Tag.Name).ToList(),
-                restaurant.Images
-                    .OrderBy(img => img.DisplayOrder)
-                    .Select(img => new RestaurantImageDto(
-                        img.Id,
-                        img.Url,
-                        img.AltText,
-                        img.DisplayOrder,
-                        img.IsPrimary
-                    )).ToList()
-            )).ToList();
+            var dtos = restaurants.Select(r => r.ToDto()).ToList();
 
             var result = new PagedResult<RestaurantDto>(
                 dtos,
@@ -81,13 +45,13 @@ public sealed class GetAllRestaurantsHandler(
                 request.PageSize
             );
 
-            logger.LogInformation("Найдено {Count} ресторанов из {Total}", dtos.Count, totalCount);
+            logger.LogFoundCount(dtos.Count, totalCount);
 
             return Result<PagedResult<RestaurantDto>>.Success(result);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Ошибка при получении списка ресторанов");
+            logger.LogGetAllError(ex);
             return Result<PagedResult<RestaurantDto>>.Error(ex.Message);
         }
     }

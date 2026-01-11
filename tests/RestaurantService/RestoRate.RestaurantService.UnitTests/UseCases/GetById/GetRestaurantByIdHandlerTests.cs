@@ -58,7 +58,7 @@ public class GetRestaurantByIdHandlerTests
         result.Value.Should().NotBeNull();
         result.Value.RestaurantId.Should().Be(restaurantId);
         result.Value.Name.Should().Be("Закусочная \"Тесткейк\"");
-        result.Value.RestaurantStatus.Should().Be(Status.Draft.Name);
+        result.Value.RestaurantStatus.Should().Be(RestaurantStatus.Draft.Name);
     }
 
     [Fact]

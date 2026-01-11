@@ -9,7 +9,7 @@
     %% Client Layer - Left
     subgraph ClientSide[Клиенты]
         direction LR
-        BZ["`Blazor Dashboard<br/>(:5005)`"]
+        BZ["`Blazor Dashboard<br/>(:5005*)`"]
     end
 
     %% PublicAPI Layer - Left-Center (public)
@@ -23,10 +23,10 @@
     %% Service Layer - Center-Right
     subgraph Services[Микросервисы]
         direction TB
-        RSVC["`Restaurant Service<br/>(:5001)`"]
-        RS["`Review Service<br/>(:5002)`"]
-        RT["`Rating Service<br/>(:5003)`"]
-        MS["`Moderation Service<br/>(:5004)`"]
+        RSVC["`Restaurant Service<br/>(:5001*)`"]
+        RS["`Review Service<br/>(:5002*)`"]
+        RT["`Rating Service<br/>(:5003*)`"]
+        MS["`Moderation Service<br/>(:5004*)`"]
     end
 
     %% Infrastructure Layer - Right
@@ -44,7 +44,7 @@
     %% Horizontal main flow (left to right)
     ClientSide --> GW
     ClientSide -->|OIDC login| KC
-    GW -.->|token exchange / introspection| KC
+    GW -.->|token exchange| KC
     GW --> Services
     
     ClientSide -.- PublicAPI
@@ -77,6 +77,8 @@
     class KC idp
     ```
 
+    Примечание: порты со звёздочкой (*) показаны для режима `AppHostConfiguration.UseDedicatedPorts`; иначе Aspire назначает порты динамически.
+
 1. Контейнерная (C4-подобная)
 
     ```mermaid
@@ -97,7 +99,7 @@
 
     %% Identity and token flows
     Dashboard -.OIDC login.-> Keycloak
-    Gateway -.token exchange/introspection.-> Keycloak
+    Gateway -.token exchange.-> Keycloak
 
     RestaurantSvc -->|CRUD Restaurants| PostgreSQL[(PostgreSQL)]
     ReviewSvc -->|CRUD Reviews| MongoDB[(MongoDB)]
@@ -234,6 +236,7 @@
 
         %% Domain Events
         class RestaurantCreatedEvent
+        class RestaurantUpdatedEvent
         class RestaurantRatingUpdatedEvent
         class RestaurantAverageCheckUpdatedEvent
         class ReviewAddedEvent
@@ -247,6 +250,7 @@
 
         %% Event Sources
         Restaurant --> RestaurantCreatedEvent
+        Restaurant --> RestaurantUpdatedEvent
         Restaurant --> RestaurantRatingUpdatedEvent
         Restaurant --> RestaurantAverageCheckUpdatedEvent
         Review --> ReviewAddedEvent

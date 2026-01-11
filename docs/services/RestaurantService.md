@@ -75,7 +75,7 @@ public sealed class Restaurant : AggregateRoot<RestaurantId>
 
 Сервис Restaurant публикует следующие интеграционные события из `RestoRate.Contracts.Restaurant.Events`:
 
-- Публикует: `RestaurantCreatedEvent`, `RestaurantArchivedEvent`
+- Публикует: `RestaurantCreatedEvent`, `RestaurantUpdatedEvent`, `RestaurantArchivedEvent`
 - Подписывается на: `RestaurantRatingRecalculatedEvent`
 
 ```mermaid
@@ -85,7 +85,7 @@ flowchart LR
         RS[API/Application]
     end
 
-    RS -- RestaurantCreatedEvent / RestaurantArchivedEvent --> MQ[(RabbitMQ)]
+    RS -- RestaurantCreatedEvent / RestaurantUpdatedEvent / RestaurantArchivedEvent --> MQ[(RabbitMQ)]
 
     MQ --> ReviewSvc[Review Service]
 
@@ -107,7 +107,7 @@ flowchart LR
 
 ### Примечания
 
-- Оранжевый — события Restaurant (Created/Archived), публикуемые сервисом Restaurant и доставляемые в Review Service.
+- Оранжевый — события Restaurant (Created/Updated/Archived), публикуемые сервисом Restaurant и доставляемые в Review Service.
 - Синий — событие Rating (`RestaurantRatingRecalculatedEvent`), публикуемое сервисом Rating и доставляемое обратно в Restaurant для проекции.
 - Пунктир — доставка события от RabbitMQ к потребителю; сплошная линия — публикация события в RabbitMQ.
 - **Внутренние события** (Domain): `RestaurantCreatedDomainEvent`, `RestaurantPublishedDomainEvent`, `RestaurantArchivedDomainEvent`, `RestaurantRatingAppliedDomainEvent`, `RestaurantAverageCheckAppliedDomainEvent`.
@@ -127,6 +127,9 @@ sequenceDiagram
     RS->>MQ: Publish RestaurantCreatedEvent
     MQ->>RV: Deliver RestaurantCreatedEvent (инициализация каталога отзывов)
 
+    RS->>MQ: Publish RestaurantUpdatedEvent
+    MQ->>RV: Deliver RestaurantUpdatedEvent (обновление каталога отзывов)
+
     RS->>MQ: Publish RestaurantArchivedEvent
     MQ->>RV: Deliver RestaurantArchivedEvent
 
@@ -139,5 +142,6 @@ sequenceDiagram
 
 ### Замечания по надёжности
 
-- Публикации из Restaurant выполняются с outbox-паттерном, обработчики в Review/Restaurant — идемпотентны.
+- Публикации из Restaurant выполняются через MassTransit с retry и in-memory outbox (в рамках процесса); устойчивого (persisted) outbox сейчас нет.
+- Обработчики в Review/Restaurant должны быть идемпотентны, т.к. доставка сообщений допускает повторы.
 - Отсутствие события пересчёта рейтинга временно не блокирует операции Restaurant; проекция будет догнана после восстановления доставки.

@@ -499,7 +499,9 @@
         "type": "Project",
         "dependencies": {
           "Ardalis.GuardClauses": "[5.0.0, )",
+          "Ardalis.Result.FluentValidation": "[10.1.0, )",
           "FluentValidation": "[12.1.1, )",
+          "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "Mediator.Abstractions": "[3.0.1, )",
           "Microsoft.Extensions.Logging.Abstractions": "[9.0.11, )",
           "RestoRate.SharedKernel": "[1.0.0, )"
@@ -509,7 +511,7 @@
         "type": "Project",
         "dependencies": {
           "Ardalis.GuardClauses": "[5.0.0, )",
-          "Aspire.Keycloak.Authentication": "[13.0.2-preview.1.25603.5, )",
+          "Aspire.Keycloak.Authentication": "[13.1.0-preview.1.25616.3, )",
           "Microsoft.AspNetCore.OpenApi": "[9.0.11, )",
           "Microsoft.Extensions.ServiceDiscovery": "[10.1.0, )",
           "RestoRate.Abstractions": "[1.0.0, )",
@@ -541,13 +543,17 @@
       "restorate.servicedefaults": {
         "type": "Project",
         "dependencies": {
+          "Ardalis.Result": "[10.1.0, )",
+          "Ardalis.Result.FluentValidation": "[10.1.0, )",
           "Microsoft.Extensions.Http.Resilience": "[10.1.0, )",
           "Microsoft.Extensions.ServiceDiscovery": "[10.1.0, )",
+          "NodaMoney.DependencyInjection": "[2.6.0, )",
           "OpenTelemetry.Exporter.OpenTelemetryProtocol": "[1.14.0, )",
           "OpenTelemetry.Extensions.Hosting": "[1.14.0, )",
           "OpenTelemetry.Instrumentation.AspNetCore": "[1.14.0, )",
           "OpenTelemetry.Instrumentation.Http": "[1.14.0, )",
-          "OpenTelemetry.Instrumentation.Runtime": "[1.14.0, )"
+          "OpenTelemetry.Instrumentation.Runtime": "[1.14.0, )",
+          "RestoRate.Abstractions": "[1.0.0, )"
         }
       },
       "restorate.sharedkernel": {
@@ -559,8 +565,7 @@
           "Ardalis.SmartEnum": "[8.2.0, )",
           "Ardalis.Specification": "[9.3.1, )",
           "Ardalis.Specification.EntityFrameworkCore": "[9.3.1, )",
-          "FluentValidation": "[12.1.1, )",
-          "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )"
+          "NodaMoney": "[2.6.0, )"
         }
       },
       "Ardalis.GuardClauses": {
@@ -574,6 +579,16 @@
         "requested": "[10.1.0, )",
         "resolved": "10.1.0",
         "contentHash": "+WgsXh+JRm0d8BZPlBUc5w0+FTda4vbWRa/IF2q4zDoRsU5BXr8w4rTbYEklZIMNgQQZTcNouR/QfBV5I/4XYQ=="
+      },
+      "Ardalis.Result.FluentValidation": {
+        "type": "CentralTransitive",
+        "requested": "[10.1.0, )",
+        "resolved": "10.1.0",
+        "contentHash": "OXfIq2LVnc8YjvpDqud1gJGVaoqOTznA2iSCFA1Ee0ScocXVvXmORWKiABCe3MfGyTg748V+Z7bdiQEXBCFoSQ==",
+        "dependencies": {
+          "Ardalis.Result": "10.1.0",
+          "FluentValidation": "11.9.2"
+        }
       },
       "Ardalis.SharedKernel": {
         "type": "CentralTransitive",
@@ -612,9 +627,9 @@
       },
       "Aspire.Keycloak.Authentication": {
         "type": "CentralTransitive",
-        "requested": "[13.0.2-preview.1.25603.5, )",
-        "resolved": "13.0.2-preview.1.25603.5",
-        "contentHash": "s4wE6+ucsEGF31tWbPlyc7fFRwIY5AtA3kUM1Isz1GsHpHD6p1OllPK+5h2Yx7TyeR+pScrRaL+7e5eSQFmyoQ==",
+        "requested": "[13.1.0-preview.1.25616.3, )",
+        "resolved": "13.1.0-preview.1.25616.3",
+        "contentHash": "dh6McYpOyoPnn8vHLqWLr4i3VX+TQoAnctZh3fuOY9+nJAPoPvdxtlgeCIPAFxJ3ObTPCvZD3ec29b8fggzdlQ==",
         "dependencies": {
           "Microsoft.AspNetCore.Authentication.JwtBearer": "9.0.11",
           "Microsoft.AspNetCore.Authentication.OpenIdConnect": "9.0.11"
@@ -706,6 +721,25 @@
         "dependencies": {
           "Microsoft.Extensions.Http": "9.0.11",
           "Microsoft.Extensions.ServiceDiscovery.Abstractions": "10.1.0"
+        }
+      },
+      "NodaMoney": {
+        "type": "CentralTransitive",
+        "requested": "[2.6.0, )",
+        "resolved": "2.6.0",
+        "contentHash": "ZUkdhGmQYKkbto8nWX+3ooTKrIVxZG1hRS4IBctD3cEq9mqT23mq2JQS4mqBbWDgf+U8uoHXvwjtMsJyRehuFw=="
+      },
+      "NodaMoney.DependencyInjection": {
+        "type": "CentralTransitive",
+        "requested": "[2.6.0, )",
+        "resolved": "2.6.0",
+        "contentHash": "sQr3Bnj12Nm5Fx+rhc7JenBIDSKq9AcoQOzDAF5urUxqUwSo1hMLzU/V7qMc/ayV2hi+e4EKVFgQ8ip5UlC/lg==",
+        "dependencies": {
+          "Microsoft.Extensions.Configuration.Abstractions": "5.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "5.0.0",
+          "Microsoft.Extensions.Options": "5.0.0",
+          "Microsoft.Extensions.Options.ConfigurationExtensions": "5.0.0",
+          "NodaMoney": "2.6.0"
         }
       },
       "OpenTelemetry.Exporter.OpenTelemetryProtocol": {

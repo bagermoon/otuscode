@@ -5,6 +5,7 @@ using MassTransit;
 using Microsoft.AspNetCore.TestHost;
 
 using RestoRate.BuildingBlocks.Data.Migrations;
+using RestoRate.BuildingBlocks.Messaging;
 using RestoRate.RestaurantService.Infrastructure.Data;
 using RestoRate.ServiceDefaults;
 
@@ -22,15 +23,7 @@ public class RestaurantWebApplicationFactory
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.ConfigureTestServices(services =>
-        {
-            // Add MassTransit In-Memory Test Harness
-            services.AddMassTransitTestHarness(cfg =>
-            {
-                // Register your consumers here
-                // You can configure sagas, activities, etc. as needed
-            });
-        });
+        builder.AddMassTransitInMemoryTestHarness();
     }
 
     protected override async Task<IHost> CreateHostAsync(IHostBuilder builder)

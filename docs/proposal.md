@@ -13,22 +13,24 @@
     * Маршрутизация запросов к соответствующим микросервисам.
 
 2. **Микросервисы (каждый — отдельный .NET проект):**
-    * **Restaurant Service:** Управление каталогом ресторанов (CRUD). `Порт: 5001`
+    * **Restaurant Service:** Управление каталогом ресторанов (CRUD). `Порт: 5001*`
         * **Хранилище:** PostgreSQL.
         * **Сущности DDD:** `Restaurant` (Aggregate Root), `RestaurantId`.
         * **Поля:** Id, Name, Description, Address (City, Street, Building, Apartment, PostalCode), Photos (список изображений), Cuisine, Rating (AverageRate, AverageCheck, ReviewCount), OpenHours (часы работы), Tags (веган, бар), Location (гео координаты).
-    * **Review Service:** Управление рецензиями. `Порт: 5002`
+    * **Review Service:** Управление рецензиями. `Порт: 5002*`
         * **Хранилище:** MongoDB.
         * **Сущности:** `Review`, `ReviewId`, `UserId`, `RestaurantId`.
         * **Поля:** Id рецензии, RestaurantId, UserId, Rate (1–10), Comment, Tags (уютно, шумно), SuggestedAverageCheck, Status (pending/approved/rejected), RejectionReason, CreatedAt.
-    * **Rating Service:** Агрегирование и кеширование. `Порт: 5003`
+    * **Rating Service:** Агрегирование и кеширование. `Порт: 5003*`
         * **Кеш:** Redis.
         * **Метрики:** AverageRate (средняя оценка), ReviewCount (количество рецензий), AverageCheck (средний чек).
         * **Источник:** Слушает `ReviewAddedEvent`, `ReviewUpdatedEvent` (финальное обновление приходит после модерации через Review Service).
 
+    Примечание: порты со звёздочкой (*) показаны для режима `AppHostConfiguration.UseDedicatedPorts` в Aspire AppHost; иначе Aspire назначает порты динамически.
+
 3. **Связь между сервисами:**
     * **События (RabbitMQ):**
-        * `RestaurantCreatedEvent` (от Restaurant Service).
+        * `RestaurantCreatedEvent`, `RestaurantUpdatedEvent`, `RestaurantArchivedEvent` (от Restaurant Service).
         * `ReviewAddedEvent`, `ReviewUpdatedEvent` (от Review Service).
         * `ReviewModeratedEvent` (от Moderation Service).
     * **Синхронные вызовы (минимально):**
@@ -67,33 +69,10 @@ public record Address
     }
 }
 
-// Rating Value Object
-public record Rating
-{
-    public decimal AverageRate { get; private init; }
-    public Money AverageCheck { get; private init; }
-    public int ReviewCount { get; private init; }
-    private Rating() { }
-    public Rating(decimal averageRate, Money averageCheck, int reviewCount = 0)
-    {
-        AverageRate = averageRate;
-        AverageCheck = averageCheck;
-        ReviewCount = reviewCount;
-    }
-}
-
-public record Money
-{
-    public long AmountMinor { get; private init; }
-    public string Currency { get; private init; }
-    private Money() { }
-    public Money(long amount, string currency = "RUB")
-    {
-        AmountMinor = amount;
-        Currency = currency;
-    }
-    public override string ToString() => $"{AmountMinor} {Currency}";
-}
+// Rating projection + Money
+// В текущей реализации RestaurantService использует:
+// - `NodaMoney.Money` для денежных значений
+// - `RatingSnapshot` как проекцию агрегированного рейтинга ресторана
 
 // Restaurant Aggregate
 public class Restaurant : AggregateRoot<RestaurantId>
@@ -102,22 +81,10 @@ public class Restaurant : AggregateRoot<RestaurantId>
     public string Description { get; private set; }
     public Address Address { get; private set; }
     public string Cuisine { get; private set; }
-    public Rating Rating { get; private set; }
+    public RatingSnapshot Rating { get; private set; }
     // ... другие поля ...
-    public void UpdateRating(decimal averageRate, int reviewCount)
-    {
-        var currentCheck = Rating?.AverageCheck ?? new Money(0);
-        Rating = new Rating(averageRate, currentCheck, reviewCount);
-        AddDomainEvent(new RestaurantRatingUpdatedEvent(Id, averageRate, reviewCount));
-    }
-    public void UpdateAverageCheck(long amount, string currency = "RUB")
-    {
-        var money = new Money(amount, currency);
-        var currentRate = Rating?.AverageRate ?? 0;
-        var reviewCount = Rating?.ReviewCount ?? 0;
-        Rating = new Rating(currentRate, money, reviewCount);
-        AddDomainEvent(new RestaurantAverageCheckUpdatedEvent(Id, amount, currency));
-    }
+    // Рейтинг обновляется через методы проекции (например, ApplyApproved/ApplyProvisional)
+    // и хранит как финальные, так и предварительные значения.
 }
 ```
 
@@ -315,7 +282,9 @@ public class ModerationTask
 
 ## API Endpoints через Gateway
 
-### Public API
+### Gateway API (требует авторизации)
+
+На текущей реализации все проксируемые маршруты в Gateway защищены (`RequireAuthorization()`), и endpoints сервиса Restaurant также требуют авторизацию на группе `/restaurants`.
 
 | Метод | Эндпоинт | Сервис | Описание |
 | --- | --- | --- | --- |

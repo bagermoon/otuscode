@@ -1,3 +1,4 @@
+using RestoRate.Contracts.Common.Dtos;
 using RestoRate.Contracts.Restaurant.DTOs;
 using RestoRate.Contracts.Restaurant.DTOs.CRUD;
 using RestoRate.SharedKernel.Enums;

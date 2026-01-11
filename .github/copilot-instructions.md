@@ -13,7 +13,7 @@ Goal: Make AI agents productive immediately in this .NET 9 + Aspire microservice
 - Build all: `dotnet build RestoRate.slnx`
 - Run everything (preferred): `dotnet run --project src/RestoRate.AppHost`
 - Run a service: `dotnet run --project src/<Service>/<Service>.csproj`
-- Health (dev): `/health`, `/alive`. OpenAPI only in Development.
+- Health (dev): `/health`, `/alive`. OpenAPI only outside Production.
 - VS Code tasks (see `.vscode/tasks.json`):
   - `install certs`: `pwsh ./setup-certs.ps1` (from AppHost dir)
   - EF (Restaurant): `List Migrations`, `Add Migration`, `Remove Last Migration`, `Update Database`
@@ -31,7 +31,7 @@ Goal: Make AI agents productive immediately in this .NET 9 + Aspire microservice
 - Access current user info via `RestoRate.Abstractions.Identity.IUserContext`:
   - `UserId` (from JWT `sub` claim), `Name`, `FullName`, `Email`, `IsAuthenticated`
   - `Roles` (from JWT `"roles"` claim array)
-- Register in services: `builder.AddItentityServices();` (part of auth setup in each API's `ConfigureAuthentication`)
+- Register in services: `builder.AddIdentityServices();` (part of auth setup in each API's `ConfigureAuthentication`)
 - Implementation: `RestoRate.Auth.Identity.HttpContextUserContext` reads claims from `HttpContext.User`
 - JWT configuration sets `RoleClaimType = "roles"` so ASP.NET Core recognizes the `"roles"` claim for `[Authorize(Roles = "...")]` and policy checks
 - Inject `IUserContext` into Application handlers or API endpoints to access authenticated user details

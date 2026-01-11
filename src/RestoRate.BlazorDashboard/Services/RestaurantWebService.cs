@@ -1,3 +1,4 @@
+using RestoRate.Contracts.Common.Dtos;
 using RestoRate.Contracts.Restaurant.DTOs;
 using RestoRate.RestaurantService.Application.UseCases.Restaurants.GetAll;
 using RestoRate.ServiceDefaults;

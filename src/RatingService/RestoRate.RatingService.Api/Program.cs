@@ -1,10 +1,13 @@
 using RestoRate.ServiceDefaults;
 using RestoRate.Auth.Authentication;
 using StackExchange.Redis;
+using RestoRate.ServiceDefaults.EndpointFilters;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+builder.Services.AddProblemDetailsDefaults();
+
 builder.AddJwtAuthentication(AppHostProjects.Keycloak);
 
 builder.Services.AddAuthorizationBuilder()
@@ -28,17 +31,22 @@ app.UseAuthorization();
 if (app.Environment.IsProduction())
 {
     app.UseHttpsRedirection();
+    app.UseExceptionHandler();
 }
+else
+{
+    app.MapOpenApi();
+    app.UseDeveloperExceptionPage();
+}
+
+app.UseStatusCodePages();
 
 app.MapDefaultEndpoints();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsProduction())
-{
-    app.MapOpenApi();
-}
+var api = app.MapGroup("/")
+    .AddEndpointFilter<ResultEndpointFilter>();
 
-app.MapGet("/redis-test", async (IConnectionMultiplexer connectionMux, CancellationToken cancellationToken) =>
+api.MapGet("/redis-test", async (IConnectionMultiplexer connectionMux, CancellationToken cancellationToken) =>
 {
     await connectionMux.GetDatabase().StringSetAsync("lastForecastGenerated", DateTime.UtcNow.ToString("o"));
     var result = await connectionMux.GetDatabase().StringGetAsync("lastForecastGenerated");

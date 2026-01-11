@@ -15,7 +15,7 @@ internal static class AuthConfigs
             .AddDefaultAuthenticationPolicy()
             .AddAdminPolicies();
 
-        builder.AddItentityServices();
+        builder.AddIdentityServices();
 
         return builder;
     }

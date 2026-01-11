@@ -6,6 +6,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 
 using NSubstitute;
+using NodaMoney;
 
 using RestoRate.Abstractions.Messaging;
 using RestoRate.Contracts.Restaurant.Events;
@@ -15,13 +16,14 @@ using RestoRate.RestaurantService.Domain.TagAggregate;
 using RestoRate.RestaurantService.UnitTests.Helpers;
 using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
+using RestoRate.RestaurantService.Domain.RestaurantAggregate;
 
 namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
 {
     public class CreateRestaurantHandlerTests
     {
         private readonly IRestaurantService _restaurantService;
-        private readonly IRepository<Tag> _tagRepository;
+        private readonly ITagsService _tagsService;
         private readonly IIntegrationEventBus _integrationEventBus;
         private readonly ILogger<CreateRestaurantHandler> _logger;
         private readonly CreateRestaurantHandler _handler;
@@ -31,14 +33,16 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
         {
             _output = output;
             _restaurantService = Substitute.For<IRestaurantService>();
-            _tagRepository = Substitute.For<IRepository<Tag>>();
+            _tagsService = Substitute.For<ITagsService>();
+            _tagsService
+                .ConvertToTagsAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<CancellationToken>())
+                .Returns(Task.FromResult(new List<Tag>()));
             _integrationEventBus = Substitute.For<IIntegrationEventBus>();
             _logger = Substitute.For<ILogger<CreateRestaurantHandler>>();
 
             _handler = new CreateRestaurantHandler(
                 _restaurantService,
-                _tagRepository,
-                _integrationEventBus,
+                _tagsService,
                 _logger);
         }
 
@@ -50,8 +54,12 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
             var dto = TestDataBuilder.CreateValidRestaurantDto();
             var command = new CreateRestaurantCommand(dto);
 
+            var restaurantEntity = TestDataBuilder.CreateRestaurantEntity(
+                restaurantId,
+                dto.Name
+            );
             _restaurantService
-                .CreateRestaurant(
+                .CreateRestaurantAsync(
                     Arg.Any<string>(),
                     Arg.Any<string?>(),
                     Arg.Any<PhoneNumber>(),
@@ -63,7 +71,7 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
                     Arg.Any<IEnumerable<CuisineType>>(),
                     Arg.Any<IEnumerable<Tag>>(),
                     Arg.Any<IEnumerable<(string, string?, bool)>?>())
-                .Returns(Task.FromResult(Result<Guid>.Success(restaurantId)));
+                .Returns(Task.FromResult(Result<Restaurant>.Success(restaurantEntity)));
 
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);
@@ -73,13 +81,7 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
             result.Value.Should().NotBeNull();
             result.Value.RestaurantId.Should().Be(restaurantId);
             result.Value.Name.Should().Be(dto.Name);
-            result.Value.RestaurantStatus.Should().Be(Status.Draft.Name);
-
-            await _integrationEventBus
-                .Received(1)
-                .PublishAsync( // проверка ивента
-                    Arg.Any<RestaurantCreatedEvent>(),
-                    Arg.Any<CancellationToken>());
+            result.Value.RestaurantStatus.Should().Be(RestaurantStatus.Draft.Name);
         }
 
         [Fact]
@@ -98,8 +100,9 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
 
             var command = new CreateRestaurantCommand(dto);
 
+            var restaurantEntity = TestDataBuilder.CreateRestaurantEntity(restaurantId, dto.Name);
             _restaurantService
-                .CreateRestaurant(
+                .CreateRestaurantAsync(
                     Arg.Any<string>(),
                     Arg.Any<string?>(),
                     Arg.Any<PhoneNumber>(),
@@ -111,14 +114,14 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
                     Arg.Any<IEnumerable<CuisineType>>(),
                     Arg.Any<IEnumerable<Tag>>(),
                     Arg.Any<IEnumerable<(string, string?, bool)>?>())
-                .Returns(Task.FromResult(Result<Guid>.Success(restaurantId)));
+                .Returns(Task.FromResult(Result<Restaurant>.Success(restaurantEntity)));
 
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Assert
             result.IsSuccess.Should().BeTrue();
-            result.Value.CuisineTypes.Should().HaveCount(3);
+            result.Value.CuisineTypes.Should().HaveCount(1);
             result.Value.CuisineTypes.Should().Contain(CuisineType.Italian.Name);
         }
 
@@ -141,8 +144,9 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
             var dto = TestDataBuilder.CreateValidRestaurantDto(images: images);
             var command = new CreateRestaurantCommand(dto);
 
+            var restaurantEntity = TestDataBuilder.CreateRestaurantEntity(restaurantId, dto.Name);
             _restaurantService
-                .CreateRestaurant(
+                .CreateRestaurantAsync(
                     Arg.Any<string>(),
                     Arg.Any<string?>(),
                     Arg.Any<PhoneNumber>(),
@@ -154,7 +158,7 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
                     Arg.Any<IEnumerable<CuisineType>>(),
                     Arg.Any<IEnumerable<Tag>>(),
                     Arg.Any<IEnumerable<(string, string?, bool)>?>())
-                .Returns(Task.FromResult(Result<Guid>.Success(restaurantId)));
+                .Returns(Task.FromResult(Result<Restaurant>.Success(restaurantEntity)));
 
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);
@@ -164,7 +168,7 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
 
             await _restaurantService
                 .Received(1)
-                .CreateRestaurant(
+                .CreateRestaurantAsync(
                     Arg.Any<string>(),
                     Arg.Any<string?>(),
                     Arg.Any<PhoneNumber>(),
@@ -192,8 +196,10 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
 
             var command = new CreateRestaurantCommand(dto);
 
+            var restaurantEntity = TestDataBuilder.CreateRestaurantEntityWithCuisines(
+                restaurantId, dto.Name, CuisineType.FromName(cuisineType));
             _restaurantService
-                .CreateRestaurant(
+                .CreateRestaurantAsync(
                     Arg.Any<string>(),
                     Arg.Any<string?>(),
                     Arg.Any<PhoneNumber>(),
@@ -205,7 +211,7 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
                     Arg.Any<IEnumerable<CuisineType>>(),
                     Arg.Any<IEnumerable<Tag>>(),
                     Arg.Any<IEnumerable<(string, string?, bool)>?>())
-                .Returns(Task.FromResult(Result<Guid>.Success(restaurantId)));
+                .Returns(Task.FromResult(Result<Restaurant>.Success(restaurantEntity)));
 
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);
@@ -225,7 +231,7 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
             var errorMessage = "Не удалось подключиться к базе данных";
 
             _restaurantService
-                .CreateRestaurant(
+                .CreateRestaurantAsync(
                     Arg.Any<string>(),
                     Arg.Any<string?>(),
                     Arg.Any<PhoneNumber>(),
@@ -237,7 +243,7 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
                     Arg.Any<IEnumerable<CuisineType>>(),
                     Arg.Any<IEnumerable<Tag>>(),
                     Arg.Any<IEnumerable<(string, string?, bool)>?>())
-                .Returns(Task.FromResult(Result<Guid>.Error(errorMessage)));
+                .Returns(Task.FromResult(Result<Restaurant>.Error(errorMessage)));
 
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);

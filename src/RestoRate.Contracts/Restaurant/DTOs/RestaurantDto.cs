@@ -1,3 +1,5 @@
+using RestoRate.Contracts.Common.Dtos;
+
 namespace RestoRate.Contracts.Restaurant.DTOs;
 
 public record RestaurantDto(
@@ -13,4 +15,5 @@ public record RestaurantDto(
     string RestaurantStatus,
     IReadOnlyCollection<string> CuisineTypes,
     IReadOnlyCollection<string> Tags,
+    RatingDto? Rating,
     IReadOnlyCollection<RestaurantImageDto> Images);
