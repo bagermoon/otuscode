@@ -22,6 +22,12 @@
   pwsh ./playwright.ps1 install
   ```
 
+- Запустить AspireHost:
+
+  ```pwsh
+  pwsh dotnet run --project .\src\RestoRate.AppHost
+  ```
+
 - Генерация кода теста (запуск интерактивного рекордера):
 
   ```pwsh
@@ -83,6 +89,7 @@
 
 ### Примечания
 
+- Запускаем Aspire как проект по причине бага <https://github.com/dotnet/aspire/issues/13817>
 - Все тесты предполагают, что сервисы подняты через Aspire и доступны для взаимодействия.
 - Для корректной работы Playwright и браузеров используйте скрипт установки перед первым запуском.
 - Для отладки используйте `show-trace` после выполнения теста.
@@ -93,7 +100,7 @@
 
 ## Интеграционные тесты
 
-Интеграционные тесты находятся в проектах `tests/<Context>/<Context>.IntegrationTests` (например, `tests/Restaurant/RestoRate.RestaurantService.IntegrationTests`). Они тестируют API endpoints с использованием WebApplicationFactory и требуют запущенных зависимостей (например, PostgreSQL, MongoDB), которые запускаются автоматически в docker.
+Интеграционные тесты находятся в проектах `tests/<Context>/<Context>.IntegrationTests` (например, `tests/RestaurantService/RestoRate.RestaurantService.IntegrationTests`). Они тестируют API endpoints с использованием WebApplicationFactory и требуют запущенных зависимостей (например, PostgreSQL, MongoDB), которые запускаются автоматически в docker.
 
 ### Тестовый раннер (Microsoft Testing Platform)
 
@@ -105,10 +112,10 @@
 
 ```powershell
 # Все интеграционные тесты
-dotnet test tests/Restaurant/RestoRate.RestaurantService.IntegrationTests
+dotnet test tests/RestaurantService/RestoRate.RestaurantService.IntegrationTests
 
 # Конкретный тест
-dotnet test tests/Restaurant/RestoRate.RestaurantService.IntegrationTests --filter "FullyQualifiedName~CreateRestaurant"
+dotnet test tests/RestaurantService/RestoRate.RestaurantService.IntegrationTests --filter "FullyQualifiedName~CreateRestaurant"
 ```
 
 ### Аутентификация в интеграционных тестах
