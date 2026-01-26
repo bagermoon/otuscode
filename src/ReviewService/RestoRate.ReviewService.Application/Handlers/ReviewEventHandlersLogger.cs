@@ -8,4 +8,7 @@ internal static partial class ReviewEventHandlersLogger
 {
     [LoggerMessage(Level = LogLevel.Information, Message = "Обработка события: Ревью добавлен (ID: {ReviewId}, Ресторан ID: {RestaurantId})")]
     internal static partial void LogReviewAdded(this ILogger logger, Guid reviewId, Guid restaurantId);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Отзыв отклонен: {ReviewId} (RestaurantId: {RestaurantId}, UserId: {UserId})")]
+    internal static partial void LogReviewRejected(this ILogger logger, Guid reviewId, Guid restaurantId, Guid userId);
 }

@@ -5,7 +5,7 @@ using RestoRate.SharedKernel.Enums;
 
 namespace RestoRate.ReviewService.Domain.Events;
 
-public sealed class ReviewAddedDomainEvent(Review review) : DomainEventBase
+public sealed class ReviewModerationPendingDomainEvent(Review review) : DomainEventBase
 {
     public Review Review { get; } = review;
     public ReviewStatus Status => Review.Status;

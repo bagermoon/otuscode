@@ -38,14 +38,57 @@ public class Review : EntityBase<Guid>, IAggregateRoot
     {
         var review = new Review(restaurantId, userId, rating, comment);
 
-        review.RegisterDomainEvent(new ReviewAddedDomainEvent(review));
+        review.RegisterDomainEvent(new ReviewCreatedDomainEvent(review));
         return review;
     }
 
-    public void Update(string comment, int rating)
+    public Review MoveToModerationPending()
+    {
+        if (Status == ReviewStatus.ModerationPending)
+        {
+            return this;
+        }
+
+        Status = ReviewStatus.ModerationPending;
+        UpdatedAt = DateTime.UtcNow;
+        RegisterDomainEvent(new ReviewModerationPendingDomainEvent(this));
+
+        return this;
+    }
+
+    public Review Reject()
+    {
+        if (Status == ReviewStatus.Rejected)
+        {
+            return this;
+        }
+
+        Status = ReviewStatus.Rejected;
+        UpdatedAt = DateTime.UtcNow;
+        RegisterDomainEvent(new ReviewRejectedDomainEvent(this));
+
+        return this;
+    }
+
+    public Review Approve()
+    {
+        if (Status == ReviewStatus.Approved)
+        {
+            return this;
+        }
+
+        Status = ReviewStatus.Approved;
+        UpdatedAt = DateTime.UtcNow;
+        RegisterDomainEvent(new ReviewApprovedDomainEvent(this));
+
+        return this;
+    }
+
+    public Review Update(string comment, int rating)
     {
         Comment = comment;
         Rating = rating;
         UpdatedAt = DateTime.UtcNow;
+        return this;
     }
 }
