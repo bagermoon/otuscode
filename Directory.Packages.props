@@ -19,6 +19,8 @@
     <PackageVersion Include="AutoFixture.Xunit3" Version="4.19.0" />
     <PackageVersion Include="EFCore.NamingConventions" Version="9.0.0" />
     <PackageVersion Include="MassTransit" Version="[8.5.7,9.0.0)" />
+    <PackageVersion Include="MassTransit.EntityFrameworkCore" Version="[8.5.7,9.0.0)" />
+    <PackageVersion Include="MassTransit.MongoDb" Version="[8.5.7,9.0.0)" />
     <PackageVersion Include="MassTransit.RabbitMQ" Version="[8.5.7,9.0.0)" />
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />

@@ -1,9 +1,8 @@
-using System;
-
 using Ardalis.SharedKernel;
 
-using RestoRate.Contracts.Review.Events;
 using RestoRate.ReviewService.Domain.Events;
+using RestoRate.ReviewService.Domain.RestaurantReferenceAggregate;
+using RestoRate.ReviewService.Domain.UserReferenceAggregate;
 using RestoRate.SharedKernel.Enums;
 
 namespace RestoRate.ReviewService.Domain.ReviewAggregate;
@@ -19,6 +18,8 @@ public class Review : EntityBase<Guid>, IAggregateRoot
 
     // Optionally, add moderation status, e.g.:
     public ReviewStatus Status { get; private set; }
+    public RestaurantReference? Restaurant { get; private set; }
+    public UserReference? User { get; private set; }
 
     private Review() { }
 

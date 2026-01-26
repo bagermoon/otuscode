@@ -3,7 +3,7 @@ using Ardalis.Result;
 using Mediator;
 
 using RestoRate.ReviewService.Application.DTOs;
-using RestoRate.ReviewService.Application.UseCases.Create;
+using RestoRate.ReviewService.Application.UseCases.Reviews.Create;
 
 namespace RestoRate.ReviewService.Api.Endpoints.Reviews;
 
