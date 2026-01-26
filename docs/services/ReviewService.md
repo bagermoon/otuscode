@@ -74,7 +74,7 @@ public sealed class Review : AggregateRoot<ReviewId>
 
 ## Интеграционные события
 
-- Публикует: `ReviewAddedEvent`, `ReviewUpdatedEvent`
+- Публикует: `ReviewAddedEvent`, `ReviewApprovedEvent`
 - Подписывается на: `ReviewModeratedEvent` (публикуется сервисом ModerationService),
   `RestaurantCreatedEvent`, `RestaurantUpdatedEvent`, `RestaurantArchivedEvent`
 
@@ -89,7 +89,7 @@ flowchart LR
         RV[API/Application]
     end
 
-    RV -- ReviewAddedEvent / ReviewUpdatedEvent --> MQ[(RabbitMQ)]
+    RV -- ReviewAddedEvent / ReviewApprovedEvent --> MQ[(RabbitMQ)]
 
     MQ --> ModSvc[Moderation Service]
 
@@ -129,7 +129,7 @@ flowchart LR
 Примечание по цветам стрелок:
 
 - Оранжевый — события Restaurant (Created/Updated/Archived)
-- Зелёный — события Review (Added/Updated)
+- Зелёный — события Review (Added/Approved)
 - Фиолетовый — событие Moderation (ReviewModerated)
 Пунктир — доставка события от RabbitMQ к потребителю; сплошная линия — публикация события.
 
@@ -160,11 +160,11 @@ sequenceDiagram
 
     MQ->>RV: Deliver ReviewModeratedEvent
     RV->>DBR: Update Review Status
-    RV->>MQ: Publish ReviewUpdatedEvent (status changed)
+    RV->>MQ: Publish ReviewApprovedEvent (if Approved)
 
     note over RV,RT: Rating может потреблять ReviewAddedEvent (черновой расчёт)
-    note over RV,RT: и ReviewUpdatedEvent (финальная фиксация рейтинга)
-    MQ->>RT: Deliver ReviewAddedEvent / ReviewUpdatedEvent
+    note over RV,RT: и ReviewApprovedEvent (финальная фиксация рейтинга)
+    MQ->>RT: Deliver ReviewAddedEvent / ReviewApprovedEvent
 ```
 
 ### Saga Обновление ресторана

@@ -24,14 +24,14 @@
     * **Rating Service:** Агрегирование и кеширование. `Порт: 5003*`
         * **Кеш:** Redis.
         * **Метрики:** AverageRate (средняя оценка), ReviewCount (количество рецензий), AverageCheck (средний чек).
-        * **Источник:** Слушает `ReviewAddedEvent`, `ReviewUpdatedEvent` (финальное обновление приходит после модерации через Review Service).
+        * **Источник:** Слушает `ReviewAddedEvent`, `ReviewApprovedEvent` (финальная фиксация приходит после модерации через Review Service).
 
     Примечание: порты со звёздочкой (*) показаны для режима `AppHostConfiguration.UseDedicatedPorts` в Aspire AppHost; иначе Aspire назначает порты динамически.
 
 3. **Связь между сервисами:**
     * **События (RabbitMQ):**
         * `RestaurantCreatedEvent`, `RestaurantUpdatedEvent`, `RestaurantArchivedEvent` (от Restaurant Service).
-        * `ReviewAddedEvent`, `ReviewUpdatedEvent` (от Review Service).
+        * `ReviewAddedEvent`, `ReviewApprovedEvent` (от Review Service).
         * `ReviewModeratedEvent` (от Moderation Service).
     * **Синхронные вызовы (минимально):**
         * Review Service при отсутствии локально кэшируемого значения может проверить ресторан через REST.
@@ -153,8 +153,8 @@ builder.Services.AddMassTransit(x =>
 2. **Gateway** перенаправляет в **Review Service**.
 3. **Review Service** сохраняет рецензию (status=pending) и публикует `ReviewAddedEvent`.
 4. **Moderation Service** (если требуется) обрабатывает и публикует `ReviewModeratedEvent`.
-5. **Review Service** принимает `ReviewModeratedEvent`, обновляет статус и публикует `ReviewUpdatedEvent`.
-6. **Rating Service** на `ReviewAddedEvent`/`ReviewUpdatedEvent` пересчитывает агрегаты и обновляет Redis.
+5. **Review Service** принимает `ReviewModeratedEvent`, обновляет статус и (если Approved) публикует `ReviewApprovedEvent`.
+6. **Rating Service** на `ReviewAddedEvent`/`ReviewApprovedEvent` пересчитывает агрегаты и обновляет Redis.
 7. **Клиент** при чтении получает актуальный рейтинг из кеша.
 
 ---
@@ -275,8 +275,8 @@ public class ModerationTask
 4. RabbitMQ ───► Rating Service (временный расчет)
 5. Модератор в Blazor Dashboard ───► Moderation Service
 6. Moderation Service ───ReviewModeratedEvent───► RabbitMQ
-7. RabbitMQ ───► Review Service (обновляет статус и публикует ReviewUpdatedEvent)
-8. RabbitMQ ───► Rating Service (финальный расчет на ReviewUpdatedEvent)
+7. RabbitMQ ───► Review Service (обновляет статус и публикует ReviewApprovedEvent)
+8. RabbitMQ ───► Rating Service (финальный расчет на ReviewApprovedEvent)
 9. Клиент видит одобренный отзыв
 ```
 

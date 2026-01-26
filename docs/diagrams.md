@@ -154,13 +154,13 @@
 
         MQ->>RS: (если Approved/Rejected) ReviewModeratedEvent
         RS->>DBR: Update Review Status
-        RS->>MQ: Publish ReviewUpdatedEvent (status changed)
+        RS->>MQ: Publish ReviewApprovedEvent (if Approved)
 
         MQ->>RT: ReviewAddedEvent (provisional rating)
         RT->>DBR: (опц.) Fetch Approved Reviews
         RT->>RD: Update Cached Rating (provisional)
 
-        MQ->>RT: ReviewUpdatedEvent (final rating calculation)
+        MQ->>RT: ReviewApprovedEvent (final rating calculation)
         RT->>DBR: Fetch Approved Reviews
         RT->>RD: Recalculate & Cache (final)
         C->>GW: GET /api/restaurants/{id}/rating
@@ -240,7 +240,7 @@
         class RestaurantRatingUpdatedEvent
         class RestaurantAverageCheckUpdatedEvent
         class ReviewAddedEvent
-        class ReviewUpdatedEvent
+        class ReviewApprovedEvent
         class ReviewModeratedEvent
 
         %% Relationships
@@ -254,14 +254,14 @@
         Restaurant --> RestaurantRatingUpdatedEvent
         Restaurant --> RestaurantAverageCheckUpdatedEvent
         Review --> ReviewAddedEvent
-        Review --> ReviewUpdatedEvent
+        Review --> ReviewApprovedEvent
         ModerationTask --> ReviewModeratedEvent
 
         %% Event Flows (Services publish these)
         ReviewAddedEvent ..> ModerationTask : triggers
         ReviewAddedEvent ..> RatingSnapshot : provisional calculation
         ReviewModeratedEvent ..> Review : updates status (approved/rejected)
-        ReviewUpdatedEvent ..> RatingSnapshot : recalculate with new values
+        ReviewApprovedEvent ..> RatingSnapshot : recalculate with new values
     ```
 
     Примечание: блок выше показывает доменные события. Интеграционные контракты могут отличаться (например, доменное “RestaurantRatingUpdated” → интеграционное “RestaurantRatingRecalculatedEvent”). Фактические интеграционные потоки — в разделах «Интеграционные события» по сервисам.
