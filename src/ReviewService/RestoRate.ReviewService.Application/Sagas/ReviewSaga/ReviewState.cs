@@ -19,4 +19,7 @@ public class ReviewState : SagaStateMachineInstance,
 
     public bool? IsUserValid { get; set; }
     public DateTime? UserValidatedAt { get; set; }
+
+    // Used by MassTransit CompositeEvent to track completion of multiple events.
+    public int ValidationCompleted { get; set; }
 }
