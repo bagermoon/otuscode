@@ -22,6 +22,9 @@ internal class ReviewConfiguration : IEntityTypeConfiguration<Review>
         builder.Property(r => r.Rating)
             .IsRequired();
 
+        builder.Property(r => r.AverageCheck)
+            .IsRequired(false);
+
         builder.Property(r => r.Comment)
             .HasMaxLength(1000);
 

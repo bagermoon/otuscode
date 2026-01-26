@@ -6,6 +6,7 @@ using Mediator;
 using Microsoft.Extensions.Logging;
 
 using RestoRate.ReviewService.Application.DTOs;
+using RestoRate.ReviewService.Application.Mappings;
 
 using ReviewEntity = RestoRate.ReviewService.Domain.ReviewAggregate.Review;
 
@@ -30,6 +31,7 @@ public sealed class GetReviewByIdHandler(
             result.RestaurantId,
             result.UserId,
             result.Rating,
+            result.AverageCheck?.ToDto(),
             result.Comment ?? string.Empty,
             result.CreatedAt,
             result.UpdatedAt);

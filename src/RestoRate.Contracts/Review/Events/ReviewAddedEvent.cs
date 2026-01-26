@@ -19,7 +19,7 @@ public sealed record ReviewAddedEvent(
     Guid ReviewId,
     Guid RestaurantId,
     Guid AuthorId,
-    int Rating,
+    decimal Rating,
     MoneyDto? AverageCheck,
     string? Comment,
     string[]? Tags) : IIntegrationEvent;

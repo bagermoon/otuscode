@@ -6,6 +6,7 @@ using Mediator;
 using Microsoft.Extensions.Logging;
 
 using RestoRate.ReviewService.Application.DTOs;
+using RestoRate.ReviewService.Application.Mappings;
 using RestoRate.ReviewService.Domain.ReviewAggregate;
 
 namespace RestoRate.ReviewService.Application.UseCases.Reviews.Create;
@@ -23,10 +24,13 @@ public sealed class CreateReviewHandler(
 
         try
         {
+            var averageCheck = request.Dto.AverageCheck?.ToDomainMoney();
+
             var reviewObjet = Review.Create(
                 request.Dto.RestaurantId,
                 request.Dto.UserId,
                 request.Dto.Rating,
+                averageCheck,
                 request.Dto.Text);
 
 
@@ -37,6 +41,7 @@ public sealed class CreateReviewHandler(
                 review.RestaurantId,
                 review.UserId,
                 review.Rating,
+                review.AverageCheck?.ToDto(),
                 review.Comment ?? string.Empty,
                 review.CreatedAt,
                 review.UpdatedAt);
