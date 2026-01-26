@@ -1,6 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
-
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 
@@ -10,12 +7,7 @@ using Microsoft.Extensions.Logging;
 
 using NSubstitute;
 
-using Xunit;
-
-using Ardalis.Result;
-
 using RestoRate.ReviewService.Application.DTOs;
-using RestoRate.ReviewService.Domain.ReviewAggregate;
 using RestoRate.ReviewService.Application.UseCases.Reviews.Create;
 
 namespace RestoRate.ReviewService.UnitTests.UseCases.Create;
@@ -71,6 +63,7 @@ public class CreateReviewHandlerTests
             .Returns<Task<Review>>(_ => throw new System.InvalidOperationException("DB down"));
 
         var logger = _fixture.Freeze<ILogger<CreateReviewHandler>>();
+
         var handler = new CreateReviewHandler(repo, logger);
 
         // Act
