@@ -167,6 +167,39 @@ sequenceDiagram
     MQ->>RT: Deliver ReviewAddedEvent / ReviewUpdatedEvent
 ```
 
+### Saga Обновление ресторана
+
+```mermaid
+sequenceDiagram
+    participant RS as RestaurantService
+    participant MQ as RabbitMQ
+    participant RVS as ReviewValidationSaga (by ReviewId)
+    participant RstVS as RestaurantValidationSaga (by RestaurantId)
+    participant RefC as RestaurantRefConsumer (projection)
+    participant DB as ReviewService DB (RestaurantReference)
+
+    RVS->>MQ: ReviewAddedEvent(reviewId, restaurantId)
+    MQ->>RstVS: ReviewAddedEvent
+
+    RstVS->>DB: Query RestaurantReference(restaurantId)
+    alt status known + acceptable
+    RstVS->>MQ: ValidationOk(reviewId, restaurantId)
+    else missing/unknown
+    RstVS->>RS: GetRestaurantStatusRequest(restaurantId)
+    RstVS->>RstVS: Schedule ValidationTimeout(restaurantId)
+    RS-->>RstVS: GetRestaurantStatusResponse(exists, status)
+    RstVS->>DB: Upsert RestaurantReference(restaurantId,status)
+    RstVS->>MQ: ValidationOk/ValidationFailed(for each pending reviewId)
+    end
+
+    RS->>MQ: RestaurantCreated/Updated/Archived(restaurantId,status)
+    MQ->>RefC: Restaurant*Event
+    RefC->>DB: Upsert RestaurantReference(restaurantId,status)
+
+    MQ->>RVS: ValidationOk(reviewId, restaurantId)
+    RVS->>MQ: ReviewReadyForModerationEvent(reviewId, restaurantId)
+```
+
 ### Замечания по надёжности
 
 - Публикации осуществляются через outbox; потребители — идемпотентны.

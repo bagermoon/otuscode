@@ -4,6 +4,7 @@ namespace RestoRate.SharedKernel.Enums;
 
 public sealed class RestaurantStatus : SmartEnum<RestaurantStatus>
 {
+    public static readonly RestaurantStatus Unknown = new(nameof(Unknown), 0);
     public static readonly RestaurantStatus Draft = new(nameof(Draft), 1);
     public static readonly RestaurantStatus OnModeration = new(nameof(OnModeration), 2);
     public static readonly RestaurantStatus Published = new(nameof(Published), 3);
@@ -15,6 +16,7 @@ public sealed class RestaurantStatus : SmartEnum<RestaurantStatus>
     /// <summary> Описание статуса </summary>
     public string GetDescription() => Name switch
     {
+        nameof(Unknown) => "Неизвестен",
         nameof(Draft) => "Черновик",
         nameof(OnModeration) => "На модерации",
         nameof(Published) => "Опубликован",

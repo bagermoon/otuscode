@@ -9,7 +9,7 @@ using RestoRate.ReviewService.Application.DTOs;
 
 using ReviewEntity = RestoRate.ReviewService.Domain.ReviewAggregate.Review;
 
-namespace RestoRate.ReviewService.Application.UseCases.GetById;
+namespace RestoRate.ReviewService.Application.UseCases.Reviews.GetById;
 
 public sealed class GetReviewByIdHandler(
     IRepository<ReviewEntity> repository,

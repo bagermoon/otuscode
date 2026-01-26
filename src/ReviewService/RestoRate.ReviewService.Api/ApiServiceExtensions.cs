@@ -11,7 +11,8 @@ internal static class ApiServiceExtensions
         builder.ConfigureAuthentication();
         builder.Services.AddReviewApplication();
         builder.AddReviewInfrastructure(
-            consumersAssembly: typeof(ApiServiceExtensions).Assembly
+            typeof(ApiServiceExtensions).Assembly,
+            typeof(ApplicationServiceExtensions).Assembly
         );
 
         return builder;

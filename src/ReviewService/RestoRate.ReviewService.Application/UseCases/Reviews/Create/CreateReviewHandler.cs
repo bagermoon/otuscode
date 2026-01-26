@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using RestoRate.ReviewService.Application.DTOs;
 using RestoRate.ReviewService.Domain.ReviewAggregate;
 
-namespace RestoRate.ReviewService.Application.UseCases.Create;
+namespace RestoRate.ReviewService.Application.UseCases.Reviews.Create;
 
 public sealed class CreateReviewHandler(
     IRepository<Review> repository,

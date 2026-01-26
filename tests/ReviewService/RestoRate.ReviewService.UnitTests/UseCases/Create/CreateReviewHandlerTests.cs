@@ -1,15 +1,22 @@
 using System.Threading;
 using System.Threading.Tasks;
+
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
+
 using FluentAssertions;
+
 using Microsoft.Extensions.Logging;
+
 using NSubstitute;
+
 using Xunit;
+
 using Ardalis.Result;
-using RestoRate.ReviewService.Application.UseCases.Create;
+
 using RestoRate.ReviewService.Application.DTOs;
 using RestoRate.ReviewService.Domain.ReviewAggregate;
+using RestoRate.ReviewService.Application.UseCases.Reviews.Create;
 
 namespace RestoRate.ReviewService.UnitTests.UseCases.Create;
 
