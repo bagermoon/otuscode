@@ -1,8 +1,11 @@
+using RestoRate.Contracts.Common.Dtos;
+
 namespace RestoRate.ReviewService.Application.DTOs;
 
 public record CreateReviewDto(
     Guid RestaurantId,
     Guid UserId,
-    int Rating,
+    decimal Rating,
+    MoneyDto? AverageCheck,
     string Text
 );

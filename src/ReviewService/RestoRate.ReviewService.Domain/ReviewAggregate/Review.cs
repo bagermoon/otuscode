@@ -1,5 +1,7 @@
 using Ardalis.SharedKernel;
 
+using NodaMoney;
+
 using RestoRate.ReviewService.Domain.Events;
 using RestoRate.ReviewService.Domain.RestaurantReferenceAggregate;
 using RestoRate.ReviewService.Domain.UserReferenceAggregate;
@@ -11,7 +13,8 @@ public class Review : EntityBase<Guid>, IAggregateRoot
 {
     public Guid RestaurantId { get; private set; } = default!;
     public Guid UserId { get; private set; } = default!;
-    public int Rating { get; private set; } = default!;
+    public decimal Rating { get; private set; } = default!;
+    public Money? AverageCheck { get; private set; }
     public string? Comment { get; private set; }
     public DateTime CreatedAt { get; private set; } = default!;
     public DateTime? UpdatedAt { get; private set; }
@@ -23,20 +26,21 @@ public class Review : EntityBase<Guid>, IAggregateRoot
 
     private Review() { }
 
-    public Review(Guid restaurantId, Guid userId, int rating, string comment)
+    public Review(Guid restaurantId, Guid userId, decimal rating, Money? averageCheck, string? comment)
     {
         Id = Guid.NewGuid();
         RestaurantId = restaurantId;
         UserId = userId;
         Rating = rating;
+        AverageCheck = averageCheck;
         Comment = comment;
         CreatedAt = DateTime.UtcNow;
         Status = ReviewStatus.Pending;
     }
 
-    public static Review Create(Guid restaurantId, Guid userId, int rating, string comment)
+    public static Review Create(Guid restaurantId, Guid userId, decimal rating, Money? averageCheck, string? comment)
     {
-        var review = new Review(restaurantId, userId, rating, comment);
+        var review = new Review(restaurantId, userId, rating, averageCheck, comment);
 
         review.RegisterDomainEvent(new ReviewCreatedDomainEvent(review));
         return review;
@@ -81,14 +85,6 @@ public class Review : EntityBase<Guid>, IAggregateRoot
         UpdatedAt = DateTime.UtcNow;
         RegisterDomainEvent(new ReviewApprovedDomainEvent(this));
 
-        return this;
-    }
-
-    public Review Update(string comment, int rating)
-    {
-        Comment = comment;
-        Rating = rating;
-        UpdatedAt = DateTime.UtcNow;
         return this;
     }
 }

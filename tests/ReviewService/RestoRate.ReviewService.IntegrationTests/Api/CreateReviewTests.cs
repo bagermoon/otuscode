@@ -23,7 +23,7 @@ public class CreateReviewTests : IClassFixture<ReviewWebApplicationFactory>
     [Fact]
     public async Task CreateReview_ValidData_ReturnsCreatedReview()
     {
-        var createDto = new CreateReviewDto(Guid.NewGuid(), Guid.NewGuid(), 4, "Integration create review");
+        var createDto = new CreateReviewDto(Guid.NewGuid(), Guid.NewGuid(), 4m, null, "Integration create review");
         var response = await _client.PostAsJsonAsync("/reviews/", createDto, CancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -33,5 +33,6 @@ public class CreateReviewTests : IClassFixture<ReviewWebApplicationFactory>
         created!.Id.Should().NotBeEmpty();
         created.Text.Should().Be(createDto.Text);
         created.Rating.Should().Be(createDto.Rating);
+        created.AverageCheck.Should().Be(createDto.AverageCheck);
     }
 }

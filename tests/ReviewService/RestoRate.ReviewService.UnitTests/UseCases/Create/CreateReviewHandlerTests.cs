@@ -27,6 +27,7 @@ public class CreateReviewHandlerTests
         // Arrange
         var dto = _fixture.Build<CreateReviewDto>()
             .With(x => x.Text, "Great food")
+            .With(x => x.AverageCheck, (RestoRate.Contracts.Common.Dtos.MoneyDto?)null)
             .Create();
         var cmd = new CreateReviewCommand(dto);
 
@@ -48,6 +49,7 @@ public class CreateReviewHandlerTests
         resDto.RestaurantId.Should().Be(dto.RestaurantId);
         resDto.UserId.Should().Be(dto.UserId);
         resDto.Rating.Should().Be(dto.Rating);
+        resDto.AverageCheck.Should().Be(dto.AverageCheck);
         resDto.Text.Should().Be(dto.Text);
     }
 

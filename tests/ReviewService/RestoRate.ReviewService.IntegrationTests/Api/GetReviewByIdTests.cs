@@ -24,7 +24,7 @@ public class GetReviewByIdTests : IClassFixture<ReviewWebApplicationFactory>
     public async Task GetReviewById_ExistingReview_ReturnsReview()
     {
         // Arrange - create a review first
-        var createDto = new CreateReviewDto(Guid.NewGuid(), Guid.NewGuid(), 5, "Integration test review");
+        var createDto = new CreateReviewDto(Guid.NewGuid(), Guid.NewGuid(), 5m, null, "Integration test review");
         var createResponse = await _client.PostAsJsonAsync("/reviews/", createDto, CancellationToken);
         createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
