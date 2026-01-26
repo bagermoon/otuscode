@@ -97,7 +97,7 @@ flowchart LR
     %% Исходящее решение модерации
     MS -- ReviewModeratedEvent --> MQ
     MQ --> RV
-    %% Rating reacts indirectly via ReviewUpdatedEvent
+    %% Rating reacts indirectly via ReviewApprovedEvent
 
     %% Подсветка стрелок для визуализации семейств событий
     %% 0: RV->MQ (события Review)
@@ -139,13 +139,13 @@ sequenceDiagram
     end
 
     MQ->>RS: Deliver ReviewModeratedEvent
-    RS->>MQ: Publish ReviewUpdatedEvent(status changed)
+    RS->>MQ: Publish ReviewApprovedEvent(if Approved)
 
     note over RS,RT: Rating может реагировать как на ReviewAddedEvent (черновой расчёт),
-    note over RS,RT: так и на ReviewUpdatedEvent (финализация)
+    note over RS,RT: так и на ReviewApprovedEvent (финализация)
 
     MQ->>RT: Deliver ReviewAddedEvent (optional)
-    MQ->>RT: Deliver ReviewUpdatedEvent
+    MQ->>RT: Deliver ReviewApprovedEvent
 ```
 
 ### Замечания по надёжности
