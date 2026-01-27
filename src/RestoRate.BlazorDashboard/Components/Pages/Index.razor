@@ -1,125 +1,175 @@
 @page "/"
 @page "/index"
-@rendermode InteractiveServer
-@using RestoRate.BlazorDashboard.Services
-@using RestoRate.Contracts.Restaurant.DTOs
-@using RestoRate.BlazorDashboard.Components.Shared
-@inject RestaurantWebService RestaurantWebService
+@using RestoRate.SharedKernel.Enums
 @inject NavigationManager Nav
-@implements IDisposable
 
-<PageTitle>Лучшие рестораны вашего города</PageTitle>
+<PageTitle>РестоРейтинг - Гастрономический гид</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.Medium" Class="py-6">
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4 mb-16">
+    <div class="hero-collage-container relative rounded-xl overflow-hidden pa-8 pa-md-16">
 
-    <section class="hero mb-8">
-        <div class="hero-content text-center">
-            <h1>РестоОценка</h1>
-            <p>Найдите идеальное место</p>
+        <MudImage Src="https://s.restorating.ru/places/3840x2160/places/41271/62fb79130c228.jpg"
+                  Class="collage-img img-1 absolute rounded-lg shadow-sm" Alt="Interior" />
 
-            <div class="search-controls mt-4">
-                <MudTextField Value="searchTerm"
-                              Placeholder="Поиск ресторанов..."
-                              TextChanged="OnSearchChanged"
-                              Adornment="Adornment.Start"
-                              AdornmentIcon="@Icons.Material.Filled.Search"
-                              Immediate="true"
-                              Clearable="true"
-                              Variant="Variant.Outlined"
-                              Margin="Margin.Dense" />
+        <MudImage Src="https://account.spb.ru/upload/22358/photo.jpg"
+                  Class="collage-img img-2 absolute rounded-lg shadow-sm" Alt="Dish" />
+
+        <MudImage Src="https://scdn.tomesto.ru/img/place/000/029/503/restoran-georgia-armenia-gruziya-armeniya-na-ulitse-pushkina_43b3e_full-416935.jpg"
+                  Class="collage-img img-3 absolute rounded-lg shadow-sm" Alt="Exterior" />
+
+        <MudImage Src="https://i.pinimg.com/736x/d3/c6/df/d3c6dff867a80a7e91cc5391312bd398.jpg"
+                  Class="collage-img img-4 absolute rounded-lg shadow-sm" Alt="Vibe" />
+
+        <div class="hero-glass-card relative z-10 pa-8 pa-md-12 d-flex flex-column align-center text-center mx-auto">
+
+            <div class="hero-badge mb-4">
+                <MudIcon Icon="@Icons.Material.Filled.Star" Size="Size.Small" Color="Color.Warning" Class="mr-1" />
+                <span>Твой честный гид</span>
             </div>
-        </div>
-    </section>
 
-    @if (loading)
-    {
-        <div class="d-flex justify-center py-10">
-            <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+            <MudText Typo="Typo.h2" Class="hero-title mb-4 text-dark font-weight-bold">
+                Выбирай сердцем,<br />оценивай со вкусом
+            </MudText>
+
+            <MudText Typo="Typo.h6" Class="hero-subtitle mb-8 text-secondary">
+                Смотрите реальные рейтинги, оставляйте отзывы и находите лучшие рестораны города в одном месте.
+            </MudText>
+
+            <div class="d-flex flex-wrap justify-center gap-4 gap-md-8 mb-8">
+                <div class="feature-item">
+                    <MudIcon Icon="@Icons.Material.Filled.Insights" Color="Color.Primary" />
+                    <MudText Typo="Typo.body2" Class="font-weight-bold ml-2">Честный рейтинг</MudText>
+                </div>
+                <div class="feature-item">
+                    <MudIcon Icon="@Icons.Material.Filled.Forum" Color="Color.Primary" />
+                    <MudText Typo="Typo.body2" Class="font-weight-bold ml-2">Живые отзывы</MudText>
+                </div>
+                <div class="feature-item">
+                    <MudIcon Icon="@Icons.Material.Filled.Recommend" Color="Color.Primary" />
+                    <MudText Typo="Typo.body2" Class="font-weight-bold ml-2">Топ места</MudText>
+                </div>
+            </div>
+
+            <div class="d-flex gap-4 flex-wrap justify-center">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="hero-btn px-8 py-3 rounded-pill font-weight-bold" Href="/catalog">
+                    Найти ресторан
+                </MudButton>
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Large" Class="hero-btn-secondary px-8 py-3 rounded-pill border-2 font-weight-bold" Href="/catalog?sort=rating">
+                    Лучшее
+                </MudButton>
+            </div>
+
         </div>
-    }
-    else if (restaurants?.Items?.Any() == true)
-    {
-        <MudGrid Spacing="4" Class="mt-4">
-            @foreach (var r in restaurants.Items)
-            {
-                <MudItem xs="12">
-                    <RestaurantCardMain Restaurant="r" OnOpen="@(restaurant => ShowDetails(restaurant.RestaurantId))" />
-                </MudItem>
-            }
+    </div>
+</MudContainer>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="pb-16">
+
+    <div class="cuisine-section-container rounded-xl overflow-hidden mb-16 relative">
+        <div class="pa-8">
+            <div class="d-flex justify-space-between align-center mb-6 relative z-10">
+                <MudText Typo="Typo.h4" Class="font-weight-bold" Color="Color.Primary">Что сегодня выберем?</MudText>
+                <MudLink Href="/catalog" Color="Color.Secondary" Underline="Underline.Always">Все кухни</MudLink>
+            </div>
+
+            <MudGrid Spacing="3" Class="relative z-10">
+                @foreach (var cuisine in _selectedCuisines)
+                {
+                    <MudItem xs="6" sm="4" md="2">
+                        <MudButton OnClick="@(() => GoToCuisine(cuisine))"
+                                   Class="cuisine-btn py-4"
+                                   FullWidth="true"
+                                   Variant="Variant.Text">
+                            <div class="d-flex flex-column align-center gap-2">
+                                <MudIcon Icon="@GetIcon(cuisine)" Color="Color.Primary" Size="Size.Large" />
+                                <MudText Typo="Typo.subtitle2" Class="font-weight-bold text-dark" Style="text-transform: none;">
+                                    @cuisine.RussianName
+                                </MudText>
+                            </div>
+                        </MudButton>
+                    </MudItem>
+                }
+            </MudGrid>
+        </div>
+    </div>
+
+    <MudGrid Class="align-center mt-8 features-block">
+        <MudItem xs="12" md="6">
+            <MudText Typo="Typo.h4" Class="font-weight-bold mb-6">Почему РестоРейтинг?</MudText>
+            <div class="d-flex flex-column gap-4 mb-8">
+                <div class="d-flex align-start">
+                    <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Primary" Size="Size.Medium" Class="mr-3 mt-1" />
+                    <div>
+                        <MudText Typo="Typo.subtitle1" Class="font-weight-bold">Проверенные отзывы</MudText>
+                        <MudText Typo="Typo.body2" Class="text-secondary">Мы следим за качеством контента.</MudText>
+                    </div>
+                </div>
+                <div class="d-flex align-start">
+                    <MudIcon Icon="@Icons.Material.Filled.RestaurantMenu" Color="Color.Primary" Size="Size.Medium" Class="mr-3 mt-1" />
+                    <div>
+                        <MudText Typo="Typo.subtitle1" Class="font-weight-bold">Разнообразие кухонь</MudText>
+                        <MudText Typo="Typo.body2" Class="text-secondary">От стрит-фуда до высокой кухни.</MudText>
+                    </div>
+                </div>
+                <div class="d-flex align-start">
+                    <MudIcon Icon="@Icons.Material.Filled.Map" Color="Color.Primary" Size="Size.Medium" Class="mr-3 mt-1" />
+                    <div>
+                        <MudText Typo="Typo.subtitle1" Class="font-weight-bold">Удобный поиск</MudText>
+                        <MudText Typo="Typo.body2" Class="text-secondary">Ищите заведения рядом и по тегам.</MudText>
+                    </div>
+                </div>
+            </div>
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Large" Class="rounded-pill border-2 px-8" Href="/catalog">
+                Перейти в каталог
+            </MudButton>
+        </MudItem>
+        <MudItem xs="12" md="6" Class="d-flex justify-center pl-md-12">
+            <MudImage Src="https://img.freepik.com/free-photo/happy-friends-checking-menu-restaurant_23-2148006676.jpg?w=996"
+                      Alt="Restaurant Vibe" Fluid="true" Class="rounded-xl shadow-lg" Style="max-height: 400px; object-fit: cover; width: 100%;" />
+        </MudItem>
+    </MudGrid>
+
+    <MudPaper Class="mt-16 pa-8 rr-cloud relative overflow-hidden" Elevation="0">
+        <div class="absolute" style="right: -20px; bottom: -20px; opacity: 0.05; pointer-events: none;">
+            <MudIcon Icon="@Icons.Material.TwoTone.Storefront" Style="font-size: 300px;" Color="Color.Primary" />
+        </div>
+        <MudGrid Class="align-center relative z-10">
+            <MudItem xs="12" md="8">
+                <MudText Typo="Typo.h4" Class="font-weight-bold mb-3">Вы владелец ресторана?</MudText>
+                <MudText Typo="Typo.body1" Class="text-secondary mb-6" Style="max-width: 600px;">
+                    Присоединяйтесь к РестоРейтинг! Создайте страницу своего заведения и привлекайте гостей.
+                </MudText>
+                <div class="d-flex gap-4">
+                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Large" Class="rounded-pill font-weight-bold">
+                        Добавить заведение
+                    </MudButton>
+                </div>
+            </MudItem>
         </MudGrid>
+    </MudPaper>
 
-        <div class="d-flex justify-center mt-6">
-            <MudPagination Selected="currentPage"
-                           SelectedChanged="OnPageChanged"
-                           Count="restaurants.TotalPages"
-                           ShowFirstButton="true"
-                           ShowLastButton="true"
-                           BoundaryCount="1"
-                           MiddleCount="2" />
-        </div>
-    }
-    else
-    {
-        <MudText Class="py-10" Align="Align.Center">
-            <h3>Рестораны не найдены</h3>
-        </MudText>
-    }
 </MudContainer>
 
 @code {
-    private PagedResult<RestaurantDto>? restaurants;
-    private bool loading = true;
-    private int currentPage = 1;
-    private string? searchTerm;
-    private string? selectedCuisine;
-    private string? selectedTag;
-    const int pageSize = 12;
-
-    protected override async Task OnInitializedAsync()
+    private void GoToCuisine(CuisineType cuisine)
     {
-        await LoadRestaurants();
+        Nav.NavigateTo($"/catalog?cuisineType={Uri.EscapeDataString(cuisine.Name)}");
     }
 
-    private async Task LoadRestaurants()
+    private List<CuisineType> _selectedCuisines = new()
     {
-        loading = true;
-        StateHasChanged();
+        CuisineType.Italian, CuisineType.Georgian, CuisineType.Japanese,
+        CuisineType.American, CuisineType.Russian, CuisineType.French
+    };
 
-        restaurants = await RestaurantWebService.GetRestaurantsAsync(
-            currentPage,
-            pageSize,
-            searchTerm,
-            selectedCuisine,
-            selectedTag);
-
-        loading = false;
-        StateHasChanged();
-    }
-
-    private async Task OnSearchChanged(string value)
+    private string GetIcon(CuisineType type)
     {
-        searchTerm = value;
-        currentPage = 1;
-        await LoadRestaurants();
+        if (type == CuisineType.Italian) return Icons.Material.Filled.LocalPizza;
+        if (type == CuisineType.Georgian) return Icons.Material.Filled.KebabDining;
+        if (type == CuisineType.Japanese) return Icons.Material.Filled.RiceBowl;
+        if (type == CuisineType.American) return Icons.Material.Filled.LunchDining;
+        if (type == CuisineType.Russian) return Icons.Material.Filled.SoupKitchen;
+        if (type == CuisineType.French) return Icons.Material.Filled.WineBar;
+        return Icons.Material.Filled.Restaurant;
     }
-
-    private async Task OnFilterChanged(string value)
-    {
-        selectedCuisine = value;
-        currentPage = 1;
-        await LoadRestaurants();
-    }
-
-    private async Task OnPageChanged(int page)
-    {
-        currentPage = page;
-        await LoadRestaurants();
-    }
-
-    private void ShowDetails(Guid restaurantId)
-    {
-        Nav.NavigateTo($"/restaurant/{restaurantId}");
-    }
-
-    public void Dispose() { }
 }

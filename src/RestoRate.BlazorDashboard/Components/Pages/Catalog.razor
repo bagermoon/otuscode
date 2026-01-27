@@ -2,8 +2,9 @@
 @using RestoRate.BlazorDashboard.Components.Shared
 @using RestoRate.BlazorDashboard.Services
 @using RestoRate.RestaurantService.Application.UseCases.Restaurants.GetAll
+@using Microsoft.AspNetCore.WebUtilities
 @inject RestaurantWebService RestaurantService
-@inject IDialogService Dialog
+@inject IDialogService DialogService
 @inject NavigationManager Nav
 @rendermode InteractiveServer
 
@@ -12,34 +13,41 @@
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-6">
     <RestaurantFilters @ref="filters" OnFiltersChanged="Reload" />
 
-    @if (loading)
-    {
-        <div class="d-flex justify-center py-10">
-            <MudProgressCircular Indeterminate="true" />
-        </div>
-    }
-    else if (pagedRestaurants is not null && pagedRestaurants.Items.Any())
+    @if (pagedRestaurants is not null && pagedRestaurants.Items.Any())
     {
         <MudGrid Spacing="3" Class="mt-4">
             @foreach (var r in pagedRestaurants.Items)
             {
-                <MudItem xs="12" sm="6" md="4">
-                    <RestaurantCard Restaurant="r" OnOpen="@(restaurant => ShowDetails(restaurant.RestaurantId))" />
+                <MudItem xs="12" sm="6" md="4" lg="3">
+                    <SearchCard Restaurant="r" OnOpen="@(restaurant => OpenDetailsDialog(restaurant))" />
                 </MudItem>
             }
         </MudGrid>
 
-        <div class="d-flex justify-center mt-6">
+        <div class="d-flex justify-center mt-8">
             <MudPagination Selected="@currentPage"
                            SelectedChanged="ChangePage"
                            Count="@pagedRestaurants.TotalPages"
                            ShowFirstButton="true"
-                           ShowLastButton="true" />
+                           ShowLastButton="true"
+                           Color="Color.Primary"
+                           Variant="Variant.Outlined"
+                           Shape="Rounded.Circle" />
+        </div>
+    }
+    else if (loading)
+    {
+        <div class="d-flex justify-center py-10">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
         </div>
     }
     else
     {
-        <MudText Class="py-10" Align="Align.Center">Рестораны не найдены</MudText>
+        <div class="d-flex flex-column align-center justify-center py-16">
+            <MudIcon Icon="@Icons.Material.Outlined.SearchOff" Size="Size.Large" Color="Color.Secondary" Style="font-size: 64px; opacity: 0.5;" />
+            <MudText Typo="Typo.h5" Class="mt-4 text-secondary">Рестораны не найдены</MudText>
+            <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="ResetAll">Сбросить фильтры</MudButton>
+        </div>
     }
 </MudContainer>
 
@@ -49,12 +57,41 @@
     private int currentPage = 1;
     private RestaurantFilters? filters;
 
-    protected override async Task OnInitializedAsync() => await Load();
+    private string? _initialSearchTerm;
+    private string? _initialCuisine;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = Nav.ToAbsoluteUri(Nav.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("cuisineType", out var cuisineType))
+            _initialCuisine = cuisineType;
+
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("searchTerm", out var searchTerm))
+            _initialSearchTerm = searchTerm;
+
+        await Load();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (filters != null && (!string.IsNullOrEmpty(_initialCuisine) || !string.IsNullOrEmpty(_initialSearchTerm)))
+            {
+                await filters.SetValues(_initialSearchTerm, _initialCuisine);
+            }
+        }
+    }
 
     private async Task Reload()
     {
         currentPage = 1;
         await Load();
+    }
+
+    private async Task ResetAll()
+    {
+        if (filters != null) await filters.ResetFilters();
     }
 
     private async Task ChangePage(int page)
@@ -66,17 +103,29 @@
     private async Task Load()
     {
         loading = true;
-        StateHasChanged();
+        var f = filters?.GetFilters() ?? (_initialSearchTerm, _initialCuisine, null);
 
-        var f = filters?.GetFilters() ?? (null, null, null);
-        pagedRestaurants = await RestaurantService.GetRestaurantsAsync(currentPage, 12, f.SearchTerm, f.CuisineType, f.Tag);
+        pagedRestaurants = await RestaurantService.GetRestaurantsAsync(
+            currentPage,
+            12,
+            f.SearchTerm,
+            f.CuisineType,
+            f.Tag);
 
         loading = false;
         StateHasChanged();
     }
 
-    private void ShowDetails(Guid restaurantId)
+    private async Task OpenDetailsDialog(RestaurantDto restaurant)
     {
-        Nav.NavigateTo($"/restaurant/{restaurantId}");
+        var parameters = new DialogParameters<RestaurantDetailsDialog> { { x => x.Restaurant, restaurant } };
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true,
+            NoHeader = true
+        };
+        await DialogService.ShowAsync<RestaurantDetailsDialog>("Details", parameters, options);
     }
 }

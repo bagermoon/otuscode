@@ -11,7 +11,7 @@
     --rr-text: rgba(15, 23, 42, 0.92);
     --rr-text-2: rgba(15, 23, 42, 0.70);
     --rr-radius: 18px;
-    /* Связка с MudBlazor */
+
     --mud-palette-primary: var(--rr-primary);
     --mud-palette-secondary: var(--rr-secondary);
     --mud-palette-background: var(--rr-bg);
@@ -24,11 +24,18 @@ html, body {
     height: 100%;
 }
 
-body {
+body, .mud-layout {
     font-family: var(--rr-font);
-    background-color: #f8fbff;
-    color: var(--rr-text);
-    text-align: left !important;
+    background: linear-gradient(180deg, #ffffff 0%, #eef2f6 100%) !important;
+    background-attachment: fixed !important;
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.mud-main-content {
+    background: transparent !important;
 }
 
 .mud-main-content, .mud-container, .rr-main {
