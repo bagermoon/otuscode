@@ -1,6 +1,7 @@
 using System;
 
 using MassTransit;
+using MassTransit.DependencyInjection;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,27 +21,23 @@ public sealed class MassTransitUserContextProvider : IUserContextProvider
     public bool TryGet(out IUserContext userContext)
     {
         userContext = default!;
-        var consumeContext = _services.GetRequiredService<ConsumeContext>();
 
-        HeaderUserContext? headerUserContext;
-        try
+        var contextProvider = _services.GetService<IScopedConsumeContextProvider>();
+
+        if (contextProvider != null && contextProvider.HasContext)
         {
-            if (consumeContext.TryGetPayload(out headerUserContext))
+            var consumeContext = contextProvider.GetContext();
+            if (consumeContext.TryGetPayload(out HeaderUserContext? headerUserContext))
             {
                 userContext = headerUserContext;
                 return true;
             }
-        }
-        catch (ConsumeContextNotAvailableException)
-        {
-            return false;
-        }
 
-        // for cases when the payload is not available yet
-        if (UserContextHeaderCodec.TryRead(consumeContext.Headers, out headerUserContext))
-        {
-            userContext = headerUserContext;
-            return true;
+            if (UserContextHeaderCodec.TryRead(consumeContext.Headers, out headerUserContext))
+            {
+                userContext = headerUserContext;
+                return true;
+            }
         }
 
         return false;

@@ -54,7 +54,7 @@
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="hero-btn px-8 py-3 rounded-pill font-weight-bold" Href="/catalog">
                     Найти ресторан
                 </MudButton>
-                <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Large" Class="hero-btn-secondary px-8 py-3 rounded-pill border-2 font-weight-bold" Href="/catalog?sort=rating">
+                <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Size="Size.Large" Class="hero-btn-secondary px-8 py-3 rounded-pill border-2 font-weight-bold" Href="/catalog?sort=rating">
                     Лучшее
                 </MudButton>
             </div>
@@ -148,9 +148,26 @@
                     Присоединяйтесь к РестоРейтинг! Создайте страницу своего заведения и привлекайте гостей.
                 </MudText>
                 <div class="d-flex gap-4">
-                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Large" Class="rounded-pill font-weight-bold">
-                        Добавить заведение
-                    </MudButton>
+                    <AuthorizeView>
+                        <Authorized>
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Secondary"
+                                       Size="Size.Large"
+                                       Class="rounded-pill font-weight-bold"
+                                       Href="/restaurants/add">
+                                Добавить заведение
+                            </MudButton>
+                        </Authorized>
+                        <NotAuthorized>
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Secondary"
+                                       Size="Size.Large"
+                                       Class="rounded-pill font-weight-bold"
+                                       Href="authentication/login">
+                                Войти и добавить
+                            </MudButton>
+                        </NotAuthorized>
+                    </AuthorizeView>
                 </div>
             </MudItem>
         </MudGrid>

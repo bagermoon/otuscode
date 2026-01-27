@@ -15,9 +15,9 @@ namespace RestoRate.RestaurantService.Application.UseCases.Restaurants.GetAll;
 public sealed class GetAllRestaurantsHandler(
     IReadRepository<RestaurantEntity> readRepository,
     ILogger<GetAllRestaurantsHandler> logger)
-    : IQueryHandler<GetAllRestaurantsQuery, Result<PagedResult<RestaurantDto>>>
+    : IQueryHandler<GetAllRestaurantsQuery, Result<Contracts.Common.PagedResult<RestaurantDto>>>
 {
-    public async ValueTask<Result<PagedResult<RestaurantDto>>> Handle(
+    public async ValueTask<Result<Contracts.Common.PagedResult<RestaurantDto>>> Handle(
         GetAllRestaurantsQuery request,
         CancellationToken cancellationToken)
     {
@@ -38,7 +38,7 @@ public sealed class GetAllRestaurantsHandler(
 
             var dtos = restaurants.Select(r => r.ToDto()).ToList();
 
-            var result = new PagedResult<RestaurantDto>(
+            var result = new Contracts.Common.PagedResult<RestaurantDto>(
                 dtos,
                 totalCount,
                 request.PageNumber,
@@ -47,12 +47,12 @@ public sealed class GetAllRestaurantsHandler(
 
             logger.LogFoundCount(dtos.Count, totalCount);
 
-            return Result<PagedResult<RestaurantDto>>.Success(result);
+            return Result<Contracts.Common.PagedResult<RestaurantDto>>.Success(result);
         }
         catch (Exception ex)
         {
             logger.LogGetAllError(ex);
-            return Result<PagedResult<RestaurantDto>>.Error(ex.Message);
+            return Result<Contracts.Common.PagedResult<RestaurantDto>>.Error(ex.Message);
         }
     }
 }
