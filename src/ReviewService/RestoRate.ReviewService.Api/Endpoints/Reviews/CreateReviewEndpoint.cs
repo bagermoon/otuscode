@@ -15,13 +15,7 @@ internal static class CreateReviewEndpoint
         group.MapPost("/", async (CreateReviewDto dto, ISender sender, CancellationToken ct) =>
         {
             var result = await sender.Send(new CreateReviewCommand(dto), ct);
-            return result.Status switch
-            {
-                ResultStatus.Ok => Results.CreatedAtRoute("GetReviewById", new { id = result.Value.Id }, result.Value),
-                ResultStatus.Invalid => Results.BadRequest(result.Errors),
-                ResultStatus.NotFound => Results.NotFound(),
-                _ => Results.Problem(string.Join(";", result.Errors))
-            };
+            return result;
         })
         .WithName("CreateReview")
         .WithSummary("Создать отзыв")

@@ -32,6 +32,11 @@ public class ReviewWebApplicationFactory
                     connectionName: AppHostProjects.ReviewDb
                 )
             );
+
+            config.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["MassTransit:UseMongoDbSagaOutbox"] = "false",
+            });
         });
 
         return base.CreateHostAsync(builder);

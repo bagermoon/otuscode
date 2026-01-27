@@ -8,7 +8,7 @@ using Mediator;
 using RestoRate.Contracts.Restaurant;
 using RestoRate.Contracts.Restaurant.Requests;
 using RestoRate.ReviewService.Application.Mappings;
-using RestoRate.ReviewService.Application.Sagas.Messages;
+using RestoRate.Contracts.Review.Events;
 using RestoRate.ReviewService.Application.UseCases.RestaurantReferences.UpsertRestaurant;
 using RestoRate.ReviewService.Domain.RestaurantReferenceAggregate;
 

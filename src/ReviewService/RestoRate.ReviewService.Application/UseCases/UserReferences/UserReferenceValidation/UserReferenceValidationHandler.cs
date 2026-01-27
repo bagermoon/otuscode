@@ -4,7 +4,7 @@ using MassTransit;
 
 using Mediator;
 
-using RestoRate.ReviewService.Application.Sagas.Messages;
+using RestoRate.Contracts.Review.Events;
 using RestoRate.ReviewService.Application.UseCases.UserReferences.UpsertUser;
 
 namespace RestoRate.ReviewService.Application.UseCases.UserReferences.UserReferenceValidation;
