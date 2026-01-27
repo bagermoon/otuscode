@@ -5,7 +5,7 @@ using Mediator;
 
 using Microsoft.Extensions.Logging;
 
-using RestoRate.ReviewService.Application.DTOs;
+using RestoRate.Contracts.Review.Dtos;
 using RestoRate.ReviewService.Application.Mappings;
 using RestoRate.ReviewService.Domain.ReviewAggregate;
 
@@ -31,7 +31,7 @@ public sealed class CreateReviewHandler(
                 request.Dto.UserId,
                 request.Dto.Rating,
                 averageCheck,
-                request.Dto.Text);
+                request.Dto.Comment);
 
 
             var review = await repository.AddAsync(reviewObjet, cancellationToken);

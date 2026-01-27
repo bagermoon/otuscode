@@ -1,6 +1,6 @@
 using FluentAssertions;
 
-using RestoRate.ReviewService.Application.DTOs;
+using RestoRate.Contracts.Review.Dtos;
 
 namespace RestoRate.ReviewService.IntegrationTests.Api;
 
@@ -39,7 +39,7 @@ public class GetReviewByIdTests : IClassFixture<ReviewWebApplicationFactory>
         var fetched = await response.Content.ReadFromJsonAsync<ReviewDto>(CancellationToken);
         fetched.Should().NotBeNull();
         fetched!.Id.Should().Be(created.Id);
-        fetched.Text.Should().Be(createDto.Text);
+        fetched.Comment.Should().Be(createDto.Comment);
     }
 
     [Fact]

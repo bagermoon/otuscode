@@ -7,7 +7,8 @@ using Microsoft.Extensions.Logging;
 
 using NSubstitute;
 
-using RestoRate.ReviewService.Application.DTOs;
+using RestoRate.Contracts.Common.Dtos;
+using RestoRate.Contracts.Review.Dtos;
 using RestoRate.ReviewService.Application.UseCases.Reviews.Create;
 
 namespace RestoRate.ReviewService.UnitTests.UseCases.Create;
@@ -26,8 +27,8 @@ public class CreateReviewHandlerTests
     {
         // Arrange
         var dto = _fixture.Build<CreateReviewDto>()
-            .With(x => x.Text, "Great food")
-            .With(x => x.AverageCheck, (RestoRate.Contracts.Common.Dtos.MoneyDto?)null)
+            .With(x => x.Comment, "Great food")
+            .With(x => x.AverageCheck, (MoneyDto?)null)
             .Create();
         var cmd = new CreateReviewCommand(dto);
 
@@ -50,7 +51,7 @@ public class CreateReviewHandlerTests
         resDto.UserId.Should().Be(dto.UserId);
         resDto.Rating.Should().Be(dto.Rating);
         resDto.AverageCheck.Should().Be(dto.AverageCheck);
-        resDto.Text.Should().Be(dto.Text);
+        resDto.Comment.Should().Be(dto.Comment);
     }
 
     [Fact]
