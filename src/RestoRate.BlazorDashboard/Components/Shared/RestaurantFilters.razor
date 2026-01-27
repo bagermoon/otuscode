@@ -6,32 +6,37 @@
 @using RestoRate.BlazorDashboard.Services
 @inject RestaurantWebService RestaurantService
 
-<MudPaper Class="rr-cloud pa-6 mb-6" Elevation="2">
-    <MudGrid Spacing="3">
+<MudPaper Class="filter-container pa-6 mb-8" Elevation="0">
+    <MudGrid Spacing="3" Class="align-center">
 
-        <MudItem xs="12" lg="5">
+        <MudItem xs="12" md="5">
             <MudAutocomplete T="string"
-                             Label="Поиск по названию..."
+                             Label="Поиск ресторана"
                              Value="searchTerm"
-                             TextChanged="OnSearchChanged"
+                             ValueChanged="OnSearchChanged"
                              SearchFunc="@SearchRestaurants"
                              ResetValueOnEmptyText="true"
                              Clearable="true"
-                             Variant="Variant.Filled"
+                             Variant="Variant.Outlined"
                              AdornmentIcon="@Icons.Material.Filled.Search"
+                             AdornmentColor="Color.Primary"
                              DebounceInterval="500"
                              MaxItems="10"
-                             Class="filter-input" />
+                             Class="rr-input"
+                             Placeholder="Название, например 'Мама Рома'" />
         </MudItem>
 
-        <MudItem xs="12" lg="3">
+        <MudItem xs="12" md="3">
             <MudSelect T="string"
                        Label="Кухня"
                        Value="selectedCuisineName"
                        ValueChanged="OnCuisineChanged"
-                       Variant="Variant.Filled"
+                       Variant="Variant.Outlined"
                        Clearable="true"
-                       AnchorOrigin="Origin.BottomCenter">
+                       AdornmentColor="Color.Primary"
+                       AnchorOrigin="Origin.BottomLeft"
+                       TransformOrigin="Origin.TopLeft"
+                       Class="rr-input">
                 <MudSelectItem T="string" Value="@(null)">Все кухни</MudSelectItem>
                 @foreach (var cuisine in CuisineType.List.OrderBy(c => c.RussianName))
                 {
@@ -40,22 +45,25 @@
             </MudSelect>
         </MudItem>
 
-        <MudItem xs="12" lg="3">
+        <MudItem xs="12" md="3">
             @if (_tags == null)
             {
-                <MudSkeleton Width="100%" Height="56px" />
+                <MudSkeleton Width="100%" Height="56px" Class="rounded-pill" />
             }
             else
             {
                 <MudSelect T="string"
-                           Label="Тэги"
+                           Label="Настроение / Теги"
                            Value="selectedTag"
                            ValueChanged="OnTagChanged"
-                           Variant="Variant.Filled"
+                           Variant="Variant.Outlined"
                            Clearable="true"
-                           AnchorOrigin="Origin.BottomCenter">
+                           AdornmentColor="Color.Primary"
+                           AnchorOrigin="Origin.BottomLeft"
+                           TransformOrigin="Origin.TopLeft"
+                           Class="rr-input">
 
-                    <MudSelectItem T="string" Value="@((string?)null)">Все тэги</MudSelectItem>
+                    <MudSelectItem T="string" Value="@((string?)null)">Любое</MudSelectItem>
 
                     @foreach (var tag in _tags)
                     {
@@ -65,12 +73,14 @@
             }
         </MudItem>
 
-        <MudItem xs="12" lg="1" Class="d-flex align-center justify-end">
-            <MudButton Variant="Variant.Text" Color="Color.Default"
-                       StartIcon="@Icons.Material.Filled.RestartAlt"
-                       Size="Size.Small" OnClick="ResetFilters">
-                Сброс
-            </MudButton>
+        <MudItem xs="12" md="1" Class="d-flex justify-start pl-2">
+            <MudTooltip Text="Сбросить все фильтры">
+                <MudIconButton Icon="@Icons.Material.Filled.Refresh"
+                               Color="Color.Secondary"
+                               Variant="Variant.Filled"
+                               OnClick="ResetFilters"
+                               Class="refresh-btn shadow-sm" />
+            </MudTooltip>
         </MudItem>
     </MudGrid>
 </MudPaper>
@@ -93,6 +103,13 @@
         {
             _tags = new();
         }
+    }
+
+    public async Task SetValues(string? search, string? cuisine)
+    {
+        searchTerm = search;
+        selectedCuisineName = cuisine;
+        StateHasChanged();
     }
 
     private Task<IEnumerable<string>> SearchRestaurants(string value, CancellationToken token)
@@ -120,7 +137,7 @@
         await OnFiltersChanged.InvokeAsync();
     }
 
-    private async Task ResetFilters()
+    public async Task ResetFilters()
     {
         searchTerm = null;
         selectedCuisineName = null;

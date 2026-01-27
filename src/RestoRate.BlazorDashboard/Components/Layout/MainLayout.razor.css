@@ -96,3 +96,46 @@ main {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+.rr-cloud {
+    background-color: #ffffff;
+    border-radius: 999px !important;
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025) !important;
+}
+
+.rr-main {
+    padding-top: 100px;
+    min-height: 100vh;
+}
+
+.hover-scale {
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-font-smoothing: subpixel-antialiased;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+    .hover-scale:hover {
+        transform: scale(1.03) translateZ(0);
+    }
+
+.text-decoration-none {
+    text-decoration: none !important;
+}
+
+::deep .mud-button-text {
+    text-transform: none;
+    font-size: 1rem;
+    padding: 6px 16px;
+    border-radius: 20px;
+}
+
+    ::deep .mud-button-text:hover {
+        background-color: rgba(119, 190, 240, 0.1);
+    }

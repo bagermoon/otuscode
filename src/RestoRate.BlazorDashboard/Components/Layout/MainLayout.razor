@@ -2,47 +2,71 @@
 @using MudBlazor
 @using Microsoft.AspNetCore.Components.Authorization
 @using RestoRate.Abstractions.Identity
-@inject IUserContext UserContext;
+@using RestoRate.BlazorDashboard.Themes
 
-<MudThemeProvider Theme="@RestoTheme" IsDarkMode="false" />
+@inject IUserContext UserContext
+
+<MudThemeProvider Theme="@AppTheme.Default" IsDarkMode="false" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar Fixed="true" Elevation="0" Color="Color.Transparent" Class="rr-appbar">
+    <MudAppBar Fixed="true" Elevation="0" Color="Color.Transparent" Class="rr-appbar pa-4">
         <MudContainer MaxWidth="MaxWidth.ExtraLarge">
-            <MudPaper Class="rr-cloud rr-topbar-inner d-flex align-center px-4 py-2" Elevation="0">
+            <MudPaper Class="rr-cloud d-flex align-center px-6 py-3 gap-4" Elevation="4">
 
-                <MudButton Variant="Variant.Text" Color="Color.Primary" Href="/index" Match="NavLinkMatch.All">
-                    Главная
-                </MudButton>
+                <div class="d-flex gap-2">
+                    <MudButton Variant="Variant.Text" Color="Color.Primary" Href="/" Match="NavLinkMatch.All" Class="font-weight-bold">
+                        Главная
+                    </MudButton>
 
-                <MudButton Variant="Variant.Text" Color="Color.Primary" Href="catalog">
-                    Каталог
-                </MudButton>
+                    <MudButton Variant="Variant.Text" Color="Color.Primary" Href="catalog" Class="font-weight-bold">
+                        Каталог
+                    </MudButton>
+                </div>
 
                 <MudSpacer />
 
                 <AuthorizeView>
                     <Authorized>
-                        <strong>@UserContext.FullName</strong>
-                        <MudButton Variant="Variant.Text" Color="Color.Primary" Href="favorites">
-                            Избранное
-                        </MudButton>
-                        <MudButton Variant="Variant.Text" Color="Color.Primary" Href="user-claims">
-                            Профиль
-                        </MudButton>
-                        <form action="authentication/logout" method="post">
-                            <AntiforgeryToken />
-                            <input type="hidden" name="ReturnUrl" value="/" />
-                            <MudButton Variant="Variant.Text" Color="Color.Primary" ButtonType="ButtonType.Submit">
-                                Выход
-                            </MudButton>
-                        </form>
+                        <div class="d-flex align-center gap-4">
+
+                            <a href="user-claims" class="d-flex align-center gap-3 text-decoration-none hover-scale">
+                                <div class="d-flex flex-column align-end">
+                                    <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="font-weight-bold" Style="line-height: 1.2;">
+                                        @UserContext.FullName
+                                    </MudText>
+                                    <MudText Typo="Typo.caption" Class="font-weight-bold mud-text-secondary" Style="font-size: 0.7rem;">
+                                        Пользователь
+                                    </MudText>
+                                </div>
+                                <MudAvatar Color="Color.Primary" Variant="Variant.Filled" Size="Size.Medium">
+                                    @(UserContext.FullName?.FirstOrDefault().ToString().ToUpper() ?? "U")
+                                </MudAvatar>
+                            </a>
+
+                            <MudDivider Vertical="true" FlexItem="true" Class="my-2" />
+
+                            <form action="authentication/logout" method="post" class="d-flex">
+                                <AntiforgeryToken />
+                                <input type="hidden" name="ReturnUrl" value="/" />
+                                <MudTooltip Text="Выйти">
+                                    <MudIconButton ButtonType="ButtonType.Submit"
+                                                   Icon="@Icons.Material.Filled.Logout"
+                                                   Color="Color.Error"
+                                                   Size="Size.Small"
+                                                   Variant="Variant.Filled"
+                                                   Class="rounded-circle" />
+                                </MudTooltip>
+                            </form>
+                        </div>
                     </Authorized>
                     <NotAuthorized>
-                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="authentication/login">
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Secondary"
+                                   Href="authentication/login"
+                                   Class="rounded-pill px-6">
                             Войти
                         </MudButton>
                     </NotAuthorized>
@@ -51,25 +75,9 @@
         </MudContainer>
     </MudAppBar>
 
-    <MudMainContent Class="rr-main text-start">
-        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="rr-content text-start">
+    <MudMainContent Class="rr-main">
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-8">
             @Body
         </MudContainer>
     </MudMainContent>
 </MudLayout>
-
-@code {
-    private static MudTheme RestoTheme => new()
-    {
-        PaletteLight = new PaletteLight
-        {
-            Primary = "#77BEF0",
-            Secondary = "#FFCB61",
-            Background = "#f8fbff",
-            Surface = "#ffffff",
-            AppbarBackground = "rgba(255,255,255,0.8)",
-            TextPrimary = "rgba(15, 23, 42, 0.92)",
-            TextSecondary = "rgba(15, 23, 42, 0.70)",
-        }
-    };
-}

@@ -1,5 +1,6 @@
 using RestoRate.Contracts.Common.Dtos;
 using RestoRate.Contracts.Restaurant.DTOs;
+using RestoRate.Contracts.Restaurant.DTOs.CRUD;
 using RestoRate.RestaurantService.Application.UseCases.Restaurants.GetAll;
 using RestoRate.ServiceDefaults;
 
@@ -9,7 +10,7 @@ public class RestaurantWebService(IHttpClientFactory httpClientFactory)
 {
     private readonly HttpClient _httpClient = httpClientFactory.CreateClient(AppHostProjects.Gateway);
 
-    public async Task<PagedResult<RestaurantDto>?> GetRestaurantsAsync(
+    public async Task<Contracts.Common.PagedResult<RestaurantDto>?> GetRestaurantsAsync(
         int pageNumber = 1,
         int pageSize = 20,
         string? searchTerm = null,
@@ -27,14 +28,22 @@ public class RestaurantWebService(IHttpClientFactory httpClientFactory)
         var response = await _httpClient.GetAsync(query);
         response.EnsureSuccessStatusCode();
 
-        return await response.Content.ReadFromJsonAsync<PagedResult<RestaurantDto>>();
+        return await response.Content.ReadFromJsonAsync<Contracts.Common.PagedResult<RestaurantDto>>();
     }
 
     public async Task<List<TagDto>> GetTagsAsync()
     {
         var response = await _httpClient.GetAsync("restaurants/tags");
-
         response.EnsureSuccessStatusCode();
+
         return await response.Content.ReadFromJsonAsync<List<TagDto>>() ?? new();
+    }
+
+    public async Task<bool> CreateRestaurantAsync(CreateRestaurantDto dto)
+    {
+        var client = httpClientFactory.CreateClient(AppHostProjects.Gateway);
+        var response = await client.PostAsJsonAsync("restaurants", dto);
+
+        return response.IsSuccessStatusCode;
     }
 }

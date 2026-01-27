@@ -1,0 +1,213 @@
+@using RestoRate.Contracts.Restaurant.DTOs
+@using RestoRate.BlazorDashboard.Helpers
+@using RestoRate.SharedKernel.Enums
+@using System.Globalization
+@using MudBlazor
+
+<MudDialog Class="rr-modern-dialog" ContentClass="pa-0 dialog-wrapper">
+    <DialogContent>
+
+        <div class="hero-header relative">
+
+            <div class="rr-custom-btn close-pos" @onclick="Close">
+                <MudIcon Icon="@Icons.Material.Filled.Close" />
+            </div>
+
+            <MudCarousel Class="rr-carousel full-height"
+                         @bind-SelectedIndex="_selectedIndex"
+                         ShowArrows="true"
+                         ShowBullets="false"
+                         EnableSwipeGesture="true"
+                         AutoCycle="false"
+                         TData="object">
+
+                <PreviousButtonTemplate>
+                    <div class="rr-custom-btn nav-arrow left" @onclick="PrevImage" @onclick:stopPropagation="true">
+                        <MudIcon Icon="@Icons.Material.Filled.ArrowBackIosNew" />
+                    </div>
+                </PreviousButtonTemplate>
+
+                <NextButtonTemplate>
+                    <div class="rr-custom-btn nav-arrow right" @onclick="NextImage" @onclick:stopPropagation="true">
+                        <MudIcon Icon="@Icons.Material.Filled.ArrowForwardIos" />
+                    </div>
+                </NextButtonTemplate>
+
+                <ChildContent>
+                    @if (Restaurant.Images != null && Restaurant.Images.Any())
+                    {
+                        @foreach (var img in Restaurant.Images)
+                        {
+                            <MudCarouselItem Transition="Transition.Fade" Class="full-height carousel-item-no-padding">
+                                <div class="carousel-image" style="background-image: url('@img.Url')"></div>
+                            </MudCarouselItem>
+                        }
+                    }
+                    else
+                    {
+                        <MudCarouselItem Class="full-height carousel-item-no-padding">
+                            <div class="carousel-image d-flex align-center justify-center bg-gray-200">
+                                <MudIcon Icon="@Icons.Material.Filled.Restaurant" Size="Size.Large" Color="Color.Default" />
+                            </div>
+                        </MudCarouselItem>
+                    }
+                </ChildContent>
+            </MudCarousel>
+
+            <div class="hero-overlay-gradient">
+                <div class="hero-text-content pa-6 pa-md-8">
+                    <MudText Typo="Typo.h3"
+                             Class="font-weight-bold mb-1"
+                             Style="color: #ffffff !important; text-shadow: 0 2px 10px rgba(0,0,0,0.9);">
+                        @Restaurant.Name
+                    </MudText>
+
+                    @if (Restaurant.CuisineTypes != null && Restaurant.CuisineTypes.Any())
+                    {
+                        var displayCuisines = Restaurant.CuisineTypes
+                        .Select(c =>
+                        {
+                            var name = CuisineType.TryFromName(c, out var ct) ? ct.RussianName : c;
+                            return name.Contains("кухня", StringComparison.OrdinalIgnoreCase) ? name : name + " кухня";
+                        })
+                        .Take(4);
+
+                        <MudText Typo="Typo.subtitle1"
+                                 Class="font-weight-bold"
+                                 Style="color: #ffffff !important; text-shadow: 0 2px 8px rgba(0,0,0,0.9);">
+                            @string.Join(" • ", displayCuisines)
+                        </MudText>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="pa-6 pa-md-8 pt-6">
+            <MudGrid Spacing="5">
+                <MudItem xs="12" md="7" lg="8">
+                    <MudText Typo="Typo.h5" Class="mb-4 font-weight-bold" Color="Color.Primary">Теги</MudText>
+                    <div class="d-flex flex-wrap gap-2 mb-6">
+                        @if (Restaurant.Tags?.Any() == true)
+                        {
+                            foreach (var tag in Restaurant.Tags)
+                            {
+                                <MudChip T="string" Variant="Variant.Outlined" Class="rr-chip font-weight-bold">#@tag</MudChip>
+                            }
+                        }
+                    </div>
+                    @if (!string.IsNullOrEmpty(Restaurant.Description))
+                    {
+                        <MudText Typo="Typo.h6" Class="mb-2 font-weight-bold" Color="Color.Primary">О ресторане</MudText>
+                        <MudText Typo="Typo.body1" Class="text-secondary lh-lg" Style="white-space: pre-line; font-size: 1.1rem;">
+                            @Restaurant.Description
+                        </MudText>
+                    }
+                </MudItem>
+                <MudItem xs="12" md="5" lg="4">
+                    <MudPaper Elevation="0" Class="info-panel pa-6 rounded-xl shadow-sm">
+                        <div class="d-flex align-center mb-6">
+                            <div class="icon-circle bg-green-light mr-4">
+                                <MudIcon Icon="@Icons.Material.Filled.CurrencyRuble" Color="Color.Success" Size="Size.Medium" />
+                            </div>
+                            <div>
+                                <MudText Typo="Typo.caption" Class="text-secondary text-uppercase font-weight-bold mb-1 d-block">Средний чек</MudText>
+                                <MudText Typo="Typo.h5" Class="font-weight-bold">
+                                    @(Restaurant.AverageCheck != null && Restaurant.AverageCheck.Amount > 0 ? $"{Restaurant.AverageCheck.Amount:N0} ₽" : "Не указан")
+                                </MudText>
+                            </div>
+                        </div>
+                        <MudDivider Class="mb-6" />
+                        <div class="d-flex align-start mb-6">
+                            <div class="icon-circle bg-blue-light mr-4 mt-1">
+                                <MudIcon Icon="@Icons.Material.Filled.Place" Color="Color.Primary" />
+                            </div>
+                            <div>
+                                <MudText Typo="Typo.caption" Class="text-secondary text-uppercase font-weight-bold mb-1 d-block">Адрес</MudText>
+                                <MudText Typo="Typo.body1" Class="font-weight-bold mb-1">
+                                    @Restaurant.Address?.FullAddress
+                                </MudText>
+                                <MudLink Href="@GetMapLink()" Target="_blank" Underline="Underline.Always" Color="Color.Primary" Class="font-weight-bold">
+                                    Показать на карте
+                                </MudLink>
+                            </div>
+                        </div>
+                        <div class="d-flex align-start mb-6">
+                            <div class="icon-circle bg-blue-light mr-4 mt-1">
+                                <MudIcon Icon="@Icons.Material.Filled.Phone" Color="Color.Primary" />
+                            </div>
+                            <div>
+                                <MudText Typo="Typo.caption" Class="text-secondary text-uppercase font-weight-bold mb-1 d-block">Контакты</MudText>
+                                <MudText Typo="Typo.body1" Class="font-weight-bold">
+                                    @(!string.IsNullOrEmpty(Restaurant.PhoneNumber) ? Restaurant.PhoneNumber : "-")
+                                </MudText>
+                                @if (!string.IsNullOrEmpty(Restaurant.Email))
+                                {
+                                    <MudText Typo="Typo.body2" Class="text-secondary mt-1 d-block" Style="word-break: break-all;">@Restaurant.Email</MudText>
+                                }
+                            </div>
+                        </div>
+                        <div class="d-flex align-start">
+                            <div class="icon-circle bg-blue-light mr-4 mt-1">
+                                <MudIcon Icon="@Icons.Material.Filled.AccessTime" Color="Color.Primary" />
+                            </div>
+                            <div>
+                                <MudText Typo="Typo.caption" Class="text-secondary text-uppercase font-weight-bold mb-1 d-block">Режим работы</MudText>
+                                @if (Restaurant.OpenHours != null)
+                                {
+                                    <MudText Typo="Typo.body1" Class="font-weight-bold text-success">
+                                        @Restaurant.OpenHours.OpenTime.ToString(@"HH\:mm") - @Restaurant.OpenHours.CloseTime.ToString(@"HH\:mm")
+                                    </MudText>
+                                }
+                                else
+                                {
+                                    <MudText Typo="Typo.body1" Class="text-secondary">Время не указано</MudText>
+                                }
+                            </div>
+                        </div>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </div>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public RestaurantDto Restaurant { get; set; } = default!;
+
+    private int _selectedIndex = 0;
+
+    protected override void OnInitialized()
+    {
+        _selectedIndex = 0;
+    }
+
+    private void Close() => MudDialog.Close();
+
+    private void NextImage()
+    {
+        if (Restaurant.Images == null || !Restaurant.Images.Any()) return;
+        var count = Restaurant.Images.Count;
+
+        _selectedIndex = (_selectedIndex + 1) % count;
+    }
+
+    private void PrevImage()
+    {
+        if (Restaurant.Images == null || !Restaurant.Images.Any()) return;
+        var count = Restaurant.Images.Count;
+
+        _selectedIndex = (_selectedIndex - 1 + count) % count;
+    }
+
+    private string GetMapLink()
+    {
+        if (Restaurant.Location != null)
+        {
+            var lat = Restaurant.Location.Latitude.ToString(CultureInfo.InvariantCulture);
+            var lon = Restaurant.Location.Longitude.ToString(CultureInfo.InvariantCulture);
+            return $"https://yandex.ru/maps/?pt={lon},{lat}&z=15&l=map";
+        }
+        return "#";
+    }
+}

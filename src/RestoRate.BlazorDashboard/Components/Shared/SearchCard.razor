@@ -1,0 +1,107 @@
+@using RestoRate.Contracts.Restaurant.DTOs
+@using MudBlazor
+@using RestoRate.BlazorDashboard.Helpers
+@using RestoRate.SharedKernel.Enums
+
+<MudCard Class="rr-card rr-hover h-100 d-flex flex-column" @onclick="() => OnOpen.InvokeAsync(Restaurant)">
+
+    <div class="card-image-container">
+        <div style="background-image: url('@CurrentImage');" class="card-hero-image">
+            <div class="status-chip-container">
+                <MudChip T="string"
+                         Size="Size.Small"
+                         Color="@StatusHelper.GetColor(Restaurant.RestaurantStatus)"
+                         Variant="Variant.Filled"
+                         Class="ma-2 font-weight-bold">
+                    @StatusHelper.GetRussianName(Restaurant.RestaurantStatus)
+                </MudChip>
+            </div>
+        </div>
+    </div>
+
+    @if (Restaurant.Images?.Count() > 1)
+    {
+        <div class="thumbnails-scroll px-2 pt-2" @onclick:stopPropagation="true">
+            @foreach (var image in Restaurant.Images.OrderByDescending(i => i.IsPrimary).Take(5))
+            {
+                <div class="thumbnail-item @(CurrentImage == image.Url ? "active" : "")"
+                     @onmouseover="@(() => SetCurrentImage(image.Url))"
+                     @onclick="@(() => SetCurrentImage(image.Url))">
+                    <div class="thumbnail-img" style="background-image: url('@image.Url');"></div>
+                </div>
+            }
+        </div>
+    }
+
+    <MudCardContent Class="pa-3 flex-grow-1">
+        <div class="d-flex justify-space-between align-start mb-1">
+            <MudText Typo="Typo.subtitle1" Class="font-weight-bold lh-sm text-truncate">@Restaurant.Name</MudText>
+        </div>
+
+        @if (Restaurant.CuisineTypes?.Any() == true)
+        {
+            <div class="d-flex flex-wrap gap-1 mb-2">
+                @foreach (var cuisine in Restaurant.CuisineTypes.Take(3))
+                {
+                    var name = CuisineType.TryFromName(cuisine, out var cType) ? cType.RussianName : cuisine;
+
+                    if (!name.Contains("кухня", StringComparison.OrdinalIgnoreCase))
+                        name += " кухня";
+
+                    <MudText Typo="Typo.caption" Class="text-secondary mr-2">
+                        @name
+                    </MudText>
+                }
+            </div>
+        }
+
+        <div class="mt-auto">
+            @if (Restaurant.Tags?.Any() == true)
+            {
+                <div class="d-flex flex-wrap gap-1 mb-2" style="overflow:hidden; height: 24px;">
+                    @foreach (var tag in Restaurant.Tags.Take(3))
+                    {
+                        <MudText Typo="Typo.caption" Color="Color.Primary" Class="mr-2 font-weight-bold">
+                            #@tag
+                        </MudText>
+                    }
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Restaurant.Address?.FullAddress))
+            {
+                <MudDivider Class="my-2" />
+                <div class="d-flex align-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Place" Size="Size.Small" Color="Color.Secondary" Class="mr-1 icon-small" />
+                    <MudText Typo="Typo.caption" Color="Color.Secondary" Class="text-truncate">
+                        @Restaurant.Address.FullAddress
+                    </MudText>
+                </div>
+            }
+        </div>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter] public RestaurantDto Restaurant { get; set; } = default!;
+    [Parameter] public EventCallback<RestaurantDto> OnOpen { get; set; }
+
+    private string CurrentImage { get; set; } = "";
+
+    protected override void OnInitialized()
+    {
+        var primary = Restaurant.Images?.FirstOrDefault(i => i.IsPrimary);
+        CurrentImage = primary?.Url ?? GetPlaceholderImage();
+    }
+
+    private void SetCurrentImage(string imageUrl)
+    {
+        CurrentImage = imageUrl;
+    }
+
+    private string GetPlaceholderImage()
+    {
+        var seed = Restaurant.RestaurantId.GetHashCode();
+        return $"https://loremflickr.com/400/300/restaurant,food?lock={seed}";
+    }
+}
