@@ -4,7 +4,7 @@ using MassTransit;
 
 using Microsoft.Extensions.Logging;
 
-using RestoRate.ReviewService.Application.Sagas.Messages;
+using RestoRate.Contracts.Review.Events;
 using RestoRate.ReviewService.Domain.Events;
 
 namespace RestoRate.ReviewService.Application.Handlers;

@@ -1,5 +1,6 @@
 using FluentAssertions;
 
+using RestoRate.Contracts.Common.Dtos;
 using RestoRate.Contracts.Review.Dtos;
 
 namespace RestoRate.ReviewService.IntegrationTests.Api;
@@ -34,5 +35,20 @@ public class CreateReviewTests : IClassFixture<ReviewWebApplicationFactory>
         created.Comment.Should().Be(createDto.Comment);
         created.Rating.Should().Be(createDto.Rating);
         created.AverageCheck.Should().Be(createDto.AverageCheck);
+    }
+
+    [Fact]
+    public async Task CreateReview_WithAverageCheck_PreservesAverageCheck()
+    {
+        var averageCheck = new MoneyDto(1234.56m, "RUB");
+        var createDto = new CreateReviewDto(Guid.NewGuid(), Guid.NewGuid(), 4.5m, averageCheck, "Integration create review with average check");
+
+        var response = await _client.PostAsJsonAsync("/reviews/", createDto, CancellationToken);
+
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        var created = await response.Content.ReadFromJsonAsync<ReviewDto>(CancellationToken);
+        created.Should().NotBeNull();
+        created!.AverageCheck.Should().Be(averageCheck);
     }
 }

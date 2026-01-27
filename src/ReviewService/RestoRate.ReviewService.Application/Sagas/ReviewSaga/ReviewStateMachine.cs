@@ -1,6 +1,6 @@
 using MassTransit;
 
-using RestoRate.ReviewService.Application.Sagas.Messages;
+using RestoRate.Contracts.Review.Events;
 using RestoRate.ReviewService.Application.UseCases.Reviews.Approve;
 using RestoRate.ReviewService.Application.UseCases.Reviews.MoveToModerationPending;
 using RestoRate.ReviewService.Application.UseCases.Reviews.Reject;

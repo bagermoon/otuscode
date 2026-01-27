@@ -5,7 +5,7 @@ using RestoRate.ReviewService.Domain.ReviewAggregate;
 
 namespace RestoRate.ReviewService.Infrastructure.Configuration;
 
-internal class ReviewConfiguration : IEntityTypeConfiguration<Review>
+internal sealed class ReviewConfiguration : IEntityTypeConfiguration<Review>
 {
     public void Configure(EntityTypeBuilder<Review> builder)
     {

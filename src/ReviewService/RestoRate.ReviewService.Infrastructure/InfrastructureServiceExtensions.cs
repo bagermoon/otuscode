@@ -9,12 +9,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using MongoDB.Driver;
+using NodaMoney;
 
 using RestoRate.BuildingBlocks.Data;
 using RestoRate.BuildingBlocks.Messaging;
 using RestoRate.Contracts.Restaurant.Requests;
 using RestoRate.ReviewService.Infrastructure.Data;
 using RestoRate.ReviewService.Infrastructure.Repositories;
+using RestoRate.ReviewService.Infrastructure.Serialization;
 using RestoRate.ServiceDefaults;
 
 namespace RestoRate.ReviewService.Infrastructure;
@@ -30,6 +32,8 @@ public static class InfrastructureServiceExtensions
         {
             assemblies = [Assembly.GetCallingAssembly()];
         }
+
+        MoneyBsonSerializerRegistration.EnsureRegistered();
 
         builder.AddMongoDbContext<ReviewDbContext>(AppHostProjects.ReviewDb);
 
@@ -52,7 +56,11 @@ public static class InfrastructureServiceExtensions
                 }
                 configs.AddRequestClient<GetRestaurantStatusRequest>();
 
-                if (reviewMongoUrl is not null && !string.IsNullOrWhiteSpace(reviewMongoUrl.DatabaseName))
+                var useMongoDbSagaOutbox = builder.Configuration.GetValue("MassTransit:UseMongoDbSagaOutbox", true);
+
+                if (useMongoDbSagaOutbox
+                    && reviewMongoUrl is not null
+                    && !string.IsNullOrWhiteSpace(reviewMongoUrl.DatabaseName))
                 {
                     configs.SetMongoDbSagaOutbox(reviewMongoUrl);
                 }

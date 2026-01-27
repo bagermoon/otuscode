@@ -6,7 +6,7 @@ using Mediator;
 
 using Microsoft.Extensions.DependencyInjection;
 
-using RestoRate.ReviewService.Application.Sagas.Messages;
+using RestoRate.Contracts.Review.Events;
 using RestoRate.ReviewService.Application.UseCases.RestaurantReferences.RestaurantReferenceValidation;
 using RestoRate.ReviewService.Domain.ReviewAggregate;
 using RestoRate.ReviewService.Domain.ReviewAggregate.Specifications;
