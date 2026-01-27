@@ -1,6 +1,6 @@
 using RestoRate.Contracts.Common.Dtos;
 
-namespace RestoRate.ReviewService.Application.DTOs;
+namespace RestoRate.Contracts.Review.Dtos;
 
 public record ReviewDto(
     Guid Id,
@@ -8,7 +8,7 @@ public record ReviewDto(
     Guid UserId,
     decimal Rating,
     MoneyDto? AverageCheck,
-    string Text,
+    string Comment,
     DateTime CreatedAt,
     DateTime? UpdatedAt
 );

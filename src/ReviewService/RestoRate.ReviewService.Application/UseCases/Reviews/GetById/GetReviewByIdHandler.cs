@@ -5,7 +5,7 @@ using Mediator;
 
 using Microsoft.Extensions.Logging;
 
-using RestoRate.ReviewService.Application.DTOs;
+using RestoRate.Contracts.Review.Dtos;
 using RestoRate.ReviewService.Application.Mappings;
 
 using ReviewEntity = RestoRate.ReviewService.Domain.ReviewAggregate.Review;

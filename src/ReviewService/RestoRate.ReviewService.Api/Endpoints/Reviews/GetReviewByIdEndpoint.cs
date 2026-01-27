@@ -2,7 +2,7 @@ using Ardalis.Result;
 
 using Mediator;
 
-using RestoRate.ReviewService.Application.DTOs;
+using RestoRate.Contracts.Review.Dtos;
 using RestoRate.ReviewService.Application.UseCases.Reviews.GetById;
 
 namespace RestoRate.ReviewService.Api.Endpoints.Reviews;
