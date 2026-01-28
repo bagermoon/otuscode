@@ -15,7 +15,13 @@ internal static class GetReviewByIdEndpoint
         group.MapGet("/{id:guid}", async (Guid id, ISender sender, CancellationToken ct) =>
         {
             var result = await sender.Send(new GetReviewByIdQuery(id), ct);
-            return result;
+            return result.Status switch
+            {
+                ResultStatus.Ok => Results.Ok(result.Value),
+                ResultStatus.NotFound => Results.NotFound(),
+                ResultStatus.Invalid => Results.BadRequest(result.Errors),
+                _ => Results.Problem(string.Join(";", result.Errors))
+            };
         })
         .WithName("GetReviewById")
         .WithSummary("Получить отзыв по ID")

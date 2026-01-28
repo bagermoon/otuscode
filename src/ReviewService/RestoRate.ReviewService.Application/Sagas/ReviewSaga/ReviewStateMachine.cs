@@ -25,9 +25,8 @@ public class ReviewStateMachine : MassTransitStateMachine<ReviewState>
     public Event<ReviewValidationRequested> ReviewValidationRequested { get; private set; } = default!;
     public Event<RestaurantValidationCompleted> RestaurantValidationCompleted { get; private set; } = default!;
     public Event<UserValidationCompleted> UserValidationCompleted { get; private set; } = default!;
-    public Event ValidationsCompleted { get; private set; } = default!;
-
     public Event<ReviewModeratedEvent> ReviewModeratedEvent { get; private set; } = default!;
+
     public ReviewStateMachine()
     {
         InstanceState(x => x.CurrentState);
@@ -53,12 +52,6 @@ public class ReviewStateMachine : MassTransitStateMachine<ReviewState>
             x.CorrelateById(context => context.Message.ReviewId);
         });
 
-        CompositeEvent(
-            () => ValidationsCompleted,
-            x => x.ValidationCompleted,
-            RestaurantValidationCompleted,
-            UserValidationCompleted);
-
         Initially(
             When(ReviewValidationRequested)
                 .Then(context =>
@@ -76,69 +69,31 @@ public class ReviewStateMachine : MassTransitStateMachine<ReviewState>
                 {
                     context.Saga.RestaurantValidatedAt = context.Message.ValidatedAt;
                     context.Saga.IsRestaurantValid = context.Message.IsValid;
-                }),
+                })
+                .If(context => context.Saga.IsUserValid.HasValue,
+                    DecideValidation),
             When(UserValidationCompleted)
                 .Then(context =>
                 {
                     context.Saga.UserValidatedAt = context.Message.ValidatedAt;
                     context.Saga.IsUserValid = context.Message.IsValid;
-                }),
-            When(ValidationsCompleted)
-                .IfElse(
-                    context => context.Saga.IsRestaurantValid == true && context.Saga.IsUserValid == true,
-                    thenBinder => thenBinder
-                        .ThenAsync(async context =>
-                        {
-                            var provider = context.GetPayload<IServiceProvider>();
-                            var sender = provider.GetRequiredService<ISender>();
-
-                            await sender.Send(
-                                new MoveReviewToModerationPendingCommand(context.Saga.CorrelationId),
-                                context.CancellationToken);
-                        })
-                        .TransitionTo(ValidationOk),
-                    elseBinder => elseBinder
-                        .ThenAsync(async context =>
-                        {
-                            var provider = context.GetPayload<IServiceProvider>();
-                            var sender = provider.GetRequiredService<ISender>();
-
-                            await sender.Send(
-                                new RejectReviewCommand(context.Saga.CorrelationId),
-                                context.CancellationToken);
-                        })
-                        .TransitionTo(ValidationFailed))
+                })
+                .If(context => context.Saga.IsRestaurantValid.HasValue,
+                    DecideValidation)
         );
 
         During(ValidationOk,
             Ignore(ReviewValidationRequested),
             Ignore(RestaurantValidationCompleted),
             Ignore(UserValidationCompleted),
-            Ignore(ValidationsCompleted),
             When(ReviewModeratedEvent)
                 .IfElse(
                     context => context.Message.Approved,
                     thenBinder => thenBinder
-                        .ThenAsync(async context =>
-                        {
-                            var provider = context.GetPayload<IServiceProvider>();
-                            var sender = provider.GetRequiredService<ISender>();
-
-                            await sender.Send(
-                                new ApproveReviewCommand(context.Saga.CorrelationId),
-                                context.CancellationToken);
-                        })
+                        .ThenAsync(ApproveReviewAsync)
                         .TransitionTo(ModerationApproved),
                     elseBinder => elseBinder
-                        .ThenAsync(async context =>
-                        {
-                            var provider = context.GetPayload<IServiceProvider>();
-                            var sender = provider.GetRequiredService<ISender>();
-
-                            await sender.Send(
-                                new RejectReviewCommand(context.Saga.CorrelationId),
-                                context.CancellationToken);
-                        })
+                        .ThenAsync(RejectReviewAsync)
                         .TransitionTo(ModerationRejected))
         );
 
@@ -146,21 +101,60 @@ public class ReviewStateMachine : MassTransitStateMachine<ReviewState>
             Ignore(ReviewValidationRequested),
             Ignore(RestaurantValidationCompleted),
             Ignore(UserValidationCompleted),
-            Ignore(ValidationsCompleted),
             Ignore(ReviewModeratedEvent));
 
         During(ModerationApproved,
             Ignore(ReviewValidationRequested),
             Ignore(RestaurantValidationCompleted),
             Ignore(UserValidationCompleted),
-            Ignore(ValidationsCompleted),
             Ignore(ReviewModeratedEvent));
 
         During(ModerationRejected,
             Ignore(ReviewValidationRequested),
             Ignore(RestaurantValidationCompleted),
             Ignore(UserValidationCompleted),
-            Ignore(ValidationsCompleted),
             Ignore(ReviewModeratedEvent));
+    }
+
+    private EventActivityBinder<ReviewState, TMessage> DecideValidation<TMessage>(EventActivityBinder<ReviewState, TMessage> binder)
+        where TMessage : class
+        => binder.IfElse(
+            context => context.Saga.IsRestaurantValid == true && context.Saga.IsUserValid == true,
+            thenBinder => thenBinder
+                .ThenAsync(MoveReviewToModerationPendingAsync)
+                .TransitionTo(ValidationOk),
+            elseBinder => elseBinder
+                .ThenAsync(RejectReviewAsync)
+                .TransitionTo(ValidationFailed));
+
+    private static async Task MoveReviewToModerationPendingAsync<TMessage>(BehaviorContext<ReviewState, TMessage> context)
+        where TMessage : class
+    {
+        var provider = context.GetPayload<IServiceProvider>();
+        var sender = provider.GetRequiredService<ISender>();
+
+        await sender.Send(
+            new MoveReviewToModerationPendingCommand(context.Saga.CorrelationId),
+            context.CancellationToken);
+    }
+    private static async Task RejectReviewAsync<TMessage>(BehaviorContext<ReviewState, TMessage> context)
+        where TMessage : class
+    {
+        var provider = context.GetPayload<IServiceProvider>();
+        var sender = provider.GetRequiredService<ISender>();
+
+        await sender.Send(
+            new RejectReviewCommand(context.Saga.CorrelationId),
+            context.CancellationToken);
+    }
+    private static async Task ApproveReviewAsync<TMessage>(BehaviorContext<ReviewState, TMessage> context)
+        where TMessage : class
+    {
+        var provider = context.GetPayload<IServiceProvider>();
+        var sender = provider.GetRequiredService<ISender>();
+
+        await sender.Send(
+            new ApproveReviewCommand(context.Saga.CorrelationId),
+            context.CancellationToken);
     }
 }
