@@ -11,7 +11,6 @@ public sealed class GetPendingReviewsByUserSpec : Specification<Review>
 {
     public GetPendingReviewsByUserSpec(Guid userId)
     {
-        Query.Where(r => r.Status == ReviewStatus.Pending);
-        Query.Where(r => r.UserId == userId);
+        Query.PendingReviews().Where(r => r.UserId == userId);
     }
 }

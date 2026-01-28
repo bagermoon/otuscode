@@ -66,7 +66,7 @@ public sealed class RestaurantValidationStateMachine : MassTransitStateMachine<R
                     var reviewRepository = provider.GetRequiredService<IRepository<Review>>();
 
                     var pendingReviews = await reviewRepository.ListAsync(
-                        new GetPendingReviewsSpec(context.Saga.CorrelationId),
+                        new GetPendingReviewsByRestaurantSpec(context.Saga.CorrelationId),
                         context.CancellationToken);
 
                     foreach (var review in pendingReviews)
