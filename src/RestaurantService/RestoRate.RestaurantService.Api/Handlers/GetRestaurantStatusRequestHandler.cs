@@ -7,23 +7,22 @@ using RestoRate.Contracts.Restaurant;
 using RestoRate.RestaurantService.Infrastructure.Data;
 using RestoRate.RestaurantService.Application.Mappings;
 
+using Mediator;
+using RestoRate.RestaurantService.Application.UseCases.Restaurants.GetStatus;
+using Ardalis.Result;
+
 namespace RestoRate.RestaurantService.Api.Handlers;
 
 public sealed class GetRestaurantStatusRequestHandler(
-    RestaurantDbContext db)
+    ISender sender)
     : IConsumer<GetRestaurantStatusRequest>
 {
     public async Task Consume(ConsumeContext<GetRestaurantStatusRequest> context)
     {
         var restaurantId = context.Message.RestaurantId;
-        //  Move to use case
-        var restaurant = await db.Restaurants
-            .AsNoTracking()
-            .Where(r => r.Id == restaurantId)
-            .Select(r => new { r.Id, r.RestaurantStatus })
-            .FirstOrDefaultAsync(context.CancellationToken);
+        var result = await sender.Send(new GetRestaurantStatusQuery(restaurantId), context.CancellationToken);
 
-        if (restaurant is null)
+        if (result.IsError())
         {
             await context.RespondAsync(new GetRestaurantStatusResponse(
                 RestaurantId: restaurantId,
@@ -31,10 +30,10 @@ public sealed class GetRestaurantStatusRequestHandler(
                 Status: RestaurantStatus.Unknown));
             return;
         }
-
+        var info = result.Value;
         await context.RespondAsync(new GetRestaurantStatusResponse(
-            RestaurantId: restaurant.Id,
-            Exists: true,
-            Status: restaurant.RestaurantStatus.ToContract()));
+            RestaurantId: info.RestaurantId,
+            Exists: info.Exists,
+            Status: info.Status.ToContract()));
     }
 }
