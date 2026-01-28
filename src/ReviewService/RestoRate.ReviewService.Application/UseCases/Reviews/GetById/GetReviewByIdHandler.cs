@@ -19,11 +19,11 @@ public sealed class GetReviewByIdHandler(
 {
     public async ValueTask<Result<ReviewDto>> Handle(GetReviewByIdQuery request, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Получение отзыва по Id: {ReviewId}", request.Id);
+        logger.LogGetting(request.Id);
         var result = await repository.GetByIdAsync(request.Id, cancellationToken);
         if (result is null)
         {
-            logger.LogWarning("Отзыв не найден: {ReviewId}", request.Id);
+            logger.LogNotFound(request.Id);
             return Result<ReviewDto>.NotFound();
         }
         var dto = new ReviewDto(

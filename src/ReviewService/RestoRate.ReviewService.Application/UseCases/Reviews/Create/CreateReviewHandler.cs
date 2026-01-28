@@ -20,7 +20,7 @@ public sealed class CreateReviewHandler(
         CreateReviewCommand request,
         CancellationToken cancellationToken)
     {
-        logger.LogInformation("Handling CreateReviewCommand for RestaurantId: {RestaurantId}, UserId: {UserId}", request.Dto.RestaurantId, request.Dto.UserId);
+        logger.LogHandling(request.Dto.RestaurantId, request.Dto.UserId);
 
         try
         {
@@ -46,12 +46,12 @@ public sealed class CreateReviewHandler(
                 review.CreatedAt,
                 review.UpdatedAt);
 
-            logger.LogInformation("Review created successfully: ID {ReviewId}", review.Id);
+            logger.LogCreated(review.Id);
             return Result<ReviewDto>.Success(dto);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error creating review");
+            logger.LogCreateError(ex);
             return Result<ReviewDto>.Error(ex.Message);
         }
     }
