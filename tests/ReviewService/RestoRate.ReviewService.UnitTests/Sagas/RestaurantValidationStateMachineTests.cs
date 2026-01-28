@@ -35,7 +35,7 @@ public sealed class RestaurantValidationStateMachineTests(ITestContextAccessor t
         var pendingReview2 = new Review(restaurantId, userId, rating: 4m, averageCheck: null, comment: null);
 
         reviewRepository
-            .ListAsync(Arg.Any<GetPendingReviewsSpec>(), Arg.Any<CancellationToken>())
+            .ListAsync(Arg.Any<GetPendingReviewsByRestaurantSpec>(), Arg.Any<CancellationToken>())
             .Returns([pendingReview1, pendingReview2]);
 
         var services = new ServiceCollection();
