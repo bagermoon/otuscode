@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\ReviewService\RestoRate.ReviewService.Application\RestoRate.ReviewService.Application.csproj" />
+    <ProjectReference Include="..\..\RestoRate.Testing.Common\RestoRate.Testing.Common.csproj" />
   </ItemGroup>
 
 </Project>

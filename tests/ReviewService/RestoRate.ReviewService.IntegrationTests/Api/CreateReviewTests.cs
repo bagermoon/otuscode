@@ -1,6 +1,7 @@
 using FluentAssertions;
 
-using RestoRate.ReviewService.Application.DTOs;
+using RestoRate.Contracts.Common.Dtos;
+using RestoRate.Contracts.Review.Dtos;
 
 namespace RestoRate.ReviewService.IntegrationTests.Api;
 
@@ -23,7 +24,7 @@ public class CreateReviewTests : IClassFixture<ReviewWebApplicationFactory>
     [Fact]
     public async Task CreateReview_ValidData_ReturnsCreatedReview()
     {
-        var createDto = new CreateReviewDto(Guid.NewGuid(), Guid.NewGuid(), 4, "Integration create review");
+        var createDto = new CreateReviewDto(Guid.NewGuid(), Guid.NewGuid(), 4m, null, "Integration create review");
         var response = await _client.PostAsJsonAsync("/reviews/", createDto, CancellationToken);
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -31,7 +32,23 @@ public class CreateReviewTests : IClassFixture<ReviewWebApplicationFactory>
         var created = await response.Content.ReadFromJsonAsync<ReviewDto>(CancellationToken);
         created.Should().NotBeNull();
         created!.Id.Should().NotBeEmpty();
-        created.Text.Should().Be(createDto.Text);
+        created.Comment.Should().Be(createDto.Comment);
         created.Rating.Should().Be(createDto.Rating);
+        created.AverageCheck.Should().Be(createDto.AverageCheck);
+    }
+
+    [Fact]
+    public async Task CreateReview_WithAverageCheck_PreservesAverageCheck()
+    {
+        var averageCheck = new MoneyDto(1234.56m, "RUB");
+        var createDto = new CreateReviewDto(Guid.NewGuid(), Guid.NewGuid(), 4.5m, averageCheck, "Integration create review with average check");
+
+        var response = await _client.PostAsJsonAsync("/reviews/", createDto, CancellationToken);
+
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        var created = await response.Content.ReadFromJsonAsync<ReviewDto>(CancellationToken);
+        created.Should().NotBeNull();
+        created!.AverageCheck.Should().Be(averageCheck);
     }
 }

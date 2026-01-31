@@ -1,17 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MongoDB.EntityFrameworkCore.Extensions;
 using Microsoft.EntityFrameworkCore;
+using RestoRate.ReviewService.Domain.ReviewAggregate;
 
 namespace RestoRate.ReviewService.Infrastructure.Configuration;
 
-internal class ReviewConfiguration : IEntityTypeConfiguration<RestoRate.ReviewService.Domain.ReviewAggregate.Review>
+internal sealed class ReviewConfiguration : IEntityTypeConfiguration<Review>
 {
-    public void Configure(EntityTypeBuilder<RestoRate.ReviewService.Domain.ReviewAggregate.Review> builder)
+    public void Configure(EntityTypeBuilder<Review> builder)
     {
         builder.ToCollection("Reviews");
 
@@ -26,6 +22,9 @@ internal class ReviewConfiguration : IEntityTypeConfiguration<RestoRate.ReviewSe
         builder.Property(r => r.Rating)
             .IsRequired();
 
+        builder.Property(r => r.AverageCheck)
+            .IsRequired(false);
+
         builder.Property(r => r.Comment)
             .HasMaxLength(1000);
 
@@ -34,5 +33,24 @@ internal class ReviewConfiguration : IEntityTypeConfiguration<RestoRate.ReviewSe
 
         builder.Property(r => r.UpdatedAt)
             .IsRequired(false);
+
+        builder.Property(r => r.Status)
+            .IsRequired();
+
+        builder.HasOne(r => r.Restaurant)
+            .WithMany()
+            .HasForeignKey(r => r.RestaurantId)
+            .IsRequired(false);
+
+        builder.Navigation(rt => rt.Restaurant)
+            .AutoInclude(false); // добавлен в спецификации
+
+        builder.HasOne(r => r.User)
+            .WithMany()
+            .HasForeignKey(r => r.UserId)
+            .IsRequired(false);
+
+        builder.Navigation(rt => rt.User)
+            .AutoInclude(false); // добавлен в спецификации
     }
 }

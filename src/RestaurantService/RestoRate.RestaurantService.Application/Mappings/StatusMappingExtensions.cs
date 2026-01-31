@@ -8,6 +8,7 @@ public static class StatusMappingExtensions
     public static ContractRestaurantStatus ToContract(this DomainRestaurantStatus status) =>
         status.Name switch
         {
+            nameof(DomainRestaurantStatus.Unknown) => ContractRestaurantStatus.Unknown,
             nameof(DomainRestaurantStatus.Draft) => ContractRestaurantStatus.Draft,
             nameof(DomainRestaurantStatus.Published) => ContractRestaurantStatus.Published,
             nameof(DomainRestaurantStatus.Archived) => ContractRestaurantStatus.Archived,
@@ -19,11 +20,12 @@ public static class StatusMappingExtensions
     public static SharedKernel.Enums.RestaurantStatus ToDomain(this Contracts.Restaurant.RestaurantStatus contractStatus) =>
         contractStatus switch
         {
+            ContractRestaurantStatus.Unknown => DomainRestaurantStatus.Unknown,
             ContractRestaurantStatus.Draft => DomainRestaurantStatus.Draft,
             ContractRestaurantStatus.Published => DomainRestaurantStatus.Published,
             ContractRestaurantStatus.Archived => DomainRestaurantStatus.Archived,
             ContractRestaurantStatus.Rejected => DomainRestaurantStatus.Rejected,
             ContractRestaurantStatus.OnModeration => DomainRestaurantStatus.OnModeration,
-            _ => DomainRestaurantStatus.Draft // default/fallback for Unknown
+            _ => DomainRestaurantStatus.Unknown // default/fallback for Unknown
         };
 }
