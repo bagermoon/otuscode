@@ -1,36 +1,142 @@
 @page "/user-claims"
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Authorization
+@using MudBlazor
 @attribute [Authorize]
 
-<PageTitle>User Claims</PageTitle>
+<PageTitle>Профиль пользователя</PageTitle>
 
-<h1>User Claims</h1>
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-8">
 
-@if (claims.Any())
-{
-    <ul>
-        @foreach (var claim in claims)
-        {
-            <li><b>@claim.Type:</b> @claim.Value</li>
-        }
-    </ul>
-}
+    <MudPaper Elevation="3" Class="pa-8 rounded-xl mb-6 d-flex align-center gap-6 relative overflow-hidden">
+        <div style="position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, #594ae2 0%, #ff4081 100%);"></div>
+
+        <MudAvatar Style="height: 100px; width: 100px; font-size: 2.5rem;" Color="Color.Primary" Variant="Variant.Filled" Class="elevation-4">
+            @GetInitials()
+        </MudAvatar>
+
+        <div>
+            <MudText Typo="Typo.h4" Class="font-weight-bold">@GetName()</MudText>
+            <div class="d-flex align-center gap-2 mt-1">
+                <MudIcon Icon="@Icons.Material.Filled.Badge" Size="Size.Small" Color="Color.Secondary" />
+                <MudText Typo="Typo.body1" Color="Color.Secondary">
+                    @GetRole()
+                </MudText>
+                @if (IsEmailVerified())
+                {
+                    <MudChip T="string" Color="Color.Success" Size="Size.Small" Icon="@Icons.Material.Filled.CheckCircle" Class="ml-2">Email подтвержден</MudChip>
+                }
+            </div>
+        </div>
+    </MudPaper>
+
+    <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+
+        <MudTabPanel Text="Основная информация" Icon="@Icons.Material.Filled.Person">
+            <MudGrid>
+                <MudItem xs="12" sm="6">
+                    <MudField Label="Email" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Email">
+                        @GetClaimValue("email")
+                    </MudField>
+                </MudItem>
+
+                <MudItem xs="12" sm="6">
+                    <MudField Label="Логин (Preferred Username)" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AccountCircle">
+                        @GetClaimValue("preferred_username")
+                    </MudField>
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudField Label="ID Пользователя (Subject)" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Fingerprint">
+                        @GetClaimValue("sub")
+                    </MudField>
+                </MudItem>
+            </MudGrid>
+        </MudTabPanel>
+
+        <MudTabPanel Text="Все данные (Debug)" Icon="@Icons.Material.Filled.Code">
+            <MudAlert Severity="Severity.Info" Class="mb-4">
+                Здесь отображаются все Claims, полученные от Keycloak.
+            </MudAlert>
+
+            <MudTable Items="@_claims" Hover="true" Striped="true" Dense="true" Elevation="0">
+                <HeaderContent>
+                    <MudTh>Тип (Key)</MudTh>
+                    <MudTh>Значение (Value)</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Тип">
+                        <MudText Typo="Typo.body2" Class="font-weight-bold">@context.Type</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">@context.ValueType.Split('#').Last()</MudText>
+                    </MudTd>
+                    <MudTd DataLabel="Значение">
+                        <code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: #333;">@context.Value</code>
+                    </MudTd>
+                </RowTemplate>
+                <PagerContent>
+                    <MudTablePager />
+                </PagerContent>
+            </MudTable>
+        </MudTabPanel>
+
+    </MudTabs>
+
+</MudContainer>
 
 @code {
-    private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
+    private IEnumerable<Claim> _claims = Enumerable.Empty<Claim>();
+    private ClaimsPrincipal _user = new();
 
     [CascadingParameter]
     private Task<AuthenticationState>? AuthState { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        if (AuthState == null)
-        {
-            return;
-        }
+        if (AuthState == null) return;
 
         var authState = await AuthState;
-        claims = authState.User.Claims;
+        _user = authState.User;
+        _claims = _user.Claims.OrderBy(c => c.Type);
+    }
+
+    private string GetName()
+    {
+        var name = GetClaimValue("name");
+        if (string.IsNullOrEmpty(name))
+        {
+            name = _user.Identity?.Name ?? "Гость";
+        }
+        return name;
+    }
+
+    private string GetInitials()
+    {
+        var name = GetName();
+        if (string.IsNullOrWhiteSpace(name)) return "?";
+
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length >= 2)
+        {
+            return $"{parts[0][0]}{parts[1][0]}".ToUpper();
+        }
+        return name.Substring(0, Math.Min(2, name.Length)).ToUpper();
+    }
+
+    private string GetRole()
+    {
+        var role = _user.FindFirst(ClaimTypes.Role)?.Value;
+        return role ?? "Пользователь";
+    }
+
+    private bool IsEmailVerified()
+    {
+        return GetClaimValue("email_verified")?.ToLower() == "true";
+    }
+
+    private string? GetClaimValue(string type)
+    {
+        return _user.FindFirst(type)?.Value
+               ?? _user.FindFirst($"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/{type}")?.Value
+               ?? _user.FindFirst($"http://schemas.microsoft.com/ws/2008/06/identity/claims/{type}")?.Value;
     }
 }
