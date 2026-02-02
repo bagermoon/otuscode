@@ -2,8 +2,6 @@ using Ardalis.Result;
 
 using Mediator;
 
-using Microsoft.Extensions.Logging;
-
 using RestoRate.RestaurantService.Domain.Interfaces;
 
 namespace RestoRate.RestaurantService.Application.UseCases.Restaurants.Delete;
