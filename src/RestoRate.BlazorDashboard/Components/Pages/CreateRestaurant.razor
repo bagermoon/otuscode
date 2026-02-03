@@ -99,19 +99,34 @@
                     </MudSelect>
                 </MudItem>
 
-                <MudItem xs="12" sm="4">
-                    <MudSelect @bind-Value="_formModel.DayOfWeek" Label="Начало рабочей недели" Variant="Variant.Outlined">
-                        @foreach (var day in _daysMap)
+                <MudItem xs="12">
+                    <MudDivider Class="my-2" />
+                    <MudText Typo="Typo.h6" Class="font-weight-bold mb-4">Режим работы</MudText>
+
+                    <div class="d-flex flex-column gap-2">
+                        @foreach (var day in _formModel.Schedule)
                         {
-                            <MudSelectItem Value="@day.Key">@day.Value</MudSelectItem>
+                            <MudPaper Elevation="0" Class="d-flex align-center pa-3 rounded-lg border-solid border mud-border-lines-default" Style="@(!day.IsOpen ? "opacity: 0.6; background-color: var(--mud-palette-background-grey);" : "")">
+                                <div style="width: 180px;">
+                                    <MudSwitch T="bool" @bind-Checked="day.IsOpen" Color="Color.Success" Label="@day.DayName" />
+                                </div>
+
+                                @if (day.IsOpen)
+                                {
+                                    <div class="d-flex gap-4 flex-grow-1">
+                                        <MudTimePicker @bind-Time="day.OpenTime" Label="Открытие" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                        <MudTimePicker @bind-Time="day.CloseTime" Label="Закрытие" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="flex-grow-1">
+                                        <MudText Color="Color.Error" Class="font-weight-medium">Выходной</MudText>
+                                    </div>
+                                }
+                            </MudPaper>
                         }
-                    </MudSelect>
-                </MudItem>
-                <MudItem xs="6" sm="4">
-                    <MudTimePicker @bind-Time="_formModel.OpenTime" Label="Открытие" Variant="Variant.Outlined" />
-                </MudItem>
-                <MudItem xs="6" sm="4">
-                    <MudTimePicker @bind-Time="_formModel.CloseTime" Label="Закрытие" Variant="Variant.Outlined" />
+                    </div>
                 </MudItem>
 
                 <MudItem xs="12">
@@ -195,6 +210,21 @@
 
     protected override void OnInitialized()
     {
+        var daysOrder = new[] {
+        DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday,
+        DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday
+        };
+
+        foreach (var day in daysOrder)
+        {
+            _formModel.Schedule.Add(new DayScheduleViewModel
+            {
+                Day = day,
+                DayName = _daysMap[day],
+                IsOpen = true
+            });
+        }
+
         AddImageField();
     }
 
@@ -225,8 +255,14 @@
                 .Select(x => x.Trim())
                 .ToList();
 
-            var openTime = _formModel.OpenTime.HasValue ? TimeOnly.FromTimeSpan(_formModel.OpenTime.Value) : new TimeOnly(9, 0);
-            var closeTime = _formModel.CloseTime.HasValue ? TimeOnly.FromTimeSpan(_formModel.CloseTime.Value) : new TimeOnly(22, 0);
+            var openHoursList = _formModel.Schedule
+                .Select(day => new OpenHoursDto(
+                    DayOfWeek: day.Day,
+                    OpenTime: day.OpenTime.HasValue ? TimeOnly.FromTimeSpan(day.OpenTime.Value) : new TimeOnly(10, 0),
+                    CloseTime: day.CloseTime.HasValue ? TimeOnly.FromTimeSpan(day.CloseTime.Value) : new TimeOnly(23, 0),
+                    IsClosed: !day.IsOpen
+                ))
+                .ToList();
 
             var validImages = _formModel.Images
                 .Where(x => !string.IsNullOrWhiteSpace(x.Url))
@@ -244,7 +280,7 @@
                 Email: _formModel.Email,
                 Address: new AddressDto(_formModel.AddressFull, _formModel.AddressHouse),
                 Location: new LocationDto(_formModel.Latitude, _formModel.Longitude),
-                OpenHours: new OpenHoursDto(_formModel.DayOfWeek, openTime, closeTime),
+                OpenHours: openHoursList,
                 AverageCheck: new MoneyDto(_formModel.AvgCheckAmount, _formModel.Currency),
                 CuisineTypes: _formModel.SelectedCuisines.ToList(),
                 Tags: tagsList,
@@ -293,13 +329,20 @@
         public decimal AvgCheckAmount { get; set; }
         public string Currency { get; set; } = "RUB";
 
-        public DayOfWeek DayOfWeek { get; set; } = DayOfWeek.Monday;
-        public TimeSpan? OpenTime { get; set; } = new TimeSpan(10, 0, 0);
-        public TimeSpan? CloseTime { get; set; } = new TimeSpan(23, 0, 0);
+        public List<DayScheduleViewModel> Schedule { get; set; } = new();
 
         public IEnumerable<string> SelectedCuisines { get; set; } = new HashSet<string>();
         public string TagsInput { get; set; } = "";
 
         public List<ImageViewModel> Images { get; set; } = new();
+    }
+
+    public class DayScheduleViewModel
+    {
+        public DayOfWeek Day { get; set; }
+        public string DayName { get; set; } = "";
+        public bool IsOpen { get; set; } = true;
+        public TimeSpan? OpenTime { get; set; } = new TimeSpan(10, 0, 0);
+        public TimeSpan? CloseTime { get; set; } = new TimeSpan(23, 0, 0);
     }
 }

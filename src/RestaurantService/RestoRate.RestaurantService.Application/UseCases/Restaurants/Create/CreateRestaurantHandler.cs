@@ -34,7 +34,11 @@ public sealed class CreateRestaurantHandler(
             var email = new Email(request.Dto.Email);
             var address = new Address(request.Dto.Address.FullAddress, request.Dto.Address.House);
             var location = new Location(request.Dto.Location.Latitude, request.Dto.Location.Longitude);
-            var openHours = new OpenHours(request.Dto.OpenHours.DayOfWeek, request.Dto.OpenHours.OpenTime, request.Dto.OpenHours.CloseTime);
+
+            var openHours = request.Dto.OpenHours
+                .Select(oh => new OpenHours(oh.DayOfWeek, oh.OpenTime, oh.CloseTime, oh.IsClosed))
+                .ToList();
+
             var averageCheck = new Money(request.Dto.AverageCheck.Amount, Currency.FromCode(request.Dto.AverageCheck.Currency));
 
             var cuisineTypes = request.Dto.CuisineTypes
@@ -56,6 +60,7 @@ public sealed class CreateRestaurantHandler(
                 location,
                 openHours,
                 averageCheck,
+                request.OwnerId,
                 cuisineTypes,
                 restaurantTags,
                 images);

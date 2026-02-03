@@ -41,11 +41,15 @@ public static class TestDataBuilder
             Email: email ?? "test@example.com",
             Address: new AddressDto("ул. Пушкина", "д. 10"),
             Location: new LocationDto(55.7558, 37.6173),
-            OpenHours: new OpenHoursDto(
-                DayOfWeek.Monday,
-                new TimeOnly(9, 0),
-                new TimeOnly(22, 0)
-            ),
+            OpenHours: new List<OpenHoursDto>
+            {
+                new OpenHoursDto(
+                    DayOfWeek.Monday,
+                    new TimeOnly(10, 0),
+                    new TimeOnly(23, 0),
+                    false
+                )
+            },
 
             AverageCheck: new MoneyDto(1500, "RUB"),
 
@@ -80,11 +84,15 @@ public static class TestDataBuilder
             Email: "updated@example.com",
             Address: new AddressDto("ул. Ленина", "д. 25"),
             Location: new LocationDto(55.7558, 37.6173),
-            OpenHours: new OpenHoursDto(
-                DayOfWeek.Monday,
-                new TimeOnly(10, 0),
-                new TimeOnly(23, 0)
-            ),
+            OpenHours: new List<OpenHoursDto>
+            {
+                new OpenHoursDto(
+                    DayOfWeek.Thursday,
+                    new TimeOnly(10, 0),
+                    new TimeOnly(23, 0),
+                    false
+                )
+            },
             AverageCheck: new MoneyDto(2000, "RUB"),
             CuisineTypes: (cuisineTypes?.ToList() ?? new List<string>
             {
@@ -131,7 +139,10 @@ public static class TestDataBuilder
         var email = new Email("test@example.com");
         var address = new Address("ул. Тестовая", "д. 1");
         var location = new Location(55.7558, 37.6173);
-        var openHours = new OpenHours(DayOfWeek.Monday, new TimeOnly(9, 0), new TimeOnly(22, 0));
+        var openHours = new List<OpenHours>
+        {
+            new OpenHours(DayOfWeek.Monday, new TimeOnly(9, 0), new TimeOnly(22, 0))
+        };
         var averageCheck = new Money(1500m, Currency.FromCode("RUB"));
 
         var restaurant = new RestaurantEntity(
@@ -142,7 +153,8 @@ public static class TestDataBuilder
             address,
             location,
             openHours,
-            averageCheck
+            averageCheck,
+            Guid.NewGuid()
         );
 
         SetPrivatePropertyValue(restaurant, "Id", id);

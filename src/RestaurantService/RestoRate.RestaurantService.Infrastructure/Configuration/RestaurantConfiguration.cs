@@ -46,13 +46,19 @@ public class RestaurantConfiguration : IEntityTypeConfiguration<Restaurant>
             l.Property(loc => loc.Longitude);
         });
 
-        builder.OwnsOne(r => r.OpenHours, l =>
+        builder.OwnsMany(r => r.OpenHours, oh =>
         {
-            l.Property(loc => loc.DayOfWeek);
-            l.Property(loc => loc.OpenTime);
-            l.Property(loc => loc.CloseTime);
-            l.Property(loc => loc.IsClosed);
+            oh.ToJson("open_hours");
+
+            oh.Property(x => x.DayOfWeek)
+              .HasConversion<string>();
+
+            oh.Property(x => x.OpenTime);
+            oh.Property(x => x.CloseTime);
+            oh.Property(x => x.IsClosed);
         });
+
+        builder.Property(r => r.OwnerId).IsRequired();
 
         builder.ComplexProperty(r => r.AverageCheck, ac =>
         {

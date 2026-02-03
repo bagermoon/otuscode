@@ -51,8 +51,9 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
         {
             // Arrange
             var restaurantId = Guid.NewGuid();
+            var ownerId = Guid.NewGuid();
             var dto = TestDataBuilder.CreateValidRestaurantDto();
-            var command = new CreateRestaurantCommand(dto);
+            var command = new CreateRestaurantCommand(dto, ownerId);
 
             var restaurantEntity = TestDataBuilder.CreateRestaurantEntity(
                 restaurantId,
@@ -66,8 +67,9 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
                     Arg.Any<Email>(),
                     Arg.Any<Address>(),
                     Arg.Any<Location>(),
-                    Arg.Any<OpenHours>(),
+                    Arg.Any<IEnumerable<OpenHours>>(),
                     Arg.Any<Money>(),
+                    Arg.Any<Guid>(),
                     Arg.Any<IEnumerable<CuisineType>>(),
                     Arg.Any<IEnumerable<Tag>>(),
                     Arg.Any<IEnumerable<(string, string?, bool)>?>())
@@ -89,6 +91,7 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
         {
             // Arrange
             var restaurantId = Guid.NewGuid();
+            var ownerId = Guid.NewGuid();
 
             var dto = TestDataBuilder.CreateValidRestaurantDto(
                 cuisineTypes: new[]
@@ -98,7 +101,7 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
                     CuisineType.Japanese.Name
                 });
 
-            var command = new CreateRestaurantCommand(dto);
+            var command = new CreateRestaurantCommand(dto, ownerId);
 
             var restaurantEntity = TestDataBuilder.CreateRestaurantEntity(restaurantId, dto.Name);
             _restaurantService
@@ -109,8 +112,9 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
                     Arg.Any<Email>(),
                     Arg.Any<Address>(),
                     Arg.Any<Location>(),
-                    Arg.Any<OpenHours>(),
+                    Arg.Any<IEnumerable<OpenHours>>(),
                     Arg.Any<Money>(),
+                    Arg.Any<Guid>(),
                     Arg.Any<IEnumerable<CuisineType>>(),
                     Arg.Any<IEnumerable<Tag>>(),
                     Arg.Any<IEnumerable<(string, string?, bool)>?>())
@@ -130,6 +134,7 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
         {
             // Arrange
             var restaurantId = Guid.NewGuid();
+            var ownerId = Guid.NewGuid();
 
             var images = new[]
             {
@@ -142,7 +147,7 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
             };
 
             var dto = TestDataBuilder.CreateValidRestaurantDto(images: images);
-            var command = new CreateRestaurantCommand(dto);
+            var command = new CreateRestaurantCommand(dto, ownerId);
 
             var restaurantEntity = TestDataBuilder.CreateRestaurantEntity(restaurantId, dto.Name);
             _restaurantService
@@ -153,8 +158,9 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
                     Arg.Any<Email>(),
                     Arg.Any<Address>(),
                     Arg.Any<Location>(),
-                    Arg.Any<OpenHours>(),
+                    Arg.Any<IEnumerable<OpenHours>>(),
                     Arg.Any<Money>(),
+                    Arg.Any<Guid>(),
                     Arg.Any<IEnumerable<CuisineType>>(),
                     Arg.Any<IEnumerable<Tag>>(),
                     Arg.Any<IEnumerable<(string, string?, bool)>?>())
@@ -175,8 +181,9 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
                     Arg.Any<Email>(),
                     Arg.Any<Address>(),
                     Arg.Any<Location>(),
-                    Arg.Any<OpenHours>(),
+                    Arg.Any<IEnumerable<OpenHours>>(),
                     Arg.Any<Money>(),
+                    Arg.Any<Guid>(),
                     Arg.Any<IEnumerable<CuisineType>>(),
                     Arg.Any<IEnumerable<Tag>>(),
                     Arg.Is<IEnumerable<(string, string?, bool)>?>(imgs => imgs != null && imgs.Count() == 2));
@@ -190,11 +197,13 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
         {
             // Arrange
             var restaurantId = Guid.NewGuid();
+            var ownerId = Guid.NewGuid();
+
             var dto = TestDataBuilder.CreateValidRestaurantDto(
                 name: name,
                 cuisineTypes: new[] { cuisineType });
 
-            var command = new CreateRestaurantCommand(dto);
+            var command = new CreateRestaurantCommand(dto, ownerId);
 
             var restaurantEntity = TestDataBuilder.CreateRestaurantEntityWithCuisines(
                 restaurantId, dto.Name, CuisineType.FromName(cuisineType));
@@ -206,8 +215,9 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
                     Arg.Any<Email>(),
                     Arg.Any<Address>(),
                     Arg.Any<Location>(),
-                    Arg.Any<OpenHours>(),
+                    Arg.Any<IEnumerable<OpenHours>>(),
                     Arg.Any<Money>(),
+                    Arg.Any<Guid>(),
                     Arg.Any<IEnumerable<CuisineType>>(),
                     Arg.Any<IEnumerable<Tag>>(),
                     Arg.Any<IEnumerable<(string, string?, bool)>?>())
@@ -227,7 +237,9 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
         {
             // Arrange
             var dto = TestDataBuilder.CreateValidRestaurantDto();
-            var command = new CreateRestaurantCommand(dto);
+            var ownerId = Guid.NewGuid();
+
+            var command = new CreateRestaurantCommand(dto, ownerId);
             var errorMessage = "Не удалось подключиться к базе данных";
 
             _restaurantService
@@ -238,8 +250,9 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
                     Arg.Any<Email>(),
                     Arg.Any<Address>(),
                     Arg.Any<Location>(),
-                    Arg.Any<OpenHours>(),
+                    Arg.Any<IEnumerable<OpenHours>>(),
                     Arg.Any<Money>(),
+                    Arg.Any<Guid>(),
                     Arg.Any<IEnumerable<CuisineType>>(),
                     Arg.Any<IEnumerable<Tag>>(),
                     Arg.Any<IEnumerable<(string, string?, bool)>?>())

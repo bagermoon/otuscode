@@ -56,8 +56,8 @@ public class UpdateRestaurantHandlerTests
                 Arg.Any<Email>(),
                 Arg.Any<Address>(),
                 Arg.Any<Location>(),
-                Arg.Any<OpenHours>(),
-                    Arg.Any<Money>(),
+                Arg.Any<IEnumerable<OpenHours>>(),
+                Arg.Any<Money>(),
                 Arg.Any<IEnumerable<CuisineType>>(),
                 Arg.Any<IEnumerable<Tag>>())
             .Returns(Task.FromResult(Result.Success()));
@@ -78,7 +78,7 @@ public class UpdateRestaurantHandlerTests
                 Arg.Any<Email>(),
                 Arg.Any<Address>(),
                 Arg.Any<Location>(),
-                Arg.Any<OpenHours>(),
+                Arg.Any<IEnumerable<OpenHours>>(),
                 Arg.Any<Money>(),
                 Arg.Any<IEnumerable<CuisineType>>(),
                 Arg.Any<IEnumerable<Tag>>());
@@ -101,8 +101,8 @@ public class UpdateRestaurantHandlerTests
                 Arg.Any<Email>(),
                 Arg.Any<Address>(),
                 Arg.Any<Location>(),
-                Arg.Any<OpenHours>(),
-                    Arg.Any<Money>(),
+                Arg.Any<IEnumerable<OpenHours>>(),
+                Arg.Any<Money>(),
                 Arg.Any<IEnumerable<CuisineType>>(),
                 Arg.Any<IEnumerable<Tag>>())
             .Returns(Task.FromResult(Result.NotFound()));
@@ -134,7 +134,7 @@ public class UpdateRestaurantHandlerTests
                 Arg.Any<Email>(),
                 Arg.Any<Address>(),
                 Arg.Any<Location>(),
-                Arg.Any<OpenHours>(),
+                Arg.Any<IEnumerable<OpenHours>>(),
                 Arg.Any<Money>(),
                 Arg.Is<IEnumerable<CuisineType>>(ct => ct.Count() == 2),
                 Arg.Any<IEnumerable<Tag>>())
@@ -156,7 +156,7 @@ public class UpdateRestaurantHandlerTests
                 Arg.Any<Email>(),
                 Arg.Any<Address>(),
                 Arg.Any<Location>(),
-                Arg.Any<OpenHours>(),
+                Arg.Any<IEnumerable<OpenHours>>(),
                 Arg.Any<Money>(),
                 Arg.Is<IEnumerable<CuisineType>>(ct => ct.Count() == 2),
                 Arg.Any<IEnumerable<Tag>>());
@@ -180,7 +180,7 @@ public class UpdateRestaurantHandlerTests
                 Arg.Any<Email>(),
                 Arg.Any<Address>(),
                 Arg.Any<Location>(),
-                Arg.Any<OpenHours>(),
+                Arg.Any<IEnumerable<OpenHours>>(),
                 Arg.Any<Money>(),
                 Arg.Any<IEnumerable<CuisineType>>(),
                 Arg.Any<IEnumerable<Tag>>())

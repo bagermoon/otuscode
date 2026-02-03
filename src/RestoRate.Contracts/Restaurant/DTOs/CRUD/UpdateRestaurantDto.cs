@@ -10,7 +10,7 @@ public record UpdateRestaurantDto(
     string Email,
     AddressDto Address,
     LocationDto Location,
-    OpenHoursDto OpenHours,
+    List<OpenHoursDto> OpenHours,
     MoneyDto AverageCheck,
     IReadOnlyCollection<string> CuisineTypes,
     IReadOnlyCollection<string> Tags);

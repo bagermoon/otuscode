@@ -18,8 +18,9 @@ public interface IRestaurantService
         Email email,
         Address address,
         Location location,
-        OpenHours openHours,
+        IEnumerable<OpenHours> openHours,
         Money averageCheck,
+        Guid ownerId,
         IEnumerable<CuisineType> cuisineTypes,
         IEnumerable<Tag> tags,
         IEnumerable<(string Url, string? AltText, bool IsPrimary)>? images = null);
@@ -32,7 +33,7 @@ public interface IRestaurantService
         Email email,
         Address address,
         Location location,
-        OpenHours openHours,
+        IEnumerable<OpenHours> openHours,
         Money averageCheck,
         IEnumerable<CuisineType> cuisineTypes,
         IEnumerable<Tag> tags);

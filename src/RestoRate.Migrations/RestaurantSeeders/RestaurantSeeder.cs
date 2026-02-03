@@ -20,164 +20,172 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
             return;
 
         List<TagEntity> dbTags = await context.Set<TagEntity>().ToListAsync(ct);
-
         var restaurants = new List<Restaurant>();
 
-        var firstRestaurant = new Restaurant(
+        var r1 = new Restaurant(
             "La Pasta",
-            "Итальянский ресторан.",
+            "Итальянский ресторан с домашней пастой.",
             new PhoneNumber("+7", "9990001122"),
             new Email("info@lapasta.ru"),
             new Address("г. Москва, ул. Ленина, 10", "10"),
             new Location(55.751244, 37.618423),
-            new OpenHours(DayOfWeek.Monday, new TimeOnly(10, 0), new TimeOnly(23, 59)),
-            new Money(2500m, Currency.FromCode("RUB"))
+            CreateDailySchedule(new TimeOnly(10, 0), new TimeOnly(23, 00)),
+            new Money(2500m, Currency.FromCode("RUB")),
+            Guid.NewGuid()
         );
-        firstRestaurant.AddCuisineType(CuisineType.Italian);
+        r1.AddCuisineType(CuisineType.Italian);
+        TryAddTag(r1, dbTags, "Уютное место");
+        TryAddTag(r1, dbTags, "Семейный отдых");
 
-        TryAddTag(firstRestaurant, dbTags, "Уютное место");
-        TryAddTag(firstRestaurant, dbTags, "Семейный отдых");
+        r1.AddImage("https://s.restorating.ru/places/3840x2160/places/41271/62fb79130c228.jpg", "Интерьер", 1, true);
+        r1.AddImage("https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/39/68/9f/caption.jpg?w=600&h=600&s=1", "Карбонара", 2);
+        r1.AddImage("https://www.tuttalavita.ru/images/about/about_01.webp", "Печь", 3);
 
-        firstRestaurant.AddImage(
-            url: "https://s.restorating.ru/places/3840x2160/places/41271/62fb79130c228.jpg",
-            altText: "Интерьер основного зала La Pasta",
-            displayOrder: 1,
-            isPrimary: true
-        );
-        firstRestaurant.AddImage(
-            url: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/39/68/9f/caption.jpg?w=600&h=600&s=1",
-            altText: "Фирменная паста Карбонара",
-            displayOrder: 2,
-            isPrimary: false
-        );
-        firstRestaurant.AddImage(
-            url: "https://www.tuttalavita.ru/images/about/about_01.webp",
-            altText: "Дровяная печь",
-            displayOrder: 3,
-            isPrimary: false
-        );
+        AddRatings(r1, 4.5m, 120);
+        restaurants.Add(r1);
 
-        firstRestaurant.SendToModeration();
-        firstRestaurant.Publish();
-        AddRatings(firstRestaurant);
-        restaurants.Add(firstRestaurant);
-
-        var secondRestaurant = new Restaurant(
+        var r2 = new Restaurant(
             "Пхали-манали",
-            "Грузинская кухня.",
+            "Аутентичная грузинская кухня и вино.",
             new PhoneNumber("+7", "9991112233"),
             new Email("geo@tbilisi.rest"),
             new Address("г. Москва, пр. Мира, 5", "5"),
             new Location(55.776123, 37.632111),
-            new OpenHours(DayOfWeek.Monday, new TimeOnly(12, 0), new TimeOnly(23, 59)),
-            new Money(1800m, Currency.FromCode("RUB"))
+            CreateDailySchedule(new TimeOnly(12, 0), new TimeOnly(23, 59)),
+            new Money(1800m, Currency.FromCode("RUB")),
+            Guid.NewGuid()
         );
-        secondRestaurant.AddCuisineType(CuisineType.Georgian);
+        r2.AddCuisineType(CuisineType.Georgian);
+        TryAddTag(r2, dbTags, "Живая музыка");
+        TryAddTag(r2, dbTags, "Детская комната");
 
-        TryAddTag(secondRestaurant, dbTags, "Живая музыка");
-        TryAddTag(secondRestaurant, dbTags, "Детская комната");
-        TryAddTag(secondRestaurant, dbTags, "Бизнес-ланч");
+        r2.AddImage("https://scdn.tomesto.ru/img/place/000/029/503/restoran-georgia-armenia-gruziya-armeniya-na-ulitse-pushkina_43b3e_full-416935.jpg", "Фасад", 1, true);
+        r2.AddImage("https://img.freepik.com/premium-photo/blank-card-restaurant-table_1203353-41107.jpg", "Хинкали", 2);
 
-        secondRestaurant.AddImage(
-            url: "https://scdn.tomesto.ru/img/place/000/029/503/restoran-georgia-armenia-gruziya-armeniya-na-ulitse-pushkina_43b3e_full-416935.jpg",
-            altText: "Фасад ресторана Тбилиси",
-            displayOrder: 1,
-            isPrimary: true
-        );
-        secondRestaurant.AddImage(
-            url: "https://img.freepik.com/premium-photo/blank-card-restaurant-table_1203353-41107.jpg?semt=ais_hybrid&w=740&q=80",
-            altText: "Хинкали",
-            displayOrder: 2,
-            isPrimary: false
-        );
+        AddRatings(r2, 4.7m, 85);
+        restaurants.Add(r2);
 
-        secondRestaurant.SendToModeration();
-        secondRestaurant.Publish();
-        restaurants.Add(secondRestaurant);
-
-        var thirdRestaurant = new Restaurant(
+        var r3 = new Restaurant(
             "Пельменная №1",
-            "Русская кухня",
-            new PhoneNumber("+7", "9991112233"),
+            "Традиционная русская кухня в современном исполнении.",
+            new PhoneNumber("+7", "9993334455"),
             new Email("pel@sbp.rest"),
             new Address("г. Санкт-Петербург, пр. Невский, 15", "45"),
-            new Location(55.776123, 37.632111),
-            new OpenHours(DayOfWeek.Monday, new TimeOnly(12, 0), new TimeOnly(23, 59)),
-            new Money(1800m, Currency.FromCode("RUB"))
+            new Location(59.9311, 30.3609),
+            CreateDailySchedule(new TimeOnly(09, 0), new TimeOnly(21, 00)),
+            new Money(1200m, Currency.FromCode("RUB")),
+            Guid.NewGuid()
         );
-        thirdRestaurant.AddCuisineType(CuisineType.Russian);
+        r3.AddCuisineType(CuisineType.Russian);
+        TryAddTag(r3, dbTags, "Бизнес-ланч");
+        TryAddTag(r3, dbTags, "Авторская кухня");
 
-        TryAddTag(thirdRestaurant, dbTags, "Бизнес-ланч");
-        TryAddTag(firstRestaurant, dbTags, "Авторская кухня");
-        TryAddTag(firstRestaurant, dbTags, "Роскошный интерьер");
-        TryAddTag(firstRestaurant, dbTags, "Бесплатная парковка");
+        r3.AddImage("https://static.78.ru/images/uploads/1702637152759.jpg", "Зал", 1, true);
+        r3.AddImage("https://account.spb.ru/upload/22358/photo.jpg", "Блюдо", 2);
 
-        thirdRestaurant.AddImage(
-            url: "https://static.78.ru/images/uploads/1702637152759.jpg",
-            altText: "#1",
-            displayOrder: 1,
-            isPrimary: true
-        );
-        thirdRestaurant.AddImage(
-            url: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/06/77/45/43/caption.jpg?w=1800&h=1000&s=1",
-            altText: "#2",
-            displayOrder: 2,
-            isPrimary: false
-        );
-        thirdRestaurant.AddImage(
-            url: "https://account.spb.ru/upload/22358/photo.jpg",
-            altText: "#3",
-            displayOrder: 3,
-            isPrimary: false
-        );
+        AddRatings(r3, 4.2m, 200);
+        restaurants.Add(r3);
 
-        thirdRestaurant.SendToModeration();
-        thirdRestaurant.Publish();
-        AddRatings(thirdRestaurant, 4m, 200);
-        restaurants.Add(thirdRestaurant);
-
-        var fourthRestaurant = new Restaurant(
+        var r4 = new Restaurant(
             "Суши-бар Аригато-ми",
-            "Японская кухня",
-            new PhoneNumber("+7", "9991112233"),
-            new Email("sushiArigato@kz.rest"),
-            new Address("г. Казань, ул. Ленина, 19", "17"),
-            new Location(55.776123, 37.632111),
-            new OpenHours(DayOfWeek.Monday, new TimeOnly(12, 0), new TimeOnly(23, 59)),
-            new Money(1800m, Currency.FromCode("RUB"))
+            "Свежайшие суши и роллы из под ножа.",
+            new PhoneNumber("+7", "9995556677"),
+            new Email("sushi@arigato.rest"),
+            new Address("г. Казань, ул. Баумана, 19", "17"),
+            new Location(55.7887, 49.1221),
+            CreateDailySchedule(new TimeOnly(11, 0), new TimeOnly(23, 00)),
+            new Money(1500m, Currency.FromCode("RUB")),
+            Guid.NewGuid()
         );
-        fourthRestaurant.AddCuisineType(CuisineType.Japanese);
+        r4.AddCuisineType(CuisineType.Japanese);
+        TryAddTag(r4, dbTags, "Суши-бар");
+        TryAddTag(r4, dbTags, "Бесплатная парковка");
 
-        TryAddTag(fourthRestaurant, dbTags, "Суши-бар");
-        TryAddTag(fourthRestaurant, dbTags, "Бизнес-ланч");
-        TryAddTag(fourthRestaurant, dbTags, "Бесплатная парковка");
+        r4.AddImage("https://www.allpbspb.ru/upload/resize_cache/iblock/d95/700_700_0/d951bec0443691a374489c8c7bcd1a1b.jpg", "Интерьер", 1, true);
+        r4.AddImage("https://i.pinimg.com/736x/d3/c6/df/d3c6dff867a80a7e91cc5391312bd398.jpg", "Сет роллов", 2);
 
-        fourthRestaurant.AddImage(
-            url: "https://www.allpbspb.ru/upload/resize_cache/iblock/d95/700_700_0/d951bec0443691a374489c8c7bcd1a1b.jpg",
-            altText: "#1",
-            displayOrder: 1,
-            isPrimary: true
+        AddRatings(r4, 4.0m, 15);
+        restaurants.Add(r4);
+
+        var r5 = new Restaurant(
+            "Burger Heroes",
+            "Крафтовые бургеры и стейки на открытом огне.",
+            new PhoneNumber("+7", "9998887766"),
+            new Email("hero@burger.com"),
+            new Address("г. Екатеринбург, ул. Вайнера, 12", "1"),
+            new Location(56.8389, 60.6057),
+            CreateDailySchedule(new TimeOnly(12, 0), new TimeOnly(23, 00)),
+            new Money(1300m, Currency.FromCode("RUB")),
+            Guid.NewGuid()
         );
-        fourthRestaurant.AddImage(
-            url: "https://i.pinimg.com/736x/d3/c6/df/d3c6dff867a80a7e91cc5391312bd398.jpg",
-            altText: "#2",
-            displayOrder: 2,
-            isPrimary: false
-        );
+        r5.AddCuisineType(CuisineType.American);
+        TryAddTag(r5, dbTags, "Стрит-фуд");
+        TryAddTag(r5, dbTags, "Мясной ресторан");
 
-        fourthRestaurant.SendToModeration();
-        fourthRestaurant.Publish();
-        AddRatings(fourthRestaurant, 1.0m, 5);
-        restaurants.Add(fourthRestaurant);
+        r5.AddImage("https://avatars.mds.yandex.net/get-altay/11018317/2a0000018c0ac3c101bc497a6a7836561499/XXL_height", "Барная стойка", 1, true);
+        r5.AddImage("https://avatars.mds.yandex.net/get-altay/10830675/2a0000018c8801293ea39c80c5138219714a/orig", "Бургер", 2);
+
+        AddRatings(r5, 4.8m, 350);
+        restaurants.Add(r5);
+
+        var r6 = new Restaurant(
+            "Le Petit Paris",
+            "Маленькая Франция в центре города. Вино и круассаны.",
+            new PhoneNumber("+7", "9992223344"),
+            new Email("bonjour@paris.ru"),
+            new Address("г. Нижний Новгород, ул. Рождественская, 24", "2"),
+            new Location(56.3269, 44.0059),
+            CreateDailySchedule(new TimeOnly(08, 0), new TimeOnly(22, 00)),
+            new Money(3000m, Currency.FromCode("RUB")),
+            Guid.NewGuid()
+        );
+        r6.AddCuisineType(CuisineType.French);
+        TryAddTag(r6, dbTags, "Винная карта");
+        TryAddTag(r6, dbTags, "Живая музыка");
+
+        r6.AddImage("https://avatars.mds.yandex.net/i?id=672e3b80d0da65a24d1666c8ca2e8225_l-5433424-images-thumbs&n=13", "Зал", 1, true);
+        r6.AddImage("https://img.freepik.com/premium-photo/design-french-style-vintage-partment-dining-room_916191-202957.jpg?semt=ais_hybrid&w=740", "Завтрак", 2);
+        r6.AddImage("https://media-cdn.tripadvisor.com/media/photo-m/1280/17/45/4e/fb/le-clarence.jpg", "Разное", 3);
+
+        AddRatings(r6, 4.9m, 42);
+        restaurants.Add(r6);
+
+        var r7 = new Restaurant(
+            "Mama Roma",
+            "Домашняя пицца из дровяной печи.",
+            new PhoneNumber("+7", "9990009988"),
+            new Email("pizza@mama.rom"),
+            new Address("г. Сочи, Курортный проспект, 50", "1"),
+            new Location(43.5808, 39.7203),
+            CreateDailySchedule(new TimeOnly(12, 0), new TimeOnly(23, 30)),
+            new Money(1600m, Currency.FromCode("RUB")),
+            Guid.NewGuid()
+        );
+        r7.AddCuisineType(CuisineType.Italian);
+        TryAddTag(r7, dbTags, "Детская комната");
+        TryAddTag(r7, dbTags, "Семейный отдых");
+
+        r7.AddImage("https://www.gdebar.ru/data/app/bar/img/gallery/6829/194504.webp", "Интерьер", 1, true);
+        r7.AddImage("https://i.pinimg.com/736x/39/fd/13/39fd132c42d02b72db85192d15f48544.jpg", "Пицца", 2);
+
+        AddRatings(r7, 4.1m, 60);
+        restaurants.Add(r7);
 
         await context.Restaurants.AddRangeAsync(restaurants, ct);
         await context.SaveChangesAsync(ct);
     }
 
-    private static void TryAddTag(
-        Restaurant restaurant,
-        List<TagEntity> availableTags,
-        string tagName)
+    private static List<OpenHours> CreateDailySchedule(TimeOnly open, TimeOnly close)
+    {
+        var schedule = new List<OpenHours>();
+        foreach (DayOfWeek day in Enum.GetValues(typeof(DayOfWeek)))
+        {
+            schedule.Add(new OpenHours(day, open, close, isClosed: false));
+        }
+        return schedule;
+    }
+
+    private static void TryAddTag(Restaurant restaurant, List<TagEntity> availableTags, string tagName)
     {
         var tag = availableTags.FirstOrDefault(t => t.Name == tagName);
         if (tag != null)
