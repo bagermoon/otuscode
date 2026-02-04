@@ -56,6 +56,7 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
         _openHours.AddRange(openHours);
         Guard.Against.Negative(averageCheck.Amount, nameof(averageCheck));
         AverageCheck = averageCheck;
+        OwnerId = ownerId;
         RestaurantStatus = RestaurantStatus.Draft;
         Rating = new RatingSnapshot(Id);
     }

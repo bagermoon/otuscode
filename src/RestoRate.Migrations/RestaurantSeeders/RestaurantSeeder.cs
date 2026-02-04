@@ -180,7 +180,14 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
         var schedule = new List<OpenHours>();
         foreach (DayOfWeek day in Enum.GetValues(typeof(DayOfWeek)))
         {
-            schedule.Add(new OpenHours(day, open, close, isClosed: false));
+            bool isWeekend = day == DayOfWeek.Monday || day == DayOfWeek.Tuesday;
+
+            schedule.Add(new OpenHours(
+                day,
+                open,
+                close,
+                isClosed: isWeekend
+            ));
         }
         return schedule;
     }
