@@ -6,6 +6,7 @@ public record ReviewDto(
     Guid Id,
     Guid RestaurantId,
     Guid UserId,
+    UserReferenceDto? User,
     decimal Rating,
     MoneyDto? AverageCheck,
     string Comment,

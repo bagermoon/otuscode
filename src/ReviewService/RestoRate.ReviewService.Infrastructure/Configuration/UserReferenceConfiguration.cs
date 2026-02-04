@@ -14,7 +14,19 @@ public class UserReferenceConfiguration : IEntityTypeConfiguration<UserReference
         builder.ToCollection("UserReferences");
         builder.HasKey(rr => rr.Id);
 
-        builder.Property(rr => rr.IsBlocked)
-            .IsRequired();
+        builder.Property(rr => rr.Name)
+            .HasMaxLength(32);
+
+        builder.Property(rr => rr.FullName)
+            .HasMaxLength(200);
+
+        builder.OwnsOne(r => r.Email, e =>
+        {
+            e.Property(em => em.Address)
+                .HasMaxLength(320);
+        });
+
+        builder.HasIndex(rr => rr.IsBlocked);
+
     }
 }

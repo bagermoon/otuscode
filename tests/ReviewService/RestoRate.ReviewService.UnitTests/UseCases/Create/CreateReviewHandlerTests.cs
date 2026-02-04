@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 
 using NSubstitute;
 
+using RestoRate.Abstractions.Identity;
 using RestoRate.Contracts.Common.Dtos;
 using RestoRate.Contracts.Review.Dtos;
 using RestoRate.ReviewService.Application.UseCases.Reviews.Create;
@@ -38,7 +39,11 @@ public class CreateReviewHandlerTests
 
         var logger = _fixture.Freeze<ILogger<CreateReviewHandler>>();
 
-        var handler = new CreateReviewHandler(repo, logger);
+        var userContext = _fixture.Freeze<IUserContext>();
+        userContext.IsAuthenticated.Returns(true);
+        userContext.UserId.Returns(dto.UserId);
+
+        var handler = new CreateReviewHandler(repo, userContext, logger);
 
         // Act
         var result = await handler.Handle(cmd, CancellationToken.None);
@@ -67,7 +72,11 @@ public class CreateReviewHandlerTests
 
         var logger = _fixture.Freeze<ILogger<CreateReviewHandler>>();
 
-        var handler = new CreateReviewHandler(repo, logger);
+        var userContext = _fixture.Freeze<IUserContext>();
+        userContext.IsAuthenticated.Returns(true);
+        userContext.UserId.Returns(dto.UserId);
+
+        var handler = new CreateReviewHandler(repo, userContext, logger);
 
         // Act
         var result = await handler.Handle(cmd, CancellationToken.None);

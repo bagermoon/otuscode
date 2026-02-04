@@ -9,6 +9,7 @@ public static class ReviewsEndpoints
     {
         var group = app.MapGroup($"/{prefix}");
         group.MapCreateReview(); // Подключаем endpoint создания отзыва
+        group.MapGetAllReviews(); // Подключаем endpoint получения списка отзывов
         group.MapGetReviewById(); // Подключаем endpoint получения отзыва по Id
         return group;
     }

@@ -14,6 +14,7 @@ using NodaMoney;
 using RestoRate.BuildingBlocks.Data;
 using RestoRate.BuildingBlocks.Messaging;
 using RestoRate.Contracts.Restaurant.Requests;
+using RestoRate.ReviewService.Domain.Interfaces;
 using RestoRate.ReviewService.Infrastructure.Data;
 using RestoRate.ReviewService.Infrastructure.Repositories;
 using RestoRate.ReviewService.Infrastructure.Serialization;
@@ -74,6 +75,7 @@ public static class InfrastructureServiceExtensions
         builder.Services
             .AddScoped(typeof(IRepository<>), typeof(EfRepository<>))
             .AddScoped(typeof(IReadRepository<>), typeof(EfRepository<>))
+            .AddScoped<IReviewRepository, ReviewRepository>()
         ;
 
         return builder;

@@ -5,6 +5,7 @@ using Mediator;
 
 using Microsoft.Extensions.Logging;
 
+using RestoRate.Abstractions.Identity;
 using RestoRate.Contracts.Review.Dtos;
 using RestoRate.ReviewService.Application.Mappings;
 using RestoRate.ReviewService.Domain.ReviewAggregate;
@@ -13,6 +14,7 @@ namespace RestoRate.ReviewService.Application.UseCases.Reviews.Create;
 
 public sealed class CreateReviewHandler(
     IRepository<Review> repository,
+    IUserContext userContext,
     ILogger<CreateReviewHandler> logger)
     : ICommandHandler<CreateReviewCommand, Result<ReviewDto>>
 {
@@ -21,6 +23,30 @@ public sealed class CreateReviewHandler(
         CancellationToken cancellationToken)
     {
         logger.LogHandling(request.Dto.RestaurantId, request.Dto.UserId);
+
+        if (!userContext.IsAuthenticated || userContext.UserId == Guid.Empty)
+        {
+            return Result<ReviewDto>.Invalid(new[]
+            {
+                new ValidationError("UserId", "Authenticated user is required.")
+            });
+        }
+
+        if (request.Dto.UserId == Guid.Empty)
+        {
+            return Result<ReviewDto>.Invalid(new[]
+            {
+                new ValidationError("UserId", "UserId must be set.")
+            });
+        }
+
+        if (request.Dto.UserId != userContext.UserId)
+        {
+            return Result<ReviewDto>.Invalid(new[]
+            {
+                new ValidationError("UserId", "UserId must match the authenticated user.")
+            });
+        }
 
         try
         {
@@ -33,21 +59,10 @@ public sealed class CreateReviewHandler(
                 averageCheck,
                 request.Dto.Comment);
 
-
             var review = await repository.AddAsync(reviewObjet, cancellationToken);
 
-            var dto = new ReviewDto(
-                review.Id,
-                review.RestaurantId,
-                review.UserId,
-                review.Rating,
-                review.AverageCheck?.ToDto(),
-                review.Comment ?? string.Empty,
-                review.CreatedAt,
-                review.UpdatedAt);
-
             logger.LogCreated(review.Id);
-            return Result<ReviewDto>.Success(dto);
+            return review.ToDto();
         }
         catch (Exception ex)
         {

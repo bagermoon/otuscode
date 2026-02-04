@@ -10,8 +10,7 @@ using RestoRate.ReviewService.Application.Mappings;
 namespace RestoRate.ReviewService.Application.Handlers;
 
 public sealed class ReviewModerationPendingDomainEventHandler(
-    IIntegrationEventBus integrationEventBus,
-    ILogger<ReviewModerationPendingDomainEventHandler> logger)
+    IIntegrationEventBus integrationEventBus)
     : IDomainEventHandler<ReviewModerationPendingDomainEvent>
 {
     public async ValueTask Handle(ReviewModerationPendingDomainEvent notification, CancellationToken cancellationToken)

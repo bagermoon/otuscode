@@ -43,7 +43,7 @@ public sealed class RestaurantReferenceValidationHandler(
             var result = await sender.Send(
                 new UpsertRestaurantCommand(restaurantId, knownStatus.ToContract()),
                 cancellationToken);
-            
+
             resolvedContractStatus = result.IsOk() ? result.Value : RestaurantStatus.Unknown;
         }
         else

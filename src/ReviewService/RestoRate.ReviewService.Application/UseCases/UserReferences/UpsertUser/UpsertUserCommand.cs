@@ -9,7 +9,7 @@ namespace RestoRate.ReviewService.Application.UseCases.UserReferences.UpsertUser
 /// Returns the current <c>IsBlocked</c> value.
 /// </summary>
 public sealed record UpsertUserCommand(
-	Guid UserId,
-	bool? IsBlocked = null
+    Guid UserId,
+    bool? IsBlocked = null
 ) : ICommand<Result<bool>>;
 
