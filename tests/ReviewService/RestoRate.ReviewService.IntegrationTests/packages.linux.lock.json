@@ -633,8 +633,8 @@
       },
       "MongoDB.Bson": {
         "type": "Transitive",
-        "resolved": "3.5.0",
-        "contentHash": "JGNK6BanLDEifgkvPLqVFCPus5EDCy416pxf1dxUBRSVd3D9+NB3AvMVX190eXlk5/UXuCxpsQv7jWfNKvppBQ==",
+        "resolved": "3.5.1",
+        "contentHash": "7+ZYBqOqzkzx/BK+vT47aFRpLxrTNw6pTV9uv2lOAQbAIpXjUpkJ/4pSs9dhJxnnryuSu4GskYW0xzy071U6og==",
         "dependencies": {
           "System.Memory": "4.5.5",
           "System.Runtime.CompilerServices.Unsafe": "5.0.0"
@@ -642,12 +642,12 @@
       },
       "MongoDB.Driver": {
         "type": "Transitive",
-        "resolved": "3.5.0",
-        "contentHash": "ST90u7psyMkNNOWFgSkexsrB3kPn7Ynl2DlMFj2rJyYuc6SIxjmzu4ufy51yzM+cPVE1SvVcdb5UFobrRw6cMg==",
+        "resolved": "3.5.1",
+        "contentHash": "p++X0PJOAeSJKavNnoc+P8mnLt4YOD7Sv5wIruKGVPDf3MyNAOKh0gcwrOBLJklByV+fKfKVsMIZkeVXGvtE9w==",
         "dependencies": {
           "DnsClient": "1.6.1",
           "Microsoft.Extensions.Logging.Abstractions": "2.0.0",
-          "MongoDB.Bson": "3.5.0",
+          "MongoDB.Bson": "3.5.1",
           "SharpCompress": "0.30.1",
           "Snappier": "1.0.0",
           "System.Buffers": "4.5.1",
@@ -941,6 +941,8 @@
           "Aspire.Npgsql.EntityFrameworkCore.PostgreSQL": "[13.1.0, )",
           "EFCore.NamingConventions": "[9.0.0, )",
           "MassTransit": "[8.5.7, 9.0.0)",
+          "MassTransit.EntityFrameworkCore": "[8.5.7, 9.0.0)",
+          "MassTransit.MongoDb": "[8.5.7, 9.0.0)",
           "MassTransit.RabbitMQ": "[8.5.7, 9.0.0)",
           "Microsoft.EntityFrameworkCore": "[9.0.11, )",
           "Microsoft.EntityFrameworkCore.Relational": "[9.0.11, )",
@@ -971,8 +973,10 @@
       "restorate.reviewservice.application": {
         "type": "Project",
         "dependencies": {
+          "MassTransit": "[8.5.7, 9.0.0)",
           "Mediator.Abstractions": "[3.0.1, )",
           "RestoRate.Abstractions": "[1.0.0, )",
+          "RestoRate.Contracts": "[1.0.0, )",
           "RestoRate.ReviewService.Domain": "[1.0.0, )",
           "RestoRate.SharedKernel": "[1.0.0, )"
         }
@@ -988,7 +992,7 @@
         "type": "Project",
         "dependencies": {
           "RestoRate.BuildingBlocks": "[1.0.0, )",
-          "RestoRate.ReviewService.Domain": "[1.0.0, )"
+          "RestoRate.ReviewService.Application": "[1.0.0, )"
         }
       },
       "restorate.servicedefaults": {
@@ -1178,6 +1182,27 @@
           "Microsoft.Extensions.Hosting.Abstractions": "9.0.0",
           "Microsoft.Extensions.Logging.Abstractions": "9.0.0",
           "Microsoft.Extensions.Options": "9.0.0"
+        }
+      },
+      "MassTransit.EntityFrameworkCore": {
+        "type": "CentralTransitive",
+        "requested": "[8.5.7, 9.0.0)",
+        "resolved": "8.5.7",
+        "contentHash": "ZOx5WseH83PXk/We2c0gWT8+4f0Z27kP0yU2mLq8CSlq9xa+Ke61exu7Th2wjgZCMGSjwtdHlBHMJNZnyQg1vA==",
+        "dependencies": {
+          "MassTransit": "8.5.7",
+          "Microsoft.EntityFrameworkCore.Relational": "9.0.1",
+          "Microsoft.Extensions.Caching.Memory": "9.0.1"
+        }
+      },
+      "MassTransit.MongoDb": {
+        "type": "CentralTransitive",
+        "requested": "[8.5.7, 9.0.0)",
+        "resolved": "8.5.7",
+        "contentHash": "i+wpi8gTu4FV4cmpx2SPIuBN/c/bjbXtxvRJ04kAttxCroYLg2XTZj/IfCFePhuL2n83becKba92ysKZk/14fA==",
+        "dependencies": {
+          "MassTransit": "8.5.7",
+          "MongoDB.Driver": "3.5.1"
         }
       },
       "MassTransit.RabbitMQ": {
