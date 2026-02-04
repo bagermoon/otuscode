@@ -33,7 +33,13 @@ public static class MassTransitExtensions
             if (string.IsNullOrEmpty(connectionString))
             {
                 // When generate OpenAPI docs locally
-                x.UsingInMemory((context, cfg) => cfg.ConfigureEndpoints(context));
+                x.UsingInMemory((context, cfg) =>
+                {
+                    cfg.UseConsumeFilter(typeof(ConsumeUserContextFilter<>), context);
+                    cfg.UsePublishFilter(typeof(PublishUserContextFilter<>), context);
+                    cfg.UseSendFilter(typeof(SendUserContextFilter<>), context);
+                    cfg.ConfigureEndpoints(context);
+                });
                 return;
             }
 
@@ -41,6 +47,8 @@ public static class MassTransitExtensions
             {
                 cfg.Host(new Uri(connectionString));
                 cfg.UseConsumeFilter(typeof(ConsumeUserContextFilter<>), context);
+                cfg.UsePublishFilter(typeof(PublishUserContextFilter<>), context);
+                cfg.UseSendFilter(typeof(SendUserContextFilter<>), context);
                 cfg.ConfigureEndpoints(context);
             });
         });
@@ -55,6 +63,7 @@ public static class MassTransitExtensions
         configurator.AddConfigureEndpointsCallback((context, _, cfg) =>
         {
             cfg.UseMessageRetry(r => r.Intervals(500, 1000));
+            cfg.UseMessageScope(context);
             cfg.UseInMemoryOutbox(context);
         });
         return configurator;
@@ -92,6 +101,7 @@ public static class MassTransitExtensions
         configurator.AddConfigureEndpointsCallback((context, _, cfg) =>
         {
             cfg.UseMessageRetry(r => r.Intervals(10, 50, 100, 1000, 1000, 1000, 1000, 1000));
+            cfg.UseMessageScope(context);
             cfg.UseMongoDbOutbox(context);
         });
 

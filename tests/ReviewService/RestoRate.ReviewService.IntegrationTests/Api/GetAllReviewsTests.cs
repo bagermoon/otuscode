@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.WebUtilities;
 using RestoRate.Contracts.Common;
 using RestoRate.Contracts.Common.Dtos;
 using RestoRate.Contracts.Review.Dtos;
+using RestoRate.ReviewService.Domain.UserReferenceAggregate;
+using RestoRate.Testing.Common.Auth;
+using RestoRate.Testing.Common.Helpers;
 
 namespace RestoRate.ReviewService.IntegrationTests.Api;
 
@@ -94,5 +97,52 @@ public class GetAllReviewsTests : IClassFixture<ReviewWebApplicationFactory>
         result!.Items.Should().OnlyContain(r => r.Id != Guid.Empty);
         // All created reviews are Pending by default, so this should include at least those.
         result.Items.Should().HaveCountGreaterThanOrEqualTo(2);
+    }
+
+    [Fact]
+    public async Task GetAllReviews_ForAuthenticatedUser_FillsUserReferenceInEachCreatedItem()
+    {
+        var userInfo = TestUsers.Get(TestUser.User);
+        var createdIds = new List<Guid>();
+
+        for (var i = 0; i < 3; i++)
+        {
+            var create = new CreateReviewDto(
+                RestaurantId: Guid.NewGuid(),
+                UserId: userInfo.UserId,
+                Rating: 4.0m,
+                AverageCheck: null,
+                Comment: $"userRef propagation {i}");
+
+            var createResponse = await _client.PostAsJsonAsync("/reviews", create, CancellationToken);
+            createResponse.EnsureSuccessStatusCode();
+
+            var created = await createResponse.Content.ReadFromJsonAsync<ReviewDto>(CancellationToken);
+            created.Should().NotBeNull();
+            createdIds.Add(created!.Id);
+        }
+
+        await Eventually.SucceedsAsync(async () =>
+        {
+            await using var scope = _factory.Services.CreateAsyncScope();
+            var repo = scope.ServiceProvider.GetRequiredService<Ardalis.SharedKernel.IRepository<UserReference>>();
+            var userRef = await repo.GetByIdAsync(userInfo.UserId, CancellationToken);
+            userRef.Should().NotBeNull();
+            userRef!.Name.Should().Be(userInfo.Name);
+        }, timeout: TimeSpan.FromSeconds(2));
+
+        await Eventually.SucceedsAsync(async () =>
+        {
+            var getAllResponse = await _client.GetAsync("/reviews?pageNumber=1&pageSize=50", CancellationToken);
+            getAllResponse.EnsureSuccessStatusCode();
+
+            var result = await getAllResponse.Content.ReadFromJsonAsync<PagedResult<ReviewDto>>(CancellationToken);
+            result.Should().NotBeNull();
+
+            var createdReviews = result!.Items.Where(r => createdIds.Contains(r.Id)).ToList();
+            createdReviews.Should().HaveCount(createdIds.Count);
+            createdReviews.Should().OnlyContain(r => r.User != null);
+            createdReviews.Select(r => r.User!.Name).Should().OnlyContain(n => n == userInfo.Name);
+        }, timeout: TimeSpan.FromSeconds(3));
     }
 }

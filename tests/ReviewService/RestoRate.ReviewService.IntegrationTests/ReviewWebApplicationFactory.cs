@@ -1,5 +1,6 @@
 using MassTransit;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using RestoRate.ServiceDefaults;
 using Testcontainers.MongoDb;
@@ -11,7 +12,7 @@ namespace RestoRate.ReviewService.IntegrationTests;
 public class ReviewWebApplicationFactory
     : BaseWebApplicationFactory<Program>
 {
-    private readonly MongoDbContainer _mongo = new MongoDbBuilder().Build();
+    private readonly MongoDbContainer _mongo = new MongoDbBuilder("docker.io/library/mongo:8.2").Build();
 
     protected override IReadOnlyList<IContainer> Containers => [_mongo];
 
@@ -43,6 +44,12 @@ public class ReviewWebApplicationFactory
     }
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.ConfigureLogging(logging =>
+        {
+            // Avoid Windows EventLog logger issues during WebApplicationFactory disposal.
+            logging.ClearProviders();
+        });
+
         builder.AddMassTransitInMemoryTestHarness();
     }
 }

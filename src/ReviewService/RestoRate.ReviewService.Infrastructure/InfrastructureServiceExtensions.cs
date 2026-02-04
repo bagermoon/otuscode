@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using MongoDB.Driver;
+
 using NodaMoney;
 
 using RestoRate.BuildingBlocks.Data;
@@ -57,7 +58,9 @@ public static class InfrastructureServiceExtensions
                 }
                 configs.AddRequestClient<GetRestaurantStatusRequest>();
 
-                var useMongoDbSagaOutbox = builder.Configuration.GetValue("MassTransit:UseMongoDbSagaOutbox", true);
+                // Для работы MongoDbSagaOutbox требуется MongoDb в режиме ReplicaSet. 
+                // Этот режим не поддерживается в Aspire на момент разработки.
+                var useMongoDbSagaOutbox = builder.Configuration.GetValue("MassTransit:UseMongoDbSagaOutbox", false);
 
                 if (useMongoDbSagaOutbox
                     && reviewMongoUrl is not null

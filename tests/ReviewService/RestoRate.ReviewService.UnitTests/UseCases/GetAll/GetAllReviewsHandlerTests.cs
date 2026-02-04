@@ -1,5 +1,6 @@
 using Ardalis.SharedKernel;
 using Ardalis.Specification;
+using Ardalis.Result;
 
 using FluentAssertions;
 
@@ -10,6 +11,7 @@ using NSubstitute;
 using RestoRate.Contracts.Review.Dtos;
 using RestoRate.ReviewService.Application.UseCases.Reviews.GetAll;
 using RestoRate.ReviewService.Domain.Interfaces;
+using RestoRate.SharedKernel.Filters;
 
 namespace RestoRate.ReviewService.UnitTests.UseCases.GetAll;
 
@@ -32,8 +34,8 @@ public class GetAllReviewsHandlerTests
         var query = new GetAllReviewsQuery(1, 10);
 
         readRepository
-            .ListAsync(Arg.Any<ISpecification<Review>>(), Arg.Any<CancellationToken>())
-            .Returns(reviews);
+            .ListAsync(Arg.Any<ISpecification<Review>>(), Arg.Any<BaseFilter>(), Arg.Any<CancellationToken>())
+            .Returns(new PagedResult<List<Review>>(new PagedInfo(1, 10, 1, 3), reviews));
 
         var handler = new GetAllReviewsHandler(readRepository, logger);
 
@@ -58,14 +60,19 @@ public class GetAllReviewsHandlerTests
             .Select(i => Review.Create(Guid.NewGuid(), Guid.NewGuid(), 4.0m, null, $"comment {i}"))
             .ToList();
 
+        var pageItems = reviews
+            .Skip(10)
+            .Take(10)
+            .ToList();
+
         var readRepository = Substitute.For<IReviewRepository>();
         var logger = Substitute.For<ILogger<GetAllReviewsHandler>>();
 
         var query = new GetAllReviewsQuery(2, 10);
 
         readRepository
-            .ListAsync(Arg.Any<ISpecification<Review>>(), Arg.Any<CancellationToken>())
-            .Returns(reviews);
+            .ListAsync(Arg.Any<ISpecification<Review>>(), Arg.Any<BaseFilter>(), Arg.Any<CancellationToken>())
+            .Returns(new PagedResult<List<Review>>(new PagedInfo(2, 10, 2, 12), pageItems));
 
         var handler = new GetAllReviewsHandler(readRepository, logger);
 

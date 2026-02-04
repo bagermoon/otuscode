@@ -71,6 +71,7 @@ public class CreateReviewTests : IClassFixture<ReviewWebApplicationFactory>
     public async Task CreateReview_EventuallyCreatesUserReference_AndIsReturnedByGetById()
     {
         var userId = TestUsers.Get(TestUser.User).UserId;
+        var expectedUserName = TestUsers.Get(TestUser.User).Name;
 
         var createDto = new CreateReviewDto(Guid.NewGuid(), userId, 5m, null, "Integration create review with user reference");
         var response = await _client.PostAsJsonAsync("/reviews/", createDto, CancellationToken);
@@ -87,6 +88,7 @@ public class CreateReviewTests : IClassFixture<ReviewWebApplicationFactory>
             var repo = scope.ServiceProvider.GetRequiredService<Ardalis.SharedKernel.IRepository<UserReference>>();
             var userRef = await repo.GetByIdAsync(userId, CancellationToken);
             userRef.Should().NotBeNull();
+            userRef!.Name.Should().Be(expectedUserName);
         }, timeout: TimeSpan.FromSeconds(2));
 
         var getById = await _client.GetAsync($"/reviews/{created.Id}", CancellationToken);
@@ -96,5 +98,6 @@ public class CreateReviewTests : IClassFixture<ReviewWebApplicationFactory>
         fetched.Should().NotBeNull();
         fetched!.User.Should().NotBeNull();
         fetched.User!.UserId.Should().Be(userId);
+        fetched.User!.Name.Should().Be(expectedUserName);
     }
 }

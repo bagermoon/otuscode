@@ -13,7 +13,7 @@ public class Pagination
     public bool HasPrevious { get; }
     public bool HasNext { get; }
 
-   public int Take { get; }
+    public int Take { get; }
     public int Skip { get; }
     public Pagination(int totalItems, int totalPages, int pageSize, int page, int startItem, int endItem, bool hasPrevious, bool hasNext)
     {

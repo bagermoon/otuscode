@@ -74,7 +74,7 @@ public sealed class UpsertUserHandler(
     {
         if (!string.IsNullOrWhiteSpace(userContext.Email))
         {
-            try 
+            try
             {
                 var userEmail = new Email(userContext.Email);
                 if (!userEmail.Equals(userReference.Email))

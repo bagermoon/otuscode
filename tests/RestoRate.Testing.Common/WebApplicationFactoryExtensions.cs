@@ -76,6 +76,8 @@ public static class WebApplicationFactoryExtensions
                 cfg.UsingInMemory((context, busCfg) =>
                 {
                     busCfg.UseConsumeFilter(typeof(ConsumeUserContextFilter<>), context);
+                    busCfg.UsePublishFilter(typeof(PublishUserContextFilter<>), context);
+                    busCfg.UseSendFilter(typeof(SendUserContextFilter<>), context);
                     busCfg.ConfigureEndpoints(context);
                 });
             });

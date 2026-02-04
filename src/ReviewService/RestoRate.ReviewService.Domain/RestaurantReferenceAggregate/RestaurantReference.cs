@@ -27,7 +27,7 @@ public class RestaurantReference : EntityBase<Guid>, IAggregateRoot
     public RestaurantReference UpdateStatus(RestaurantStatus status)
     {
         RestaurantStatus = status;
-        
+
         return this;
     }
 }

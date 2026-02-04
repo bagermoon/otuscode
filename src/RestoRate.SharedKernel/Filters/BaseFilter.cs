@@ -4,5 +4,5 @@ public record BaseFilter(int? PageNumber = null, int? PageSize = null, string? O
 {
     public int? PageNumber { get; set; } = PageNumber;
     public int? PageSize { get; set; } = PageSize;
-    public string? OrderBy { get; set; } =  OrderBy;
+    public string? OrderBy { get; set; } = OrderBy;
 }
