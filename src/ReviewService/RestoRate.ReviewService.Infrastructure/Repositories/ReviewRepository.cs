@@ -35,7 +35,17 @@ public class ReviewRepository(ReviewDbContext context)
             return null;
 
         if (review.UserId == Guid.Empty)
+        {
+            DetachIfNoTracking(
+                context,
+                asNoTracking,
+                preTrackedReviewIds,
+                preTrackedUserIds: null,
+                reviewsToDetach: new[] { review.Id },
+                userIdsToDetach: new HashSet<Guid>());
+
             return review;
+        }
 
         var userIds = new[] { review.UserId };
         var userIdsSet = userIds.ToHashSet();
@@ -74,10 +84,20 @@ public class ReviewRepository(ReviewDbContext context)
         if (reviews.Count == 0)
             return reviews;
 
-        var userIds = reviews.Select(r => r.UserId).Distinct().ToArray();
+        var userIds = reviews.Select(r => r.UserId).Where(id => id != Guid.Empty).Distinct().ToArray();
 
         if (userIds.Length == 0)
+        {
+            DetachIfNoTracking(
+                context,
+                asNoTracking,
+                preTrackedReviewIds,
+                preTrackedUserIds: null,
+                reviewsToDetach: reviews.Select(r => r.Id),
+                userIdsToDetach: new HashSet<Guid>());
+
             return reviews;
+        }
 
         var userIdsSet = userIds.ToHashSet();
         var preTrackedUserIds = CapturePreTrackedUserIds(context, asNoTracking, userIdsSet);
@@ -117,9 +137,19 @@ public class ReviewRepository(ReviewDbContext context)
 
         var reviews = pagedResult.Value;
 
-        var userIds = reviews.Select(r => r.UserId).Distinct().ToArray();
+        var userIds = reviews.Select(r => r.UserId).Where(id => id != Guid.Empty).Distinct().ToArray();
         if (userIds.Length == 0)
+        {
+            DetachIfNoTracking(
+                context,
+                asNoTracking,
+                preTrackedReviewIds,
+                preTrackedUserIds: null,
+                reviewsToDetach: reviews.Select(r => r.Id),
+                userIdsToDetach: new HashSet<Guid>());
+
             return pagedResult;
+        }
 
         var userIdsSet = userIds.ToHashSet();
         var preTrackedUserIds = CapturePreTrackedUserIds(context, asNoTracking, userIdsSet);
@@ -164,8 +194,8 @@ public class ReviewRepository(ReviewDbContext context)
     {
         return asNoTracking
             ? context.ChangeTracker.Entries<UserReference>()
+                .Where(e => relevantUserIds.Contains(e.Entity.Id))
                 .Select(e => e.Entity.Id)
-                .Where(relevantUserIds.Contains)
                 .ToHashSet()
             : null;
     }
@@ -193,23 +223,24 @@ public class ReviewRepository(ReviewDbContext context)
         if (!asNoTracking)
             return;
 
-        var reviewIdsSet = reviewsToDetach.ToHashSet();
+        var userRefsToDetach = context.ChangeTracker.Entries<UserReference>()
+            .Where(e => userIdsToDetach.Contains(e.Entity.Id))
+            .Where(e => preTrackedUserIds is null || !preTrackedUserIds.Contains(e.Entity.Id))
+            .ToList();
 
-        foreach (var entry in context.ChangeTracker.Entries<UserReference>()
-                     .Where(e => userIdsToDetach.Contains(e.Entity.Id)))
+        foreach (var entry in userRefsToDetach)
         {
-            if (preTrackedUserIds is not null && preTrackedUserIds.Contains(entry.Entity.Id))
-                continue;
-
             entry.State = EntityState.Detached;
         }
 
-        foreach (var entry in context.ChangeTracker.Entries<Review>()
-                     .Where(e => reviewIdsSet.Contains(e.Entity.Id)))
-        {
-            if (preTrackedReviewIds is not null && preTrackedReviewIds.Contains(entry.Entity.Id))
-                continue;
+        var reviewIdsSet = reviewsToDetach.ToHashSet();
+        var reviewRefsToDetach = context.ChangeTracker.Entries<Review>()
+            .Where(e => reviewIdsSet.Contains(e.Entity.Id))
+            .Where(e => preTrackedReviewIds is null || !preTrackedReviewIds.Contains(e.Entity.Id))
+            .ToList();
 
+        foreach (var entry in reviewRefsToDetach)
+        {
             entry.State = EntityState.Detached;
         }
     }

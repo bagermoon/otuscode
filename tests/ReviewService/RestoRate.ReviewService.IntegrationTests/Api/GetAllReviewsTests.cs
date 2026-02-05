@@ -38,7 +38,7 @@ public class GetAllReviewsTests : IClassFixture<ReviewWebApplicationFactory>
                 RestaurantId: Guid.NewGuid(),
                 UserId: userId,
                 Rating: 4.0m + (i * 0.1m),
-                AverageCheck: new MoneyDto(1000 + (i * 100), "RUB"),
+                AverageCheck: new MoneyDto(1000m + (i * 100m), "RUB"),
                 Comment: $"comment {i}");
 
             var createResponse = await _client.PostAsJsonAsync("/reviews", create, CancellationToken);
