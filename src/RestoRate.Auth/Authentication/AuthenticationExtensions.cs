@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -107,6 +109,29 @@ public static class AuthenticationExtensions
                     options.MapInboundClaims = false;
                     options.TokenValidationParameters.NameClaimType = "preferred_username";
                     options.TokenValidationParameters.RoleClaimType = "roles";
+
+                    // Roles are often present only in access_token (not in id_token/userinfo).
+                    // The dashboard authorizes against the cookie principal, so we hydrate role claims
+                    // onto the principal during sign-in.
+                    options.Events ??= new OpenIdConnectEvents();
+                    var existingTokenValidated = options.Events.OnTokenValidated;
+                    options.Events.OnTokenValidated = async context =>
+                    {
+                        if (context.Principal?.Identity is ClaimsIdentity identity)
+                        {
+                            var accessToken = context.TokenEndpointResponse?.AccessToken
+                                ?? context.ProtocolMessage?.AccessToken
+                                ?? context.Properties?.GetTokenValue("access_token");
+
+                            KeycloakRoleExtractor.AddRolesFromAccessToken(
+                                identity: identity,
+                                jwtAccessToken: accessToken,
+                                clientId: settings.ClientId);
+                        }
+
+                        if (existingTokenValidated is not null)
+                            await existingTokenValidated(context);
+                    };
                 }
             );
 

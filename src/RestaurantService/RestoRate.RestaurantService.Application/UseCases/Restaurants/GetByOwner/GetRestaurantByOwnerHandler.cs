@@ -3,8 +3,6 @@ using Ardalis.SharedKernel;
 
 using Mediator;
 
-using Microsoft.Extensions.Logging;
-
 using RestoRate.Contracts.Restaurant.DTOs;
 using RestoRate.RestaurantService.Application.Mappings;
 using RestoRate.RestaurantService.Domain.RestaurantAggregate;

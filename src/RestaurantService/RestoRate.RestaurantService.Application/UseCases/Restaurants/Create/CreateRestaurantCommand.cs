@@ -7,4 +7,4 @@ using RestoRate.Contracts.Restaurant.DTOs.CRUD;
 
 namespace RestoRate.RestaurantService.Application.UseCases.Restaurants.Create;
 
-public record CreateRestaurantCommand(CreateRestaurantDto Dto, Guid OwnerId) : ICommand<Result<RestaurantDto>>;
+public record CreateRestaurantCommand(CreateRestaurantDto Dto) : ICommand<Result<RestaurantDto>>;

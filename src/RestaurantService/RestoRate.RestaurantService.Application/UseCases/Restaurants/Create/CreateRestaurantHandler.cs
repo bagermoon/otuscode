@@ -6,19 +6,20 @@ using Microsoft.Extensions.Logging;
 
 using NodaMoney;
 
-using RestoRate.Abstractions.Messaging;
+using RestoRate.Abstractions.Identity;
+using RestoRate.Contracts.Restaurant.DTOs;
+using RestoRate.RestaurantService.Application.Mappings;
 using RestoRate.RestaurantService.Domain.Interfaces;
+using RestoRate.RestaurantService.Domain.RestaurantAggregate;
 using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
-using RestoRate.Contracts.Restaurant.DTOs;
-using RestoRate.RestaurantService.Domain.RestaurantAggregate;
-using RestoRate.RestaurantService.Application.Mappings;
 
 namespace RestoRate.RestaurantService.Application.UseCases.Restaurants.Create;
 
 public sealed class CreateRestaurantHandler(
     IRestaurantService restaurantService,
     ITagsService tagsService,
+    IUserContext userContext,
     ILogger<CreateRestaurantHandler> logger)
     : ICommandHandler<CreateRestaurantCommand, Result<RestaurantDto>>
 {
@@ -60,7 +61,7 @@ public sealed class CreateRestaurantHandler(
                 location,
                 openHours,
                 averageCheck,
-                request.OwnerId,
+                userContext.UserId,
                 cuisineTypes,
                 restaurantTags,
                 images);

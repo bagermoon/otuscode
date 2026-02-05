@@ -1,7 +1,3 @@
-using System.Security.Claims;
-
-using Ardalis.Result;
-
 using Mediator;
 
 using Microsoft.AspNetCore.Mvc;
@@ -18,17 +14,10 @@ internal static class CreateRestaurantEndpoint
     {
         return group.MapPost("/", async (
             [FromBody] CreateRestaurantDto dto,
-            ClaimsPrincipal user,
             [FromServices] ISender sender,
             CancellationToken ct) =>
         {
-            var userIdString = user.FindFirst("sub")?.Value
-                               ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (!Guid.TryParse(userIdString, out var ownerId))
-                return Results.Unauthorized();
-
-            var result = await sender.Send(new CreateRestaurantCommand(dto, ownerId), ct);
+            var result = await sender.Send(new CreateRestaurantCommand(dto), ct);
             if (result.IsSuccess)
                 return Results.Created($"/restaurants/{result.Value.RestaurantId}", result.Value);
 

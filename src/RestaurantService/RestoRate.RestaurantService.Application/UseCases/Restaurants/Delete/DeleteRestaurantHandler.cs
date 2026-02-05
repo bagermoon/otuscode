@@ -9,8 +9,7 @@ using RestoRate.RestaurantService.Domain.Interfaces;
 namespace RestoRate.RestaurantService.Application.UseCases.Restaurants.Delete;
 
 public sealed class DeleteRestaurantHandler(
-    IRestaurantService restaurantService,
-    ILogger<DeleteRestaurantHandler> logger)
+    IRestaurantService restaurantService)
     : ICommandHandler<DeleteRestaurantCommand, Result>
 {
     public async ValueTask<Result> Handle(
