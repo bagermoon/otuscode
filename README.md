@@ -6,7 +6,6 @@ C#-2025-09 Команда 2
 
 * Роман Кузнецов <https://github.com/bagermen>
 * Евгений Кабаев <https://github.com/Adeosh>
-* Vladislav Pinkman <https://github.com/blvcknwh1te>
 
 ## Documentation
 
