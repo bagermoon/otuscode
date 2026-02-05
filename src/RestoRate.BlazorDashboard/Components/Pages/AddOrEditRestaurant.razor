@@ -1,0 +1,374 @@
+@page "/restaurants/add"
+@page "/restaurants/edit/{Id:guid}"
+
+@using RestoRate.Contracts.Restaurant.DTOs.CRUD
+@using RestoRate.Contracts.Restaurant.DTOs
+@using RestoRate.Contracts.Common.Dtos
+@using RestoRate.SharedKernel.Enums
+@using RestoRate.BlazorDashboard.Services
+@using Microsoft.AspNetCore.Authorization
+@using System.Text.RegularExpressions
+@using System.Globalization
+
+@attribute [Authorize]
+@inject RestaurantWebService RestaurantService
+@inject NavigationManager Nav
+@inject ISnackbar Snackbar
+
+<PageTitle>@(Id.HasValue ? "Редактирование" : "Добавить ресторан")</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-8 mb-16">
+    <div class="d-flex align-center mb-6">
+        <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" OnClick="@(() => Nav.NavigateTo("/"))" Color="Color.Inherit" Class="mr-3" />
+        <MudText Typo="Typo.h4" Class="font-weight-bold mud-text-primary">
+            @(Id.HasValue ? "Редактирование заведения" : "Новое заведение")
+        </MudText>
+    </div>
+
+    <MudPaper Class="rr-cloud pa-8" Elevation="0">
+        @if (_isLoading)
+        {
+            <div class="d-flex justify-center my-8">
+                <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+            </div>
+        }
+        else
+        {
+            <EditForm Model="@_formModel" OnValidSubmit="SubmitAsync">
+                <DataAnnotationsValidator />
+
+                <MudGrid Spacing="4">
+
+                    <MudItem xs="12"><MudText Typo="Typo.h6" Class="font-weight-bold">Основное</MudText></MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_formModel.Name" Label="Название" Variant="Variant.Outlined" Required="true" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_formModel.Description" Label="Описание" Lines="3" Variant="Variant.Outlined" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="_formModel.PhoneNumber" Label="Телефон" Variant="Variant.Outlined" Mask="@(new PatternMask("(000) 000-00-00"))" AdornmentText="+7" Adornment="Adornment.Start" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudTextField @bind-Value="_formModel.Email" Label="Email" Variant="Variant.Outlined" />
+                    </MudItem>
+
+                    <MudItem xs="12"><MudDivider Class="my-2" /><MudText Typo="Typo.h6" Class="font-weight-bold">Локация</MudText></MudItem>
+                    <MudItem xs="12" sm="8"><MudTextField @bind-Value="_formModel.AddressFull" Label="Адрес" Variant="Variant.Outlined" /></MudItem>
+                    <MudItem xs="12" sm="4"><MudTextField @bind-Value="_formModel.AddressHouse" Label="Дом" Variant="Variant.Outlined" /></MudItem>
+                    <MudItem xs="6">
+                        <MudNumericField T="double?"
+                                         @bind-Value="_formModel.Latitude"
+                                         Label="Широта"
+                                         Variant="Variant.Outlined"
+                                         Step="0.000001"
+                                         Format="0.000000"
+                                         Immediate="true"
+                                         Culture="@CultureInfo.InvariantCulture" />
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudNumericField T="double?"
+                                         @bind-Value="_formModel.Longitude"
+                                         Label="Долгота"
+                                         Variant="Variant.Outlined"
+                                         Step="0.000001"
+                                         Format="0.000000"
+                                         Immediate="true"
+                                         Culture="@CultureInfo.InvariantCulture" />
+                    </MudItem>
+
+                    <MudItem xs="12"><MudDivider Class="my-2" /><MudText Typo="Typo.h6" Class="font-weight-bold">Детали</MudText></MudItem>
+
+                    <MudItem xs="6">
+                        <MudNumericField T="decimal?"
+                                         @bind-Value="_formModel.AvgCheckAmount"
+                                         Label="Средний чек"
+                                         Variant="Variant.Outlined"
+                                         Min="0"
+                                         Step="100"
+                                         Format="F2"
+                                         Immediate="true"
+                                         HideSpinButtons="true"
+                                         Adornment="Adornment.Start"
+                                         AdornmentIcon="@Icons.Material.Filled.CurrencyRuble"
+                                         Culture="@System.Globalization.CultureInfo.InvariantCulture" />
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudSelect @bind-Value="_formModel.Currency" Label="Валюта" Variant="Variant.Outlined">
+                            <MudSelectItem Value="@("RUB")">RUB</MudSelectItem>
+                            <MudSelectItem Value="@("USD")">USD</MudSelectItem>
+                            <MudSelectItem Value="@("EUR")">EUR</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+
+                    <MudItem xs="12">
+                        <MudDivider Class="my-2" />
+                        <MudText Typo="Typo.h6" Class="font-weight-bold mb-4">Режим работы</MudText>
+
+                        <div class="d-flex flex-column gap-2">
+                            @for (int i = 0; i < _formModel.Schedule.Count; i++)
+                            {
+                                var index = i;
+                                <MudPaper Elevation="0" Class="d-flex align-center pa-3 rounded-lg border-solid border mud-border-lines-default"
+                                          Style="@(!_formModel.Schedule[index].IsOpen ? "opacity: 0.6; background-color: var(--mud-palette-background-grey);" : "")">
+
+                                    <div style="width: 180px;">
+                                        <MudSwitch T="bool"
+                                                   Value="@_formModel.Schedule[index].IsOpen"
+                                                   ValueChanged="@((bool v) => ToggleDay(index, v))"
+                                                   Color="Color.Success"
+                                                   Label="@_formModel.Schedule[index].DayName" />
+                                    </div>
+
+                                    @if (_formModel.Schedule[index].IsOpen)
+                                    {
+                                        <div class="d-flex gap-4 flex-grow-1">
+                                            <MudTimePicker @bind-Time="_formModel.Schedule[index].OpenTime" Label="Открытие" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                            <MudTimePicker @bind-Time="_formModel.Schedule[index].CloseTime" Label="Закрытие" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="flex-grow-1"><MudText Color="Color.Error" Class="font-weight-medium">Выходной</MudText></div>
+                                    }
+                                </MudPaper>
+                            }
+                        </div>
+                    </MudItem>
+
+                    <MudItem xs="12"><MudDivider Class="my-2" /><MudText Typo="Typo.h6">Характеристики</MudText></MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudSelect T="string" Label="Кухни" MultiSelection="true" @bind-SelectedValues="_formModel.SelectedCuisines" Variant="Variant.Outlined">
+                            @foreach (var c in CuisineType.List)
+                            {
+                                <MudSelectItem T="string" Value="@c.Name">@c.RussianName</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="_formModel.TagsInput" Label="Теги (через запятую)" Variant="Variant.Outlined" HelperText="WiFi, Терраса, Детская комната" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Tag" />
+                    </MudItem>
+
+                    <MudItem xs="12">
+                        <div class="d-flex justify-space-between align-center mb-2">
+                            <MudText>Фотографии (@_formModel.Images.Count)</MudText>
+                            <MudButton OnClick="AddImageField" StartIcon="@Icons.Material.Filled.Add" Color="Color.Secondary" Variant="Variant.Text">
+                                Добавить URL
+                            </MudButton>
+                        </div>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">Первая фотография будет главной.</MudText>
+                    </MudItem>
+
+                    @for (int i = 0; i < _formModel.Images.Count; i++)
+                    {
+                        var index = i;
+                        <MudItem xs="12">
+                            <div class="d-flex gap-2 align-center">
+                                <MudTextField @bind-Value="_formModel.Images[index].Url"
+                                              Label="@(index == 0 ? "Главное фото" : $"Фото #{index + 1}")"
+                                              Variant="Variant.Outlined"
+                                              FullWidth="true" />
+
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                               Color="Color.Error"
+                                               OnClick="@(() => RemoveImage(_formModel.Images[index]))" />
+                            </div>
+                        </MudItem>
+                    }
+
+                    <MudItem xs="12" Class="mt-4 d-flex justify-end">
+                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Large" Disabled="@_isSubmitting">
+                            @(_isSubmitting ? "Отправка..." : "Сохранить")
+                        </MudButton>
+                    </MudItem>
+
+                </MudGrid>
+            </EditForm>
+        }
+    </MudPaper>
+</MudContainer>
+
+@code {
+    [Parameter] public Guid? Id { get; set; }
+
+    private CreateRestaurantFormModel _formModel = new();
+    private bool _isSubmitting = false;
+    private bool _isLoading = true;
+
+    private Dictionary<DayOfWeek, string> _daysMap = new()
+    {
+        { DayOfWeek.Monday, "Понедельник" }, { DayOfWeek.Tuesday, "Вторник" }, { DayOfWeek.Wednesday, "Среда" },
+        { DayOfWeek.Thursday, "Четверг" }, { DayOfWeek.Friday, "Пятница" }, { DayOfWeek.Saturday, "Суббота" }, { DayOfWeek.Sunday, "Воскресенье" }
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var daysOrder = new[] { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday };
+        foreach (var day in daysOrder)
+        {
+            _formModel.Schedule.Add(new DayScheduleViewModel { Day = day, DayName = _daysMap[day], IsOpen = false });
+        }
+
+        if (Id.HasValue)
+        {
+            await LoadRestaurantDataAsync(Id.Value);
+        }
+        else
+        {
+            AddImageField();
+            _isLoading = false;
+        }
+    }
+
+    private async Task LoadRestaurantDataAsync(Guid id)
+    {
+        try
+        {
+            var dto = await RestaurantService.GetRestaurantByIdAsync(id);
+            if (dto != null)
+            {
+                _formModel.Name = dto.Name;
+                _formModel.Description = dto.Description ?? string.Empty;
+                _formModel.PhoneNumber = dto.PhoneNumber;
+                _formModel.Email = dto.Email;
+                _formModel.AddressFull = dto.Address?.FullAddress ?? "";
+                _formModel.AddressHouse = dto.Address?.House ?? "";
+                _formModel.Latitude = dto.Location?.Latitude ?? 00.0001;
+                _formModel.Longitude = dto.Location?.Longitude ?? 00.0001;
+                _formModel.AvgCheckAmount = dto.AverageCheck?.Amount;
+                _formModel.Currency = dto.AverageCheck?.Currency ?? "RUB";
+                _formModel.SelectedCuisines = dto.CuisineTypes;
+                _formModel.TagsInput = string.Join(", ", dto.Tags);
+
+                if (dto.OpenHours != null)
+                {
+                    foreach (var day in _formModel.Schedule)
+                    {
+                        var apiDay = dto.OpenHours.FirstOrDefault(x => x.DayOfWeek == day.Day);
+                        if (apiDay != null)
+                        {
+                            day.IsOpen = !apiDay.IsClosed;
+                            if (day.IsOpen)
+                            {
+                                day.OpenTime = apiDay.OpenTime.ToTimeSpan();
+                                day.CloseTime = apiDay.CloseTime.ToTimeSpan();
+                            }
+                        }
+                    }
+                }
+
+                _formModel.Images.Clear();
+                if (dto.Images != null)
+                {
+                    foreach (var img in dto.Images.OrderByDescending(x => x.IsPrimary))
+                        _formModel.Images.Add(new ImageViewModel { Url = img.Url });
+                }
+                if (!_formModel.Images.Any()) AddImageField();
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Ошибка: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void ToggleDay(int index, bool isOpen)
+    {
+        _formModel.Schedule[index].IsOpen = isOpen;
+        if (isOpen)
+        {
+            _formModel.Schedule[index].OpenTime ??= new TimeSpan(10, 0, 0);
+            _formModel.Schedule[index].CloseTime ??= new TimeSpan(23, 0, 0);
+        }
+        StateHasChanged();
+    }
+
+    private void AddImageField() => _formModel.Images.Add(new ImageViewModel());
+    private void RemoveImage(ImageViewModel img) => _formModel.Images.Remove(img);
+
+    private async Task SubmitAsync()
+    {
+        _isSubmitting = true;
+        try
+        {
+            string rawPhone = _formModel.PhoneNumber ?? "";
+            string digitsOnly = Regex.Replace(rawPhone, @"\D", "");
+            if (digitsOnly.Length == 11 && (digitsOnly.StartsWith("7") || digitsOnly.StartsWith("8"))) digitsOnly = digitsOnly.Substring(1);
+
+            var tagsList = _formModel.TagsInput.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToList();
+
+            var openHoursList = _formModel.Schedule.Select(day => new OpenHoursDto(
+                DayOfWeek: day.Day,
+                OpenTime: day.OpenTime.HasValue ? TimeOnly.FromTimeSpan(day.OpenTime.Value) : new TimeOnly(10, 0),
+                CloseTime: day.CloseTime.HasValue ? TimeOnly.FromTimeSpan(day.CloseTime.Value) : new TimeOnly(23, 0),
+                IsClosed: !day.IsOpen
+            )).ToList();
+
+            var validImages = _formModel.Images.Where(x => !string.IsNullOrWhiteSpace(x.Url))
+                .Select((x, index) => new CreateRestaurantImageDto(x.Url, null, index == 0)).ToList();
+
+            var lat = _formModel.Latitude ?? 00.0000;
+            var lon = _formModel.Longitude ?? 00.0000;
+
+            var dto = new CreateRestaurantDto(
+                _formModel.Name, _formModel.Description, digitsOnly, _formModel.Email,
+                new AddressDto(_formModel.AddressFull, _formModel.AddressHouse),
+                new LocationDto(lat, lon),
+                openHoursList,
+                new MoneyDto(_formModel.AvgCheckAmount ?? 0, _formModel.Currency),
+                _formModel.SelectedCuisines.ToList(), tagsList, validImages
+            );
+
+            bool success = Id.HasValue
+                ? await RestaurantService.UpdateRestaurantAsync(Id.Value, dto)
+                : await RestaurantService.CreateRestaurantAsync(dto);
+
+            if (success)
+            {
+                Snackbar.Add("Сохранено!", Severity.Success);
+                Nav.NavigateTo(Id.HasValue ? "/user-claims" : "/catalog");
+            }
+            else Snackbar.Add("Ошибка сохранения", Severity.Error);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Ошибка: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+
+    public class CreateRestaurantFormModel
+    {
+        public string Name { get; set; } = "";
+        public string Description { get; set; } = "";
+        public string PhoneNumber { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string AddressFull { get; set; } = "";
+        public string AddressHouse { get; set; } = "";
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
+        public decimal? AvgCheckAmount { get; set; }
+        public string Currency { get; set; } = "RUB";
+        public List<DayScheduleViewModel> Schedule { get; set; } = new();
+        public IEnumerable<string> SelectedCuisines { get; set; } = new HashSet<string>();
+        public string TagsInput { get; set; } = "";
+        public List<ImageViewModel> Images { get; set; } = new();
+    }
+
+    public class DayScheduleViewModel
+    {
+        public DayOfWeek Day { get; set; }
+        public string DayName { get; set; } = "";
+        public bool IsOpen { get; set; } = false;
+        public TimeSpan? OpenTime { get; set; }
+        public TimeSpan? CloseTime { get; set; }
+    }
+    public class ImageViewModel { public string Url { get; set; } = ""; }
+}

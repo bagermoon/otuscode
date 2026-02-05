@@ -68,18 +68,20 @@
 
         if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("searchTerm", out var searchTerm))
             _initialSearchTerm = searchTerm;
-
-        await Load();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            if (filters != null && (!string.IsNullOrEmpty(_initialCuisine) || !string.IsNullOrEmpty(_initialSearchTerm)))
-            {
+            if (filters != null
+                && (!string.IsNullOrEmpty(_initialCuisine)
+                || !string.IsNullOrEmpty(_initialSearchTerm)))
                 await filters.SetValues(_initialSearchTerm, _initialCuisine);
-            }
+
+            await Load();
+
+            StateHasChanged();
         }
     }
 

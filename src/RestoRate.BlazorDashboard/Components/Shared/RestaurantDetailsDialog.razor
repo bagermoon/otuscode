@@ -8,7 +8,6 @@
     <DialogContent>
 
         <div class="hero-header relative">
-
             <div class="rr-custom-btn close-pos" @onclick="Close">
                 <MudIcon Icon="@Icons.Material.Filled.Close" />
             </div>
@@ -20,19 +19,16 @@
                          EnableSwipeGesture="true"
                          AutoCycle="false"
                          TData="object">
-
                 <PreviousButtonTemplate>
                     <div class="rr-custom-btn nav-arrow left" @onclick="PrevImage" @onclick:stopPropagation="true">
                         <MudIcon Icon="@Icons.Material.Filled.ArrowBackIosNew" />
                     </div>
                 </PreviousButtonTemplate>
-
                 <NextButtonTemplate>
                     <div class="rr-custom-btn nav-arrow right" @onclick="NextImage" @onclick:stopPropagation="true">
                         <MudIcon Icon="@Icons.Material.Filled.ArrowForwardIos" />
                     </div>
                 </NextButtonTemplate>
-
                 <ChildContent>
                     @if (Restaurant.Images != null && Restaurant.Images.Any())
                     {
@@ -56,9 +52,7 @@
 
             <div class="hero-overlay-gradient">
                 <div class="hero-text-content pa-6 pa-md-8">
-                    <MudText Typo="Typo.h3"
-                             Class="font-weight-bold mb-1"
-                             Style="color: #ffffff !important; text-shadow: 0 2px 10px rgba(0,0,0,0.9);">
+                    <MudText Typo="Typo.h3" Class="font-weight-bold mb-1" Style="color: #ffffff !important; text-shadow: 0 2px 10px rgba(0,0,0,0.9);">
                         @Restaurant.Name
                     </MudText>
 
@@ -72,9 +66,7 @@
                         })
                         .Take(4);
 
-                        <MudText Typo="Typo.subtitle1"
-                                 Class="font-weight-bold"
-                                 Style="color: #ffffff !important; text-shadow: 0 2px 8px rgba(0,0,0,0.9);">
+                        <MudText Typo="Typo.subtitle1" Class="font-weight-bold" Style="color: #ffffff !important; text-shadow: 0 2px 8px rgba(0,0,0,0.9);">
                             @string.Join(" • ", displayCuisines)
                         </MudText>
                     }
@@ -103,8 +95,10 @@
                         </MudText>
                     }
                 </MudItem>
+
                 <MudItem xs="12" md="5" lg="4">
                     <MudPaper Elevation="0" Class="info-panel pa-6 rounded-xl shadow-sm">
+
                         <div class="d-flex align-center mb-6">
                             <div class="icon-circle bg-green-light mr-4">
                                 <MudIcon Icon="@Icons.Material.Filled.CurrencyRuble" Color="Color.Success" Size="Size.Medium" />
@@ -116,7 +110,9 @@
                                 </MudText>
                             </div>
                         </div>
+
                         <MudDivider Class="mb-6" />
+
                         <div class="d-flex align-start mb-6">
                             <div class="icon-circle bg-blue-light mr-4 mt-1">
                                 <MudIcon Icon="@Icons.Material.Filled.Place" Color="Color.Primary" />
@@ -131,6 +127,7 @@
                                 </MudLink>
                             </div>
                         </div>
+
                         <div class="d-flex align-start mb-6">
                             <div class="icon-circle bg-blue-light mr-4 mt-1">
                                 <MudIcon Icon="@Icons.Material.Filled.Phone" Color="Color.Primary" />
@@ -146,17 +143,58 @@
                                 }
                             </div>
                         </div>
+
+                        <MudDivider Class="mb-6" />
+
                         <div class="d-flex align-start">
                             <div class="icon-circle bg-blue-light mr-4 mt-1">
                                 <MudIcon Icon="@Icons.Material.Filled.AccessTime" Color="Color.Primary" />
                             </div>
-                            <div>
-                                <MudText Typo="Typo.caption" Class="text-secondary text-uppercase font-weight-bold mb-1 d-block">Режим работы</MudText>
-                                @if (Restaurant.OpenHours != null)
+                            <div style="width: 100%;">
+                                <MudText Typo="Typo.caption" Class="text-secondary text-uppercase font-weight-bold mb-3 d-block">Режим работы</MudText>
+
+                                @if (Restaurant.OpenHours != null && Restaurant.OpenHours.Any())
                                 {
-                                    <MudText Typo="Typo.body1" Class="font-weight-bold text-success">
-                                        @Restaurant.OpenHours.OpenTime.ToString(@"HH\:mm") - @Restaurant.OpenHours.CloseTime.ToString(@"HH\:mm")
-                                    </MudText>
+                                    var today = DateTime.Now.DayOfWeek;
+                                    var isOpenNow = IsRestaurantOpenNow(Restaurant.OpenHours);
+
+                                    <div class="d-flex align-center mb-4 pa-2 rounded-lg" style="background-color: @(isOpenNow ? "rgba(22, 163, 74, 0.08)" : "rgba(239, 68, 68, 0.08)");">
+                                        <MudIcon Icon="@Icons.Material.Filled.Circle"
+                                                 Size="Size.Small"
+                                                 Color="@(isOpenNow ? Color.Success : Color.Error)"
+                                                 Class="mr-2"
+                                                 Style="font-size: 12px;" />
+                                        <MudText Typo="Typo.body1" Color="@(isOpenNow? Color.Success: Color.Error)" Class="font-weight-bold">
+                                            @(isOpenNow ? "Сейчас открыто" : "Сейчас закрыто")
+                                        </MudText>
+                                    </div>
+
+                                    <div class="schedule-list">
+                                        @foreach (var daySchedule in GetSortedSchedule(Restaurant.OpenHours))
+                                        {
+                                            bool isToday = daySchedule.DayOfWeek == today;
+
+                                            <div class="d-flex align-center py-2 @(isToday ? "current-day" : null)">
+
+                                                <MudText Typo="Typo.body1" Class="@(isToday ? "font-weight-bold text-primary" : "text-secondary font-weight-medium")">
+                                                    @GetRussianDayName(daySchedule.DayOfWeek)
+                                                </MudText>
+
+                                                <MudText Typo="Typo.body1"
+                                                         Class="@(isToday ? "font-weight-bold text-dark" : "text-dark font-weight-medium")"
+                                                         Style="white-space: nowrap; font-variant-numeric: tabular-nums;">
+                                                    @if (daySchedule.IsClosed)
+                                                    {
+                                                        <span style="color: var(--mud-palette-error);">Выходной</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        @($"{daySchedule.OpenTime:HH:mm} — {daySchedule.CloseTime:HH:mm}")
+                                                    }
+                                                </MudText>
+                                            </div>
+                                        }
+                                    </div>
                                 }
                                 else
                                 {
@@ -164,6 +202,7 @@
                                 }
                             </div>
                         </div>
+
                     </MudPaper>
                 </MudItem>
             </MudGrid>
@@ -187,16 +226,13 @@
     private void NextImage()
     {
         if (Restaurant.Images == null || !Restaurant.Images.Any()) return;
-        var count = Restaurant.Images.Count;
-
-        _selectedIndex = (_selectedIndex + 1) % count;
+        _selectedIndex = (_selectedIndex + 1) % Restaurant.Images.Count;
     }
 
     private void PrevImage()
     {
         if (Restaurant.Images == null || !Restaurant.Images.Any()) return;
         var count = Restaurant.Images.Count;
-
         _selectedIndex = (_selectedIndex - 1 + count) % count;
     }
 
@@ -209,5 +245,41 @@
             return $"https://yandex.ru/maps/?pt={lon},{lat}&z=15&l=map";
         }
         return "#";
+    }
+
+    private IEnumerable<OpenHoursDto> GetSortedSchedule(IEnumerable<OpenHoursDto> hours)
+    {
+        return hours.OrderBy(h => h.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)h.DayOfWeek);
+    }
+
+    private string GetRussianDayName(DayOfWeek day)
+    {
+        return day switch
+        {
+            DayOfWeek.Monday => "Пн.",
+            DayOfWeek.Tuesday => "Вт.",
+            DayOfWeek.Wednesday => "Ср.",
+            DayOfWeek.Thursday => "Чт.",
+            DayOfWeek.Friday => "Пт.",
+            DayOfWeek.Saturday => "Сб.",
+            DayOfWeek.Sunday => "Вс.",
+            _ => day.ToString()
+        };
+    }
+
+    private bool IsRestaurantOpenNow(IEnumerable<OpenHoursDto> hours)
+    {
+        var now = DateTime.Now;
+        var todaySchedule = hours.FirstOrDefault(h => h.DayOfWeek == now.DayOfWeek);
+
+        if (todaySchedule == null || todaySchedule.IsClosed)
+            return false;
+
+        var currentTime = TimeOnly.FromDateTime(now);
+
+        if (todaySchedule.CloseTime < todaySchedule.OpenTime)
+            return currentTime >= todaySchedule.OpenTime;
+
+        return currentTime >= todaySchedule.OpenTime && currentTime <= todaySchedule.CloseTime;
     }
 }

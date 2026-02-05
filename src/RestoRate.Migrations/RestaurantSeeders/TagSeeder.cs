@@ -35,7 +35,9 @@ public class TagSeeder : IDbSeeder<RestaurantDbContext>
             new TagEntity("Проведение банкетов"),
             new TagEntity("Мастер-классы шефа"),
             new TagEntity("Винная карта"),
-            new TagEntity("Бесплатная парковка")
+            new TagEntity("Бесплатная парковка"),
+            new TagEntity("Стрит-фуд"),
+            new TagEntity("Мясной ресторан")
         };
 
         await context.Set<TagEntity>().AddRangeAsync(tags, ct);

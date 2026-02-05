@@ -31,6 +31,11 @@ public class RestaurantWebService(IHttpClientFactory httpClientFactory)
         return await response.Content.ReadFromJsonAsync<Contracts.Common.PagedResult<RestaurantDto>>();
     }
 
+    public async Task<RestaurantDto?> GetRestaurantByIdAsync(Guid id)
+    {
+        return await _httpClient.GetFromJsonAsync<RestaurantDto>($"restaurants/{id}");
+    }
+
     public async Task<List<TagDto>> GetTagsAsync()
     {
         var response = await _httpClient.GetAsync("restaurants/tags");
@@ -45,5 +50,24 @@ public class RestaurantWebService(IHttpClientFactory httpClientFactory)
         var response = await client.PostAsJsonAsync("restaurants", dto);
 
         return response.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> UpdateRestaurantAsync(Guid id, CreateRestaurantDto dto)
+    {
+        var response = await _httpClient.PutAsJsonAsync($"restaurants/{id}", dto);
+
+        return response.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> DeleteRestaurantAsync(Guid id)
+    {
+        var response = await _httpClient.DeleteAsync($"restaurants/{id}");
+        return response.IsSuccessStatusCode;
+    }
+
+    public async Task<List<RestaurantDto>> GetUserRestaurantsByOwnerAsync(string ownerId)
+    {
+        var result = await _httpClient.GetFromJsonAsync<List<RestaurantDto>>($"restaurants/owner/{ownerId}");
+        return result ?? new List<RestaurantDto>();
     }
 }

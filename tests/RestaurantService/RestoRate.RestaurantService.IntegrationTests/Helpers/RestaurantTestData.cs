@@ -18,11 +18,21 @@ public static class RestaurantTestData
             Email: $"test{Guid.NewGuid().ToString()[..8]}@example.com",
             Address: new AddressDto("ул. Тестовая", "д. 1"),
             Location: new LocationDto(55.7558, 37.6173),
-            OpenHours: new OpenHoursDto(
-                DayOfWeek.Monday,
-                new TimeOnly(9, 0),
-                new TimeOnly(22, 0)
-            ),
+            OpenHours: new List<OpenHoursDto>
+            {
+                new OpenHoursDto(
+                    DayOfWeek.Monday,
+                    new TimeOnly(10, 0),
+                    new TimeOnly(23, 0),
+                    false
+                ),
+                new OpenHoursDto(
+                    DayOfWeek.Thursday,
+                    new TimeOnly(10, 0),
+                    new TimeOnly(23, 0),
+                    false
+                ),
+            },
             AverageCheck: new MoneyDto(1500, "RUB"),
             CuisineTypes: new List<string>
             {
@@ -45,17 +55,27 @@ public static class RestaurantTestData
     {
         return new UpdateRestaurantDto(
             RestaurantId: restaurantId,
-            Name: name ?? "Ресторан \"Обновлень\"",
+            Name: name ?? "Ресторан \"Обновлен\"",
             Description: "Обновление...",
             PhoneNumber: "9876543210",
             Email: "updated@example.com",
             Address: new AddressDto("ул. Обновленная", "д. 2"),
             Location: new LocationDto(55.7558, 37.6173),
-            OpenHours: new OpenHoursDto(
-                DayOfWeek.Monday,
-                new TimeOnly(10, 0),
-                new TimeOnly(23, 0)
-            ),
+            OpenHours: new List<OpenHoursDto>
+            {
+                new OpenHoursDto(
+                    DayOfWeek.Monday,
+                    new TimeOnly(10, 0),
+                    new TimeOnly(23, 0),
+                    false
+                ),
+                new OpenHoursDto(
+                    DayOfWeek.Thursday,
+                    new TimeOnly(10, 0),
+                    new TimeOnly(23, 0),
+                    false
+                ),
+            },
             AverageCheck: new MoneyDto(2000, "RUB"),
             CuisineTypes: new List<string>
             {

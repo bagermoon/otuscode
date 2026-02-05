@@ -13,16 +13,12 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Delete;
 public class DeleteRestaurantHandlerTests
 {
     private readonly IRestaurantService _restaurantService;
-    private readonly ILogger<DeleteRestaurantHandler> _logger;
     private readonly DeleteRestaurantHandler _handler;
-    private readonly ITestOutputHelper _output;
 
-    public DeleteRestaurantHandlerTests(ITestOutputHelper output)
+    public DeleteRestaurantHandlerTests()
     {
-        _output = output;
         _restaurantService = Substitute.For<IRestaurantService>();
-        _logger = Substitute.For<ILogger<DeleteRestaurantHandler>>();
-        _handler = new DeleteRestaurantHandler(_restaurantService, _logger);
+        _handler = new DeleteRestaurantHandler(_restaurantService);
     }
 
     [Fact]

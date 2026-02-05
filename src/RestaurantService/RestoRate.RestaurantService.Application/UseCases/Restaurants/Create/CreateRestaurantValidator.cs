@@ -32,14 +32,22 @@ public class CreateRestaurantValidator : AbstractValidator<CreateRestaurantComma
         RuleFor(x => x.Dto.Location.Longitude)
             .InclusiveBetween(-180, 180).WithMessage("Долгота должна быть между -180 и 180");
 
-        RuleFor(x => x.Dto.OpenHours.DayOfWeek)
-            .NotEmpty().WithMessage("Указать дни недели работы ресторана, обязателено");
+        RuleForEach(x => x.Dto.OpenHours)
+            .ChildRules(hours =>
+            {
+                hours.RuleFor(h => h.DayOfWeek)
+                    .IsInEnum().WithMessage("Некорректный день недели");
 
-        RuleFor(x => x.Dto.OpenHours.DayOfWeek)
-            .NotEmpty().WithMessage("Указать время открытия ресторана, обязателено");
+                hours.RuleFor(h => h.OpenTime)
+                    .Must(t => t != TimeOnly.MinValue).WithMessage("Время открытия обязательно");
 
-        RuleFor(x => x.Dto.OpenHours.DayOfWeek)
-            .NotEmpty().WithMessage("Указать время закрытия ресторана, обязателено");
+                hours.RuleFor(h => h.CloseTime)
+                    .Must(t => t != TimeOnly.MinValue).WithMessage("Время закрытия обязательно")
+                    .GreaterThan(h => h.OpenTime).WithMessage("Время закрытия должно быть позже открытия");
+            });
+
+        RuleFor(x => x.Dto.OpenHours)
+            .NotEmpty().WithMessage("Должен быть указан хотя бы один рабочий интервал");
 
         RuleFor(x => x.Dto.AverageCheck.Amount)
             .GreaterThan(0).WithMessage("Средний чек должен быть больше 0");

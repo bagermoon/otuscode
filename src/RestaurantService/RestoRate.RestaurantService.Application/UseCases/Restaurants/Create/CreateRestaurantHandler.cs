@@ -6,19 +6,20 @@ using Microsoft.Extensions.Logging;
 
 using NodaMoney;
 
-using RestoRate.Abstractions.Messaging;
+using RestoRate.Abstractions.Identity;
+using RestoRate.Contracts.Restaurant.DTOs;
+using RestoRate.RestaurantService.Application.Mappings;
 using RestoRate.RestaurantService.Domain.Interfaces;
+using RestoRate.RestaurantService.Domain.RestaurantAggregate;
 using RestoRate.SharedKernel.Enums;
 using RestoRate.SharedKernel.ValueObjects;
-using RestoRate.Contracts.Restaurant.DTOs;
-using RestoRate.RestaurantService.Domain.RestaurantAggregate;
-using RestoRate.RestaurantService.Application.Mappings;
 
 namespace RestoRate.RestaurantService.Application.UseCases.Restaurants.Create;
 
 public sealed class CreateRestaurantHandler(
     IRestaurantService restaurantService,
     ITagsService tagsService,
+    IUserContext userContext,
     ILogger<CreateRestaurantHandler> logger)
     : ICommandHandler<CreateRestaurantCommand, Result<RestaurantDto>>
 {
@@ -34,7 +35,11 @@ public sealed class CreateRestaurantHandler(
             var email = new Email(request.Dto.Email);
             var address = new Address(request.Dto.Address.FullAddress, request.Dto.Address.House);
             var location = new Location(request.Dto.Location.Latitude, request.Dto.Location.Longitude);
-            var openHours = new OpenHours(request.Dto.OpenHours.DayOfWeek, request.Dto.OpenHours.OpenTime, request.Dto.OpenHours.CloseTime);
+
+            var openHours = request.Dto.OpenHours
+                .Select(oh => new OpenHours(oh.DayOfWeek, oh.OpenTime, oh.CloseTime, oh.IsClosed))
+                .ToList();
+
             var averageCheck = new Money(request.Dto.AverageCheck.Amount, Currency.FromCode(request.Dto.AverageCheck.Currency));
 
             var cuisineTypes = request.Dto.CuisineTypes
@@ -56,6 +61,7 @@ public sealed class CreateRestaurantHandler(
                 location,
                 openHours,
                 averageCheck,
+                userContext.UserId,
                 cuisineTypes,
                 restaurantTags,
                 images);

@@ -1,6 +1,7 @@
 @page "/"
 @page "/index"
 @using RestoRate.SharedKernel.Enums
+@using RestoRate.Auth.Authorization
 @inject NavigationManager Nav
 
 <PageTitle>РестоРейтинг - Гастрономический гид</PageTitle>
@@ -148,7 +149,7 @@
                     Присоединяйтесь к РестоРейтинг! Создайте страницу своего заведения и привлекайте гостей.
                 </MudText>
                 <div class="d-flex gap-4">
-                    <AuthorizeView>
+                    <AuthorizeView Policy="@PolicyNames.RequireAdminRole">
                         <Authorized>
                             <MudButton Variant="Variant.Filled"
                                        Color="Color.Secondary"
@@ -158,6 +159,9 @@
                                 Добавить заведение
                             </MudButton>
                         </Authorized>
+                    </AuthorizeView>
+
+                    <AuthorizeView>
                         <NotAuthorized>
                             <MudButton Variant="Variant.Filled"
                                        Color="Color.Secondary"

@@ -74,6 +74,17 @@ internal sealed class CookieOidcRefresher(
 
         // Renew cookie and principal
         validateContext.ShouldRenew = true;
+
+        // The refreshed principal is created from id_token, which may not contain roles.
+        // Hydrate roles from the refreshed access_token so policy checks work.
+        if (validationResult.ClaimsIdentity is ClaimsIdentity refreshedIdentity)
+        {
+            KeycloakRoleExtractor.AddRolesFromAccessToken(
+                                identity: refreshedIdentity,
+                                jwtAccessToken: message.AccessToken,
+                                clientId: oidcOptions.ClientId);
+        }
+
         validateContext.ReplacePrincipal(new ClaimsPrincipal(validationResult.ClaimsIdentity));
 
         var expiresAt = ComputeExpiresAt(message, now);

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Server;
 using MudBlazor.Services;
 
 using RestoRate.Auth.Authentication;
+using RestoRate.Auth.Authorization;
 using RestoRate.Auth.Identity;
 using RestoRate.BlazorDashboard.Components;
 using RestoRate.BlazorDashboard.Services;
@@ -23,7 +24,9 @@ builder.Services.Configure<CircuitOptions>(opts => opts.DetailedErrors = true);
 builder.Services.AddMudServices();
 
 builder.AddCookieOidcAuthentication(AppHostProjects.Keycloak);
-builder.Services.AddAuthorizationBuilder();
+builder.Services.AddAuthorizationBuilder()
+    .AddDefaultAuthenticationPolicy()
+    .AddAdminPolicies();
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddAntiforgery();

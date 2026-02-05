@@ -8,8 +8,7 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NodaMoney;
 
-using RestoRate.Abstractions.Messaging;
-using RestoRate.Contracts.Restaurant.Events;
+using RestoRate.Abstractions.Identity;
 using RestoRate.RestaurantService.Application.UseCases.Restaurants.Create;
 using RestoRate.RestaurantService.Domain.Interfaces;
 using RestoRate.RestaurantService.Domain.TagAggregate;
@@ -24,7 +23,7 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
     {
         private readonly IRestaurantService _restaurantService;
         private readonly ITagsService _tagsService;
-        private readonly IIntegrationEventBus _integrationEventBus;
+        private readonly IUserContext _userContext;
         private readonly ILogger<CreateRestaurantHandler> _logger;
         private readonly CreateRestaurantHandler _handler;
         private readonly ITestOutputHelper _output;
@@ -37,12 +36,13 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
             _tagsService
                 .ConvertToTagsAsync(Arg.Any<IEnumerable<string>>(), Arg.Any<CancellationToken>())
                 .Returns(Task.FromResult(new List<Tag>()));
-            _integrationEventBus = Substitute.For<IIntegrationEventBus>();
+            _userContext = Substitute.For<IUserContext>();
             _logger = Substitute.For<ILogger<CreateRestaurantHandler>>();
 
             _handler = new CreateRestaurantHandler(
                 _restaurantService,
                 _tagsService,
+                _userContext,
                 _logger);
         }
 
@@ -51,6 +51,8 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
         {
             // Arrange
             var restaurantId = Guid.NewGuid();
+            var ownerId = Guid.NewGuid();
+            _userContext.UserId.Returns(ownerId);
             var dto = TestDataBuilder.CreateValidRestaurantDto();
             var command = new CreateRestaurantCommand(dto);
 
@@ -66,8 +68,9 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
                     Arg.Any<Email>(),
                     Arg.Any<Address>(),
                     Arg.Any<Location>(),
-                    Arg.Any<OpenHours>(),
+                    Arg.Any<IEnumerable<OpenHours>>(),
                     Arg.Any<Money>(),
+                    Arg.Any<Guid>(),
                     Arg.Any<IEnumerable<CuisineType>>(),
                     Arg.Any<IEnumerable<Tag>>(),
                     Arg.Any<IEnumerable<(string, string?, bool)>?>())
@@ -89,6 +92,8 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
         {
             // Arrange
             var restaurantId = Guid.NewGuid();
+            var ownerId = Guid.NewGuid();
+            _userContext.UserId.Returns(ownerId);
 
             var dto = TestDataBuilder.CreateValidRestaurantDto(
                 cuisineTypes: new[]
@@ -109,8 +114,9 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
                     Arg.Any<Email>(),
                     Arg.Any<Address>(),
                     Arg.Any<Location>(),
-                    Arg.Any<OpenHours>(),
+                    Arg.Any<IEnumerable<OpenHours>>(),
                     Arg.Any<Money>(),
+                    Arg.Any<Guid>(),
                     Arg.Any<IEnumerable<CuisineType>>(),
                     Arg.Any<IEnumerable<Tag>>(),
                     Arg.Any<IEnumerable<(string, string?, bool)>?>())
@@ -130,6 +136,8 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
         {
             // Arrange
             var restaurantId = Guid.NewGuid();
+            var ownerId = Guid.NewGuid();
+            _userContext.UserId.Returns(ownerId);
 
             var images = new[]
             {
@@ -153,8 +161,9 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
                     Arg.Any<Email>(),
                     Arg.Any<Address>(),
                     Arg.Any<Location>(),
-                    Arg.Any<OpenHours>(),
+                    Arg.Any<IEnumerable<OpenHours>>(),
                     Arg.Any<Money>(),
+                    Arg.Any<Guid>(),
                     Arg.Any<IEnumerable<CuisineType>>(),
                     Arg.Any<IEnumerable<Tag>>(),
                     Arg.Any<IEnumerable<(string, string?, bool)>?>())
@@ -175,8 +184,9 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
                     Arg.Any<Email>(),
                     Arg.Any<Address>(),
                     Arg.Any<Location>(),
-                    Arg.Any<OpenHours>(),
+                    Arg.Any<IEnumerable<OpenHours>>(),
                     Arg.Any<Money>(),
+                    Arg.Any<Guid>(),
                     Arg.Any<IEnumerable<CuisineType>>(),
                     Arg.Any<IEnumerable<Tag>>(),
                     Arg.Is<IEnumerable<(string, string?, bool)>?>(imgs => imgs != null && imgs.Count() == 2));
@@ -190,6 +200,9 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
         {
             // Arrange
             var restaurantId = Guid.NewGuid();
+            var ownerId = Guid.NewGuid();
+            _userContext.UserId.Returns(ownerId);
+
             var dto = TestDataBuilder.CreateValidRestaurantDto(
                 name: name,
                 cuisineTypes: new[] { cuisineType });
@@ -206,8 +219,9 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
                     Arg.Any<Email>(),
                     Arg.Any<Address>(),
                     Arg.Any<Location>(),
-                    Arg.Any<OpenHours>(),
+                    Arg.Any<IEnumerable<OpenHours>>(),
                     Arg.Any<Money>(),
+                    Arg.Any<Guid>(),
                     Arg.Any<IEnumerable<CuisineType>>(),
                     Arg.Any<IEnumerable<Tag>>(),
                     Arg.Any<IEnumerable<(string, string?, bool)>?>())
@@ -227,6 +241,9 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
         {
             // Arrange
             var dto = TestDataBuilder.CreateValidRestaurantDto();
+            var ownerId = Guid.NewGuid();
+            _userContext.UserId.Returns(ownerId);
+
             var command = new CreateRestaurantCommand(dto);
             var errorMessage = "Не удалось подключиться к базе данных";
 
@@ -238,8 +255,9 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
                     Arg.Any<Email>(),
                     Arg.Any<Address>(),
                     Arg.Any<Location>(),
-                    Arg.Any<OpenHours>(),
+                    Arg.Any<IEnumerable<OpenHours>>(),
                     Arg.Any<Money>(),
+                    Arg.Any<Guid>(),
                     Arg.Any<IEnumerable<CuisineType>>(),
                     Arg.Any<IEnumerable<Tag>>(),
                     Arg.Any<IEnumerable<(string, string?, bool)>?>())
@@ -251,12 +269,6 @@ namespace RestoRate.RestaurantService.UnitTests.UseCases.Create
             // Assert
             result.IsSuccess.Should().BeFalse();
             result.Errors.Should().Contain(errorMessage);
-
-            await _integrationEventBus
-                .DidNotReceive()
-                .PublishAsync( // проверка ивента
-                    Arg.Any<RestaurantCreatedEvent>(),
-                    Arg.Any<CancellationToken>());
         }
     }
 }

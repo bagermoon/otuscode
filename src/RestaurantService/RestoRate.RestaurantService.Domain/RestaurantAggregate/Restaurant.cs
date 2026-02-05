@@ -17,14 +17,17 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
     public Email Email { get; private set; } = default!;
     public Address Address { get; private set; } = default!;
     public Location Location { get; private set; } = default!;
-    public OpenHours OpenHours { get; private set; } = default!;
     public Money AverageCheck { get; private set; }
     public RestaurantStatus RestaurantStatus { get; private set; } = RestaurantStatus.Draft;
     public RatingSnapshot Rating { get; private set; } = default!;
+    public Guid OwnerId { get; private set; }
+
+    private readonly List<OpenHours> _openHours = new();
     private readonly List<RestaurantImage> _images = new();
     private readonly List<RestaurantCuisineType> _cuisineTypes = new();
     private readonly List<RestaurantTag> _tags = new();
 
+    public IReadOnlyCollection<OpenHours> OpenHours => _openHours.AsReadOnly();
     public IReadOnlyCollection<RestaurantImage> Images => _images.AsReadOnly();
     public IReadOnlyCollection<RestaurantCuisineType> CuisineTypes => _cuisineTypes.AsReadOnly();
     public IReadOnlyCollection<RestaurantTag> Tags => _tags.AsReadOnly();
@@ -38,8 +41,9 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
         Email email,
         Address address,
         Location location,
-        OpenHours openHours,
-        Money averageCheck)
+        IEnumerable<OpenHours> openHours,
+        Money averageCheck,
+        Guid ownerId)
     {
         Id = Guid.NewGuid();
         Name = Guard.Against.NullOrEmpty(name, nameof(name));
@@ -48,9 +52,11 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
         Email = Guard.Against.Null(email, nameof(email));
         Address = Guard.Against.Null(address, nameof(address));
         Location = Guard.Against.Null(location, nameof(location));
-        OpenHours = Guard.Against.Null(openHours, nameof(openHours));
+        Guard.Against.Null(openHours, nameof(openHours));
+        _openHours.AddRange(openHours);
         Guard.Against.Negative(averageCheck.Amount, nameof(averageCheck));
         AverageCheck = averageCheck;
+        OwnerId = ownerId;
         RestaurantStatus = RestaurantStatus.Draft;
         Rating = new RatingSnapshot(Id);
     }
@@ -62,8 +68,9 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
         Email email,
         Address address,
         Location location,
-        OpenHours openHours,
-        Money averageCheck
+        IEnumerable<OpenHours> openHours,
+        Money averageCheck,
+        Guid ownerId
     )
     {
         var restaurant = new Restaurant(
@@ -74,7 +81,8 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
             address,
             location,
             openHours,
-            averageCheck);
+            averageCheck,
+            ownerId);
 
         restaurant.RegisterDomainEvent(new RestaurantCreatedEvent(restaurant));
 
@@ -204,9 +212,11 @@ public class Restaurant : EntityBase<Guid>, IAggregateRoot
         Location = Guard.Against.Null(location, nameof(location));
     }
 
-    public void UpdateOpenHours(OpenHours openHours)
+    public void UpdateOpenHours(IEnumerable<OpenHours> newHours)
     {
-        OpenHours = Guard.Against.Null(openHours, nameof(openHours));
+        Guard.Against.Null(newHours, nameof(newHours));
+        _openHours.Clear();
+        _openHours.AddRange(newHours);
     }
 
     public void UpdateAverageCheck(Money averageCheck)

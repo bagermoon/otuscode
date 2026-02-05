@@ -28,7 +28,7 @@ public class RestaurantApiTests : IClassFixture<RestaurantWebApplicationFactory>
         _output = output;
         _testContextAccessor = testContextAccessor;
 
-        _client = _factory.CreateClientWithUser(TestUser.User);
+        _client = _factory.CreateClientWithUser(TestUser.Admin);
     }
 
     [Fact]

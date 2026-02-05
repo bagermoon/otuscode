@@ -25,7 +25,7 @@ public class RestaurantRatingTests : IClassFixture<RestaurantWebApplicationFacto
         RestaurantWebApplicationFactory factory,
         ITestContextAccessor testContextAccessor)
     {
-        (_factory, _client) = factory.CreateFactoryAndClientWithUser(TestUser.User);
+        (_factory, _client) = factory.CreateFactoryAndClientWithUser(TestUser.Admin);
         _testContextAccessor = testContextAccessor;
     }
 
