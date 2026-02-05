@@ -24,7 +24,7 @@ public class GetRestaurantStatusRequestHandlerTests : IClassFixture<RestaurantWe
         RestaurantWebApplicationFactory factory,
         ITestContextAccessor testContextAccessor)
     {
-        (_factory, _client) = factory.CreateFactoryAndClientWithUser(TestUser.User);
+        (_factory, _client) = factory.CreateFactoryAndClientWithUser(TestUser.Admin);
         _testContextAccessor = testContextAccessor;
     }
 
