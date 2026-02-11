@@ -1,15 +1,26 @@
 using MassTransit;
 
-using RestoRate.Abstractions.Identity;
+using Mediator;
+
 using RestoRate.Contracts.Restaurant.Events;
+using RestoRate.ReviewService.Application.UseCases.RestaurantReferences.RestaurantReferenceValidation;
 
 namespace RestoRate.ReviewService.Api.Handlers;
 
-public class RestaurantCreatedHandler(ILogger<RestaurantCreatedHandler> logger, IUserContext userContext) : IConsumer<RestaurantCreatedEvent>
+public sealed class RestaurantCreatedHandler(
+    ISender sender
+)
+    : IConsumer<RestaurantCreatedEvent>
 {
-    public Task Consume(ConsumeContext<RestaurantCreatedEvent> context)
+    public async Task Consume(ConsumeContext<RestaurantCreatedEvent> context)
     {
-        logger.LogInformation("Restaurant created: {RestaurantId}, UserId: {UserId}", context.Message.RestaurantId, userContext.UserId);
-        return Task.CompletedTask;
+        var message = context.Message;
+
+        await sender.Send(
+            new RestaurantReferenceValidationCommand(
+                RestaurantId: message.RestaurantId,
+                KnownStatus: message.Status,
+                Exists: true),
+            context.CancellationToken);
     }
 }

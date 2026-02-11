@@ -74,7 +74,7 @@ public sealed class Review : AggregateRoot<ReviewId>
 
 ## Интеграционные события
 
-- Публикует: `ReviewAddedEvent`, `ReviewUpdatedEvent`
+- Публикует: `ReviewAddedEvent`, `ReviewApprovedEvent`
 - Подписывается на: `ReviewModeratedEvent` (публикуется сервисом ModerationService),
   `RestaurantCreatedEvent`, `RestaurantUpdatedEvent`, `RestaurantArchivedEvent`
 
@@ -89,7 +89,7 @@ flowchart LR
         RV[API/Application]
     end
 
-    RV -- ReviewAddedEvent / ReviewUpdatedEvent --> MQ[(RabbitMQ)]
+    RV -- ReviewAddedEvent / ReviewApprovedEvent --> MQ[(RabbitMQ)]
 
     MQ --> ModSvc[Moderation Service]
 
@@ -129,7 +129,7 @@ flowchart LR
 Примечание по цветам стрелок:
 
 - Оранжевый — события Restaurant (Created/Updated/Archived)
-- Зелёный — события Review (Added/Updated)
+- Зелёный — события Review (Added/Approved)
 - Фиолетовый — событие Moderation (ReviewModerated)
 Пунктир — доставка события от RabbitMQ к потребителю; сплошная линия — публикация события.
 
@@ -160,11 +160,44 @@ sequenceDiagram
 
     MQ->>RV: Deliver ReviewModeratedEvent
     RV->>DBR: Update Review Status
-    RV->>MQ: Publish ReviewUpdatedEvent (status changed)
+    RV->>MQ: Publish ReviewApprovedEvent (if Approved)
 
     note over RV,RT: Rating может потреблять ReviewAddedEvent (черновой расчёт)
-    note over RV,RT: и ReviewUpdatedEvent (финальная фиксация рейтинга)
-    MQ->>RT: Deliver ReviewAddedEvent / ReviewUpdatedEvent
+    note over RV,RT: и ReviewApprovedEvent (финальная фиксация рейтинга)
+    MQ->>RT: Deliver ReviewAddedEvent / ReviewApprovedEvent
+```
+
+### Saga Обновление ресторана
+
+```mermaid
+sequenceDiagram
+    participant RS as RestaurantService
+    participant MQ as RabbitMQ
+    participant RVS as ReviewValidationSaga (by ReviewId)
+    participant RstVS as RestaurantValidationSaga (by RestaurantId)
+    participant RefC as RestaurantRefConsumer (projection)
+    participant DB as ReviewService DB (RestaurantReference)
+
+    RVS->>MQ: ReviewAddedEvent(reviewId, restaurantId)
+    MQ->>RstVS: ReviewAddedEvent
+
+    RstVS->>DB: Query RestaurantReference(restaurantId)
+    alt status known + acceptable
+    RstVS->>MQ: ValidationOk(reviewId, restaurantId)
+    else missing/unknown
+    RstVS->>RS: GetRestaurantStatusRequest(restaurantId)
+    RstVS->>RstVS: Schedule ValidationTimeout(restaurantId)
+    RS-->>RstVS: GetRestaurantStatusResponse(exists, status)
+    RstVS->>DB: Upsert RestaurantReference(restaurantId,status)
+    RstVS->>MQ: ValidationOk/ValidationFailed(for each pending reviewId)
+    end
+
+    RS->>MQ: RestaurantCreated/Updated/Archived(restaurantId,status)
+    MQ->>RefC: Restaurant*Event
+    RefC->>DB: Upsert RestaurantReference(restaurantId,status)
+
+    MQ->>RVS: ValidationOk(reviewId, restaurantId)
+    RVS->>MQ: ReviewReadyForModerationEvent(reviewId, restaurantId)
 ```
 
 ### Замечания по надёжности

@@ -1,13 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 using Microsoft.EntityFrameworkCore;
 
 using RestoRate.BuildingBlocks.Data.DbContexts;
+using RestoRate.ReviewService.Domain.RestaurantReferenceAggregate;
+using RestoRate.ReviewService.Domain.UserReferenceAggregate;
 
 using ReviewEntity = RestoRate.ReviewService.Domain.ReviewAggregate.Review;
 
@@ -16,6 +13,8 @@ namespace RestoRate.ReviewService.Infrastructure.Data;
 public class ReviewDbContext : DbContextBase
 {
     public DbSet<ReviewEntity> Reviews { get; set; }
+    public DbSet<UserReference> UserReferences { get; set; }
+    public DbSet<RestaurantReference> RestaurantReferences { get; set; }
     public ReviewDbContext(DbContextOptions<ReviewDbContext> options) : base(options)
     { }
 
@@ -24,6 +23,5 @@ public class ReviewDbContext : DbContextBase
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-
     }
 }

@@ -1,16 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Ardalis.Specification;
 
 using Microsoft.EntityFrameworkCore;
 
 using RestoRate.SharedKernel.Enums;
-
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace RestoRate.RestaurantService.Domain.RestaurantAggregate.Specifications;
 
@@ -32,8 +24,10 @@ public sealed class GetAllRestaurantsSpec : Specification<Restaurant>
             .Take(pageSize)
             .OrderBy(r => r.Name);
 
+#pragma warning disable CA1862 // EF query does not support string comparisons directly
         if (!string.IsNullOrWhiteSpace(searchTerm))
             Query.Where(r => r.Name.ToLower().Contains(searchTerm.Trim().ToLower()));
+#pragma warning restore CA1862
 
         if (!string.IsNullOrWhiteSpace(cuisineType))
             if (CuisineType.TryFromName(cuisineType, true, out var cuisineEnum))

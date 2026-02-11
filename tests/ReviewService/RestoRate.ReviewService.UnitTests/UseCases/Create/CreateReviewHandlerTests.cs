@@ -1,15 +1,16 @@
-using System.Threading;
-using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
+
 using FluentAssertions;
+
 using Microsoft.Extensions.Logging;
+
 using NSubstitute;
-using Xunit;
-using Ardalis.Result;
-using RestoRate.ReviewService.Application.UseCases.Create;
-using RestoRate.ReviewService.Application.DTOs;
-using RestoRate.ReviewService.Domain.ReviewAggregate;
+
+using RestoRate.Abstractions.Identity;
+using RestoRate.Contracts.Common.Dtos;
+using RestoRate.Contracts.Review.Dtos;
+using RestoRate.ReviewService.Application.UseCases.Reviews.Create;
 
 namespace RestoRate.ReviewService.UnitTests.UseCases.Create;
 
@@ -27,7 +28,8 @@ public class CreateReviewHandlerTests
     {
         // Arrange
         var dto = _fixture.Build<CreateReviewDto>()
-            .With(x => x.Text, "Great food")
+            .With(x => x.Comment, "Great food")
+            .With(x => x.AverageCheck, (MoneyDto?)null)
             .Create();
         var cmd = new CreateReviewCommand(dto);
 
@@ -37,7 +39,11 @@ public class CreateReviewHandlerTests
 
         var logger = _fixture.Freeze<ILogger<CreateReviewHandler>>();
 
-        var handler = new CreateReviewHandler(repo, logger);
+        var userContext = _fixture.Freeze<IUserContext>();
+        userContext.IsAuthenticated.Returns(true);
+        userContext.UserId.Returns(dto.UserId);
+
+        var handler = new CreateReviewHandler(repo, userContext, logger);
 
         // Act
         var result = await handler.Handle(cmd, CancellationToken.None);
@@ -49,7 +55,8 @@ public class CreateReviewHandlerTests
         resDto.RestaurantId.Should().Be(dto.RestaurantId);
         resDto.UserId.Should().Be(dto.UserId);
         resDto.Rating.Should().Be(dto.Rating);
-        resDto.Text.Should().Be(dto.Text);
+        resDto.AverageCheck.Should().Be(dto.AverageCheck);
+        resDto.Comment.Should().Be(dto.Comment);
     }
 
     [Fact]
@@ -64,7 +71,12 @@ public class CreateReviewHandlerTests
             .Returns<Task<Review>>(_ => throw new System.InvalidOperationException("DB down"));
 
         var logger = _fixture.Freeze<ILogger<CreateReviewHandler>>();
-        var handler = new CreateReviewHandler(repo, logger);
+
+        var userContext = _fixture.Freeze<IUserContext>();
+        userContext.IsAuthenticated.Returns(true);
+        userContext.UserId.Returns(dto.UserId);
+
+        var handler = new CreateReviewHandler(repo, userContext, logger);
 
         // Act
         var result = await handler.Handle(cmd, CancellationToken.None);

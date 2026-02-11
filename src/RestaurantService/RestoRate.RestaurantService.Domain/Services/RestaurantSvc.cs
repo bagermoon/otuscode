@@ -1,8 +1,6 @@
 using Ardalis.Result;
 using Ardalis.SharedKernel;
 
-using Mediator;
-
 using Microsoft.Extensions.Logging;
 
 using NodaMoney;
@@ -19,7 +17,6 @@ namespace RestoRate.RestaurantService.Domain.Services;
 
 public class RestaurantSvc(
     IRepository<RestaurantEntity> repository,
-    IMediator mediator,
     ILogger<RestaurantSvc> logger) : IRestaurantService
 {
     public async Task<Result<RestaurantEntity>> CreateRestaurantAsync(
@@ -115,11 +112,6 @@ public class RestaurantSvc(
         restaurant.MarkDeleted();
 
         await repository.UpdateAsync(restaurant);
-
-        foreach (var domainEvent in restaurant.DomainEvents)
-            await mediator.Publish(domainEvent);
-
-        restaurant.ClearDomainEvents();
 
         logger.LogDeleteRestaurantCompleted(restaurantId);
         return Result.Success();

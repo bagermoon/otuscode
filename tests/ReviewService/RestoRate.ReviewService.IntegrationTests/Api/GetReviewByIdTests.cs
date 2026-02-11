@@ -1,6 +1,7 @@
 using FluentAssertions;
 
-using RestoRate.ReviewService.Application.DTOs;
+using RestoRate.Contracts.Review.Dtos;
+using RestoRate.Testing.Common.Auth;
 
 namespace RestoRate.ReviewService.IntegrationTests.Api;
 
@@ -24,7 +25,8 @@ public class GetReviewByIdTests : IClassFixture<ReviewWebApplicationFactory>
     public async Task GetReviewById_ExistingReview_ReturnsReview()
     {
         // Arrange - create a review first
-        var createDto = new CreateReviewDto(Guid.NewGuid(), Guid.NewGuid(), 5, "Integration test review");
+        var userId = TestUsers.Get(TestUser.User).UserId;
+        var createDto = new CreateReviewDto(Guid.NewGuid(), userId, 5m, null, "Integration test review");
         var createResponse = await _client.PostAsJsonAsync("/reviews/", createDto, CancellationToken);
         createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
 
@@ -39,7 +41,7 @@ public class GetReviewByIdTests : IClassFixture<ReviewWebApplicationFactory>
         var fetched = await response.Content.ReadFromJsonAsync<ReviewDto>(CancellationToken);
         fetched.Should().NotBeNull();
         fetched!.Id.Should().Be(created.Id);
-        fetched.Text.Should().Be(createDto.Text);
+        fetched.Comment.Should().Be(createDto.Comment);
     }
 
     [Fact]

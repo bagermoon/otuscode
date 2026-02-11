@@ -18,7 +18,7 @@ public class TestAuthHandler : AuthenticationHandler<TestAuthOptions>
         var user = TestUsers.Get(Options.User);
 
         List<Claim> claims = [
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim("sub", user.UserId.ToString()),
             new Claim(ClaimTypes.Name, user.Name),
             new Claim("preferred_username", user.Name),
             new Claim(ClaimTypes.Email, user.Email),
