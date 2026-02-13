@@ -3,13 +3,11 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using RestoRate.Abstractions.Identity
 @using RestoRate.BlazorDashboard.Themes
+@using RestoRate.BlazorDashboard.Components.Layout
 
 @inject IUserContext UserContext
 
-<MudThemeProvider Theme="@AppTheme.Default" IsDarkMode="false" />
-<MudPopoverProvider />
-<MudDialogProvider />
-<MudSnackbarProvider />
+<MudProviders />
 
 <MudLayout>
     <MudAppBar Fixed="true" Elevation="0" Color="Color.Transparent" Class="rr-appbar pa-4">

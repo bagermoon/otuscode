@@ -1,6 +1,7 @@
 using RestoRate.Contracts.Common.Dtos;
 using RestoRate.Contracts.Restaurant.DTOs;
 using RestoRate.Contracts.Restaurant.DTOs.CRUD;
+using RestoRate.Contracts.Review.Dtos;
 using RestoRate.RestaurantService.Application.UseCases.Restaurants.GetAll;
 using RestoRate.ServiceDefaults;
 
@@ -69,5 +70,21 @@ public class RestaurantWebService(IHttpClientFactory httpClientFactory)
     {
         var result = await _httpClient.GetFromJsonAsync<List<RestaurantDto>>($"restaurants/owner/{ownerId}");
         return result ?? new List<RestaurantDto>();
+    }
+
+    public async Task<bool> CreateReviewAsync(CreateReviewDto dto)
+    {
+        var response = await _httpClient.PostAsJsonAsync("/reviews", dto);
+        return response.IsSuccessStatusCode;
+    }
+
+    public async Task<Contracts.Common.PagedResult<ReviewDto>?> GetReviewsByRestaurantAsync(Guid restaurantId, int page = 1, int pageSize = 10)
+    {
+        var query = $"/reviews?pageNumber={page}&pageSize={pageSize}&restaurantId={restaurantId}";
+
+        var response = await _httpClient.GetAsync(query);
+        if (!response.IsSuccessStatusCode) return null;
+
+        return await response.Content.ReadFromJsonAsync<Contracts.Common.PagedResult<ReviewDto>>();
     }
 }

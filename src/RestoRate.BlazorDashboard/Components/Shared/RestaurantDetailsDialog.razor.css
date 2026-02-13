@@ -104,6 +104,31 @@
     z-index: 11;
 }
 
+::deep .border-gray {
+    border: 1px solid #e2e8f0;
+    background-color: #f8fafc;
+}
+
+::deep .border-success-light {
+    border: 1px solid #bbf7d0;
+    background-color: #f0fdf4;
+}
+
+::deep .reviews-scroll-container {
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+    .reviews-scroll-container::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .reviews-scroll-container::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 4px;
+    }
+
 .info-panel {
     background-color: #f8fafc;
     border: 1px solid #e2e8f0;
