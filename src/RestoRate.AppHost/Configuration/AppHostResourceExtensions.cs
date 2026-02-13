@@ -97,8 +97,8 @@ public static class AppHostResourceExtensions
         {
             keycloak.WithDataVolume("restorate-keycloak");
         }
-
-        keycloak.WithBindMount("../RestoRate.BlazorDashboard/wwwroot/keycloak-themes/restorate", "/opt/keycloak/themes/restorate", isReadOnly: false)
+        // Тема для dashboard (временное решение)
+        keycloak.WithBindMount("keycloak-themes/restorate", "/opt/keycloak/themes/restorate", isReadOnly: false)
             .WithEnvironment("KC_SPI_THEME_STATIC_MAX_AGE", "-1")
             .WithEnvironment("KC_SPI_THEME_CACHE_THEMES", "false")
             .WithEnvironment("KC_SPI_THEME_CACHE_TEMPLATES", "false");

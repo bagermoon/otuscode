@@ -1148,6 +1148,7 @@
       "client.secret.creation.time" : "1763141793",
       "backchannel.logout.session.required" : "true",
       "standard.token.exchange.enabled" : "false",
+      "login_theme" : "restorate",
       "post.logout.redirect.uris" : "*",
       "frontchannel.logout.session.required" : "true",
       "oauth2.device.authorization.grant.enabled" : "false",
@@ -2128,6 +2129,10 @@
     "strictTransportSecurity" : "max-age=31536000; includeSubDomains"
   },
   "smtpServer" : { },
+  "loginTheme" : "",
+  "accountTheme" : "",
+  "adminTheme" : "",
+  "emailTheme" : "",
   "eventsEnabled" : false,
   "eventsListeners" : [ "jboss-logging" ],
   "enabledEventTypes" : [ ],
@@ -2177,7 +2182,7 @@
       "subType" : "authenticated",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "saml-role-list-mapper", "saml-user-attribute-mapper", "oidc-full-name-mapper", "oidc-usermodel-attribute-mapper", "oidc-usermodel-property-mapper", "saml-user-property-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-address-mapper" ]
+        "allowed-protocol-mapper-types" : [ "saml-user-attribute-mapper", "saml-role-list-mapper", "saml-user-property-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-usermodel-property-mapper", "oidc-address-mapper", "oidc-full-name-mapper", "oidc-usermodel-attribute-mapper" ]
       }
     }, {
       "id" : "8b9a0ba6-cf94-40b6-8fc6-c3ceebd17d9b",
@@ -2203,7 +2208,7 @@
       "subType" : "anonymous",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "oidc-usermodel-property-mapper", "saml-role-list-mapper", "saml-user-property-mapper", "oidc-usermodel-attribute-mapper", "oidc-full-name-mapper", "oidc-address-mapper", "oidc-sha256-pairwise-sub-mapper", "saml-user-attribute-mapper" ]
+        "allowed-protocol-mapper-types" : [ "oidc-usermodel-attribute-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-full-name-mapper", "oidc-usermodel-property-mapper", "saml-role-list-mapper", "oidc-address-mapper", "saml-user-property-mapper", "saml-user-attribute-mapper" ]
       }
     } ],
     "org.keycloak.keys.KeyProvider" : [ {
@@ -2250,7 +2255,9 @@
       }
     } ]
   },
-  "internationalizationEnabled" : false,
+  "internationalizationEnabled" : true,
+  "supportedLocales" : [ "ru", "en" ],
+  "defaultLocale" : "ru",
   "authenticationFlows" : [ {
     "id" : "dbba8450-08b7-4b93-aa64-16e214437ca5",
     "alias" : "Account verification options",
@@ -2933,7 +2940,8 @@
     "parRequestUriLifespan" : "60",
     "clientSessionMaxLifespan" : "0",
     "frontendUrl" : "",
-    "acr.loa.map" : "{}"
+    "acr.loa.map" : "{}",
+    "darkMode" : "false"
   },
   "keycloakVersion" : "26.3.5",
   "userManagedAccessAllowed" : false,
