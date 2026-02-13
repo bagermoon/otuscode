@@ -1,8 +1,17 @@
 @using RestoRate.Contracts.Restaurant.DTOs
+@using RestoRate.Contracts.Review.Dtos
+@using RestoRate.Contracts.Common.Dtos
+@using RestoRate.BlazorDashboard.Services
 @using RestoRate.BlazorDashboard.Helpers
 @using RestoRate.SharedKernel.Enums
 @using System.Globalization
+@using System.Security.Claims
 @using MudBlazor
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject RestaurantWebService RestaurantService
+@inject ISnackbar Snackbar
+@inject AuthenticationStateProvider AuthStateProvider
 
 <MudDialog Class="rr-modern-dialog" ContentClass="pa-0 dialog-wrapper">
     <DialogContent>
@@ -12,13 +21,7 @@
                 <MudIcon Icon="@Icons.Material.Filled.Close" />
             </div>
 
-            <MudCarousel Class="rr-carousel full-height"
-                         @bind-SelectedIndex="_selectedIndex"
-                         ShowArrows="true"
-                         ShowBullets="false"
-                         EnableSwipeGesture="true"
-                         AutoCycle="false"
-                         TData="object">
+            <MudCarousel Class="rr-carousel full-height" @bind-SelectedIndex="_selectedIndex" ShowArrows="true" ShowBullets="false" EnableSwipeGesture="true" AutoCycle="false" TData="object">
                 <PreviousButtonTemplate>
                     <div class="rr-custom-btn nav-arrow left" @onclick="PrevImage" @onclick:stopPropagation="true">
                         <MudIcon Icon="@Icons.Material.Filled.ArrowBackIosNew" />
@@ -55,17 +58,9 @@
                     <MudText Typo="Typo.h3" Class="font-weight-bold mb-1" Style="color: #ffffff !important; text-shadow: 0 2px 10px rgba(0,0,0,0.9);">
                         @Restaurant.Name
                     </MudText>
-
                     @if (Restaurant.CuisineTypes != null && Restaurant.CuisineTypes.Any())
                     {
-                        var displayCuisines = Restaurant.CuisineTypes
-                        .Select(c =>
-                        {
-                            var name = CuisineType.TryFromName(c, out var ct) ? ct.RussianName : c;
-                            return name.Contains("кухня", StringComparison.OrdinalIgnoreCase) ? name : name + " кухня";
-                        })
-                        .Take(4);
-
+                        var displayCuisines = Restaurant.CuisineTypes.Take(4);
                         <MudText Typo="Typo.subtitle1" Class="font-weight-bold" Style="color: #ffffff !important; text-shadow: 0 2px 8px rgba(0,0,0,0.9);">
                             @string.Join(" • ", displayCuisines)
                         </MudText>
@@ -90,15 +85,135 @@
                     @if (!string.IsNullOrEmpty(Restaurant.Description))
                     {
                         <MudText Typo="Typo.h6" Class="mb-2 font-weight-bold" Color="Color.Primary">О ресторане</MudText>
-                        <MudText Typo="Typo.body1" Class="text-secondary lh-lg" Style="white-space: pre-line; font-size: 1.1rem;">
+                        <MudText Typo="Typo.body1" Class="text-secondary lh-lg mb-8" Style="white-space: pre-line; font-size: 1.1rem;">
                             @Restaurant.Description
                         </MudText>
                     }
+
+                    <MudDivider Class="mb-6" />
+
+                    <AuthorizeView>
+                        <Authorized>
+                            @if (_myExistingReview != null)
+                            {
+                                <MudText Typo="Typo.h6" Class="mb-4 font-weight-bold" Color="Color.Success">Ваш отзыв</MudText>
+                                <MudPaper Elevation="0" Class="pa-6 rounded-xl mb-8 border-success-light">
+                                    <div class="d-flex justify-space-between align-start">
+                                        <div class="d-flex align-center">
+                                            <MudRating SelectedValue="(int)_myExistingReview.Rating" ReadOnly="true" Size="Size.Large" FullIcon="@Icons.Material.Filled.Star" />
+                                            <MudText Typo="Typo.caption" Class="ml-2 text-secondary">@_myExistingReview.CreatedAt.ToString("d MMMM yyyy")</MudText>
+                                        </div>
+                                        <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Text">Вы уже оценили это место</MudChip>
+                                    </div>
+
+                                    <MudText Typo="Typo.body1" Class="mt-3 font-weight-medium">@_myExistingReview.Comment</MudText>
+
+                                    @if (_myExistingReview.AverageCheck != null)
+                                    {
+                                        <div class="d-flex align-center mt-3">
+                                            <MudIcon Icon="@Icons.Material.Filled.ReceiptLong" Size="Size.Small" Color="Color.Success" Class="mr-1" />
+                                            <MudText Typo="Typo.body2" Class="text-success font-weight-bold">
+                                                Потрачено: @_myExistingReview.AverageCheck.Amount.ToString("N0") ₽
+                                            </MudText>
+                                        </div>
+                                    }
+                                </MudPaper>
+                            }
+                            else
+                            {
+                                <MudText Typo="Typo.h6" Class="mb-4 font-weight-bold" Color="Color.Primary">Оставить отзыв</MudText>
+                                <MudPaper Elevation="0" Class="review-form-panel pa-6 rounded-xl mb-8">
+                                    <div class="d-flex flex-column gap-4">
+                                        <div>
+                                            <MudText Typo="Typo.caption" Class="text-secondary mb-1">Ваша оценка</MudText>
+                                            <MudRating @bind-SelectedValue="_reviewRating" Size="Size.Large" HoveredColor="Color.Warning" FullIcon="@Icons.Material.Filled.Star" EmptyIcon="@Icons.Material.Filled.StarBorder" />
+                                            @if (_reviewRating == 0)
+                                            {
+                                                <MudText Typo="Typo.caption" Color="Color.Error">Пожалуйста, поставьте оценку</MudText>
+                                            }
+                                        </div>
+
+                                        <MudNumericField @bind-Value="_userAverageCheck" Label="Сколько вы потратили? (₽)" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.CurrencyRuble" HideSpinButtons="true" Class="mb-2" />
+                                        <MudTextField @bind-Value="_reviewComment" Label="Ваш комментарий" Variant="Variant.Outlined" Lines="3" Counter="500" MaxLength="500" Placeholder="Расскажите, что вам понравилось..." />
+
+                                        <div class="d-flex justify-end mt-2">
+                                            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitReviewAsync" Disabled="_isSubmitting" Class="rounded-pill px-6 font-weight-bold">
+                                                @if (_isSubmitting)
+                                                {
+                                                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                                    <MudText Class="ms-2">Отправка...</MudText>
+                                                }
+                                                else
+                                                {
+                                                    <MudText>Опубликовать</MudText>
+                                                }
+                                            </MudButton>
+                                        </div>
+                                    </div>
+                                </MudPaper>
+                            }
+                        </Authorized>
+                        <NotAuthorized>
+                            <MudPaper Elevation="0" Class="review-login-panel pa-6 rounded-xl d-flex flex-column align-center justify-center text-center mb-8">
+                                <MudIcon Icon="@Icons.Material.Filled.LockPerson" Size="Size.Large" Class="text-secondary mb-3" />
+                                <MudText Typo="Typo.h6" Class="font-weight-bold">Войдите, чтобы оставить отзыв</MudText>
+                                <MudButton Variant="Variant.Outlined" Color="Color.Primary" Href="authentication/login" Class="rounded-pill px-6 mt-3">Войти в аккаунт</MudButton>
+                            </MudPaper>
+                        </NotAuthorized>
+                    </AuthorizeView>
+
+                    <MudText Typo="Typo.h6" Class="mb-4 font-weight-bold" Color="Color.Primary">Отзывы гостей</MudText>
+
+                    @if (_reviews == null)
+                    {
+                        <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Small" />
+                    }
+                    else if (!_reviews.Any())
+                    {
+                        <MudText Typo="Typo.body2" Class="text-secondary">Пока нет отзывов. Будьте первым!</MudText>
+                    }
+                    else
+                    {
+                        <div class="reviews-scroll-container">
+                            @foreach (var review in _reviews)
+                            {
+                                if (_currentUserId != null && review.UserId == _currentUserId) continue;
+
+                                <MudPaper Elevation="0" Class="pa-4 mb-4 rounded-xl border-gray">
+                                    <div class="d-flex align-center mb-2">
+                                        <MudAvatar Color="Color.Secondary" Size="Size.Small" Class="mr-3">
+                                            @(review.User?.FullName?.FirstOrDefault().ToString() ?? "?")
+                                        </MudAvatar>
+                                        <div>
+                                            <MudText Typo="Typo.subtitle2" Class="font-weight-bold">
+                                                @(review.User?.FullName ?? "Гость")
+                                            </MudText>
+                                            <div class="d-flex align-center">
+                                                <MudRating SelectedValue="(int)review.Rating" ReadOnly="true" Size="Size.Small" />
+                                                <MudText Typo="Typo.caption" Class="ml-2 text-secondary">
+                                                    @review.CreatedAt.ToString("d MMM yyyy")
+                                                </MudText>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <MudText Typo="Typo.body2" Class="mb-2">@review.Comment</MudText>
+
+                                    @if (review.AverageCheck != null)
+                                    {
+                                        <MudText Typo="Typo.caption" Class="text-secondary font-weight-bold">
+                                            Чек: @review.AverageCheck.Amount.ToString("N0") ₽
+                                        </MudText>
+                                    }
+                                </MudPaper>
+                            }
+                        </div>
+                    }
+
                 </MudItem>
 
                 <MudItem xs="12" md="5" lg="4">
                     <MudPaper Elevation="0" Class="info-panel pa-6 rounded-xl shadow-sm">
-
                         <div class="d-flex align-center mb-6">
                             <div class="icon-circle bg-green-light mr-4">
                                 <MudIcon Icon="@Icons.Material.Filled.CurrencyRuble" Color="Color.Success" Size="Size.Medium" />
@@ -214,11 +329,21 @@
     [CascadingParameter] public IMudDialogInstance MudDialog { get; set; } = default!;
     [Parameter] public RestaurantDto Restaurant { get; set; } = default!;
 
+    private List<ReviewDto>? _reviews;
+    private ReviewDto? _myExistingReview;
+    private Guid? _currentUserId;
+
+    private int _reviewRating = 0;
+    private string? _reviewComment;
+    private decimal? _userAverageCheck;
+    private bool _isSubmitting = false;
+
     private int _selectedIndex = 0;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         _selectedIndex = 0;
+        await LoadReviewsAndUser();
     }
 
     private void Close() => MudDialog.Close();
@@ -281,5 +406,96 @@
             return currentTime >= todaySchedule.OpenTime;
 
         return currentTime >= todaySchedule.OpenTime && currentTime <= todaySchedule.CloseTime;
+    }
+
+    private async Task LoadReviewsAndUser()
+    {
+        try
+        {
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            var userClaims = authState.User;
+            var userIdStr = userClaims.FindFirst("sub")?.Value ?? userClaims.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (Guid.TryParse(userIdStr, out var uid))
+                _currentUserId = uid;
+
+            var result = await RestaurantService.GetReviewsByRestaurantAsync(Restaurant.RestaurantId);
+            if (result != null)
+            {
+                _reviews = result.Items
+                    .Where(r => r.RestaurantId == Restaurant.RestaurantId)
+                    .ToList();
+
+                if (_currentUserId.HasValue)
+                    _myExistingReview = _reviews.FirstOrDefault(r => r.UserId == _currentUserId.Value);
+            }
+            else
+                _reviews = new List<ReviewDto>();
+        }
+        catch
+        {
+            _reviews = new List<ReviewDto>();
+        }
+    }
+
+    private async Task SubmitReviewAsync()
+    {
+        if (_reviewRating == 0)
+        {
+            Snackbar.Add("Пожалуйста, поставьте оценку", Severity.Warning);
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(_reviewComment))
+        {
+            Snackbar.Add("Пожалуйста, напишите пару слов", Severity.Warning);
+            return;
+        }
+
+        _isSubmitting = true;
+
+        try
+        {
+            if (_currentUserId == null)
+            {
+                Snackbar.Add("Ошибка авторизации", Severity.Error);
+                return;
+            }
+
+            MoneyDto? moneyDto = null;
+            if (_userAverageCheck.HasValue)
+                moneyDto = new MoneyDto(_userAverageCheck.Value, "RUB");
+
+            var dto = new CreateReviewDto(
+                RestaurantId: Restaurant.RestaurantId,
+                UserId: _currentUserId.Value,
+                Rating: (decimal)_reviewRating,
+                AverageCheck: moneyDto,
+                Comment: _reviewComment
+            );
+
+            var result = await RestaurantService.CreateReviewAsync(dto);
+
+            if (result)
+            {
+                Snackbar.Add("Отзыв успешно отправлен!", Severity.Success);
+
+                _reviewRating = 0;
+                _reviewComment = string.Empty;
+                _userAverageCheck = null;
+
+                await LoadReviewsAndUser();
+            }
+            else
+                Snackbar.Add("Не удалось отправить отзыв.", Severity.Error);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Ошибка: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
     }
 }

@@ -1,0 +1,15 @@
+@using MudBlazor
+@using RestoRate.BlazorDashboard.Themes
+
+@rendermode InteractiveServer
+
+<MudThemeProvider Theme="@AppTheme.Default" IsDarkMode="false" />
+<MudPopoverProvider />
+
+<MudDialogProvider FullWidth="true"
+                   MaxWidth="MaxWidth.Medium"
+                   CloseButton="true"
+                   Position="DialogPosition.Center"
+                   CloseOnEscapeKey="true" />
+
+<MudSnackbarProvider />
