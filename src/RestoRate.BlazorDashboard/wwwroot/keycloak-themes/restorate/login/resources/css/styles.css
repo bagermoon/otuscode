@@ -1,0 +1,153 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&display=swap');
+
+:root {
+    --rr-bg: #f8fbff;
+    --rr-primary: #77BEF0;
+    --rr-text: #0F172A;
+    --rr-border: #E2E8F0;
+    --rr-muted: #64748B;
+}
+
+body, html {
+    background: var(--rr-bg) !important;
+    height: 200vh;
+    margin: 0;
+    font-family: "Montserrat", sans-serif !important;
+}
+
+#kc-header,
+.pf-v5-c-login__header,
+.pf-v5-c-brand {
+    display: none !important;
+}
+
+.login-pf,
+.pf-v5-c-login {
+    background: transparent !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 100% !important;
+    width: 100% !important;
+    padding: 0 !important;
+}
+
+.pf-v5-c-login__container {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    grid-template-columns: unset !important;
+    grid-template-areas: unset !important;
+    background: transparent !important;
+}
+
+.pf-v5-c-login__main {
+    background-color: #ffffff !important;
+    width: 600px !important;
+    border-radius: 24px !important;
+    border: 1px solid var(--rr-border) !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+    padding: 40px !important;
+    margin: 0 !important;
+    flex: none !important;
+}
+
+.pf-v5-c-login__main-header {
+    padding: 0 !important;
+    margin-bottom: 24px !important;
+    border: none !important;
+}
+
+.pf-v5-c-title {
+    color: var(--rr-text) !important;
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+}
+
+.pf-v5-c-form {
+    margin: 0 !important;
+    gap: 16px !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.pf-v5-c-form__label-text {
+    font-size: 13px !important;
+    color: var(--rr-muted) !important;
+    font-weight: 600 !important;
+}
+
+input.pf-v5-c-form-control,
+.pf-v5-c-input-group__item input {
+    background: #ffffff !important;
+    border: 1px solid var(--rr-border) !important;
+    border-radius: 0 !important;
+    height: 48px !important;
+    font-size: 14px !important;
+    color: var(--rr-text) !important;
+    padding: 0 16px !important;
+    box-shadow: none !important;
+    transition: none !important;
+}
+
+    input.pf-v5-c-form-control:focus,
+    input.pf-v5-c-form-control:active,
+    .pf-v5-c-input-group:focus-within {
+        border-color: var(--rr-primary) !important;
+        border-radius: 0 !important;
+        box-shadow: 0 0 0 3px rgba(119, 190, 240, 0.2) !important;
+        outline: none !important;
+    }
+
+.pf-v5-c-input-group__item .pf-v5-c-button {
+    border-radius: 0 !important;
+}
+
+.pf-v5-c-form-control {
+    --pf-v5-c-form-control--border-radius: 0 !important;
+}
+
+.pf-v5-c-button.pf-m-primary {
+    background-color: var(--rr-primary) !important;
+    border-radius: 100px !important;
+    height: 44px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    margin-top: 16px !important;
+    width: 100% !important;
+    border: none !important;
+    box-shadow: 0 4px 12px rgba(119, 190, 240, 0.3) !important;
+}
+
+    .pf-v5-c-button.pf-m-primary:hover {
+        filter: brightness(1.05);
+    }
+
+.pf-v5-c-login__main-footer {
+    padding: 24px 0 0 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+.pf-v5-c-login__main-footer-band {
+    text-align: center !important;
+    font-size: 14px !important;
+    color: var(--rr-muted) !important;
+}
+
+a {
+    color: var(--rr-text) !important;
+    text-decoration: none !important;
+    border-bottom: 1px dashed var(--rr-primary);
+    font-weight: 600;
+}
+
+    a:hover {
+        border-bottom-style: solid;
+    }
