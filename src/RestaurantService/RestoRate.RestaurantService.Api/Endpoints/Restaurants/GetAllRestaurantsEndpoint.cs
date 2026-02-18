@@ -32,6 +32,7 @@ internal static class GetAllRestaurantsEndpoint
             return result;
         })
         .WithName("GetAllRestaurants")
+        .AllowAnonymous()
         .WithSummary("Получить список ресторанов")
         .WithDescription("Получает список ресторанов с пагинацией и фильтрацией")
         .Produces<Contracts.Common.PagedResult<RestaurantDto>>(StatusCodes.Status200OK)
