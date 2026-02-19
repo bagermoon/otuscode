@@ -10,15 +10,13 @@ using Microsoft.Extensions.Hosting;
 
 using MongoDB.Driver;
 
-using NodaMoney;
-
 using RestoRate.BuildingBlocks.Data;
 using RestoRate.BuildingBlocks.Messaging;
+using RestoRate.BuildingBlocks.Serialization;
 using RestoRate.Contracts.Restaurant.Requests;
 using RestoRate.ReviewService.Domain.Interfaces;
 using RestoRate.ReviewService.Infrastructure.Data;
 using RestoRate.ReviewService.Infrastructure.Repositories;
-using RestoRate.ReviewService.Infrastructure.Serialization;
 using RestoRate.ServiceDefaults;
 
 namespace RestoRate.ReviewService.Infrastructure;
@@ -35,7 +33,7 @@ public static class InfrastructureServiceExtensions
             assemblies = [Assembly.GetCallingAssembly()];
         }
 
-        MoneyBsonSerializerRegistration.EnsureRegistered();
+        MoneyBsonSerializer.EnsureRegistered();
 
         builder.AddMongoDbContext<ReviewDbContext>(AppHostProjects.ReviewDb);
 

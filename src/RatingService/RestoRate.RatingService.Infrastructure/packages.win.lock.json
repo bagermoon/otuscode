@@ -2,41 +2,6 @@
   "version": 2,
   "dependencies": {
     "net9.0": {
-      "Aspire.StackExchange.Redis": {
-        "type": "Direct",
-        "requested": "[13.1.0, )",
-        "resolved": "13.1.0",
-        "contentHash": "//ovDYL0ehoVho+omWveScCrjkEOkzDxITXWqKfyF+02cpEj+u1kMLWr/0+huUzCbdS2RVZreNDHOXGlc2XGLg==",
-        "dependencies": {
-          "AspNetCore.HealthChecks.Redis": "9.0.0",
-          "Microsoft.Extensions.Configuration.Abstractions": "9.0.11",
-          "Microsoft.Extensions.Configuration.Binder": "9.0.11",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.11",
-          "Microsoft.Extensions.DependencyInjection.AutoActivation": "10.1.0",
-          "Microsoft.Extensions.Diagnostics.HealthChecks": "9.0.11",
-          "Microsoft.Extensions.Hosting.Abstractions": "9.0.11",
-          "Microsoft.Extensions.Logging.Abstractions": "9.0.11",
-          "Microsoft.Extensions.Options": "9.0.11",
-          "Microsoft.Extensions.Primitives": "9.0.11",
-          "OpenTelemetry.Extensions.Hosting": "1.14.0",
-          "StackExchange.Redis": "2.9.32"
-        }
-      },
-      "Microsoft.AspNetCore.OpenApi": {
-        "type": "Direct",
-        "requested": "[9.0.11, )",
-        "resolved": "9.0.11",
-        "contentHash": "rTa3lp6B8KM8AESIwLakTT6XaoUBTnjAZq2pRX6zS/BzQy6mOVUgaawRSyM0WHykHdwbfrEAmer3ys2xE4DVtg==",
-        "dependencies": {
-          "Microsoft.OpenApi": "1.6.17"
-        }
-      },
-      "Microsoft.Extensions.ApiDescription.Server": {
-        "type": "Direct",
-        "requested": "[9.0.11, )",
-        "resolved": "9.0.11",
-        "contentHash": "Iwd7zsvK5RhV7yG3ECrMHpDsSFKZUXU3Ze50h5yP3MyoxpbqDm6teDRlJFawqnG7cCP6HBxM5rqVyfuWeIhQsA=="
-      },
       "AspNetCore.HealthChecks.MongoDb": {
         "type": "Transitive",
         "resolved": "9.0.0",
@@ -44,15 +9,6 @@
         "dependencies": {
           "Microsoft.Extensions.Diagnostics.HealthChecks": "8.0.11",
           "MongoDB.Driver": "3.0.0"
-        }
-      },
-      "AspNetCore.HealthChecks.Redis": {
-        "type": "Transitive",
-        "resolved": "9.0.0",
-        "contentHash": "yNH0h8GLRbAf+PU5HNVLZ5hNeyq9mDVmRKO9xuZsme/znUYoBJlQvI0gq45gaZNlLncCHkMhR4o90MuT+gxxPw==",
-        "dependencies": {
-          "Microsoft.Extensions.Diagnostics.HealthChecks": "8.0.11",
-          "StackExchange.Redis": "2.7.4"
         }
       },
       "DnsClient": {
@@ -64,22 +20,6 @@
         "type": "Transitive",
         "resolved": "8.5.7",
         "contentHash": "HdS4nzARrW34F+ftZpfykSEwmvEFD8Z+lRulwakt0YU9xg4IE3bUmbls15vuOxfC2YDtcr7y3+SQYzXx6fG/vA=="
-      },
-      "Microsoft.AspNetCore.Authentication.JwtBearer": {
-        "type": "Transitive",
-        "resolved": "9.0.11",
-        "contentHash": "76KB8sBNzyo4L6mPXCYVHC/Uo1wQKF0jdGzQD8lPLLZ01CAyq2daU/h4jk2+F6QJ1gPgprlZz3Z/1trQ3CVdLA==",
-        "dependencies": {
-          "Microsoft.IdentityModel.Protocols.OpenIdConnect": "8.0.1"
-        }
-      },
-      "Microsoft.AspNetCore.Authentication.OpenIdConnect": {
-        "type": "Transitive",
-        "resolved": "9.0.11",
-        "contentHash": "c6vAj8YoQjRrof5hVEIuRh12LmPjcLqBZtW55owWB9oAwHYI+Nh/UO3GUQVMBHD3lLoJmXE6pA1zMQNiy86yFg==",
-        "dependencies": {
-          "Microsoft.IdentityModel.Protocols.OpenIdConnect": "8.0.1"
-        }
       },
       "Microsoft.EntityFrameworkCore.Abstractions": {
         "type": "Transitive",
@@ -382,57 +322,6 @@
           "Microsoft.Extensions.Options": "9.0.11"
         }
       },
-      "Microsoft.IdentityModel.Abstractions": {
-        "type": "Transitive",
-        "resolved": "8.0.1",
-        "contentHash": "OtlIWcyX01olfdevPKZdIPfBEvbcioDyBiE/Z2lHsopsMD7twcKtlN9kMevHmI5IIPhFpfwCIiR6qHQz1WHUIw=="
-      },
-      "Microsoft.IdentityModel.JsonWebTokens": {
-        "type": "Transitive",
-        "resolved": "8.0.1",
-        "contentHash": "s6++gF9x0rQApQzOBbSyp4jUaAlwm+DroKfL8gdOHxs83k8SJfUXhuc46rDB3rNXBQ1MVRxqKUrqFhO/M0E97g==",
-        "dependencies": {
-          "Microsoft.IdentityModel.Tokens": "8.0.1"
-        }
-      },
-      "Microsoft.IdentityModel.Logging": {
-        "type": "Transitive",
-        "resolved": "8.0.1",
-        "contentHash": "UCPF2exZqBXe7v/6sGNiM6zCQOUXXQ9+v5VTb9gPB8ZSUPnX53BxlN78v2jsbIvK9Dq4GovQxo23x8JgWvm/Qg==",
-        "dependencies": {
-          "Microsoft.IdentityModel.Abstractions": "8.0.1"
-        }
-      },
-      "Microsoft.IdentityModel.Protocols": {
-        "type": "Transitive",
-        "resolved": "8.0.1",
-        "contentHash": "uA2vpKqU3I2mBBEaeJAWPTjT9v1TZrGWKdgK6G5qJd03CLx83kdiqO9cmiK8/n1erkHzFBwU/RphP83aAe3i3g==",
-        "dependencies": {
-          "Microsoft.IdentityModel.Tokens": "8.0.1"
-        }
-      },
-      "Microsoft.IdentityModel.Protocols.OpenIdConnect": {
-        "type": "Transitive",
-        "resolved": "8.0.1",
-        "contentHash": "AQDbfpL+yzuuGhO/mQhKNsp44pm5Jv8/BI4KiFXR7beVGZoSH35zMV3PrmcfvSTsyI6qrcR898NzUauD6SRigg==",
-        "dependencies": {
-          "Microsoft.IdentityModel.Protocols": "8.0.1",
-          "System.IdentityModel.Tokens.Jwt": "8.0.1"
-        }
-      },
-      "Microsoft.IdentityModel.Tokens": {
-        "type": "Transitive",
-        "resolved": "8.0.1",
-        "contentHash": "kDimB6Dkd3nkW2oZPDkMkVHfQt3IDqO5gL0oa8WVy3OP4uE8Ij+8TXnqg9TOd9ufjsY3IDiGz7pCUbnfL18tjg==",
-        "dependencies": {
-          "Microsoft.IdentityModel.Logging": "8.0.1"
-        }
-      },
-      "Microsoft.OpenApi": {
-        "type": "Transitive",
-        "resolved": "1.6.17",
-        "contentHash": "Le+kehlmrlQfuDFUt1zZ2dVwrhFQtKREdKBo+rexOwaCoYP0/qpgT9tLxCsZjsgR5Itk1UKPcbgO+FyaNid/bA=="
-      },
       "MongoDB.Bson": {
         "type": "Transitive",
         "resolved": "3.5.1",
@@ -529,14 +418,6 @@
           "OpenTelemetry.Api": "1.14.0"
         }
       },
-      "Pipelines.Sockets.Unofficial": {
-        "type": "Transitive",
-        "resolved": "2.2.8",
-        "contentHash": "zG2FApP5zxSx6OcdJQLbZDk2AVlN2BNQD6MorwIfV6gVj0RRxWPEp2LXAxqDGZqeNV1Zp0BNPcNaey/GXmTdvQ==",
-        "dependencies": {
-          "System.IO.Pipelines": "5.0.1"
-        }
-      },
       "Polly.Core": {
         "type": "Transitive",
         "resolved": "8.4.2",
@@ -580,15 +461,6 @@
         "resolved": "1.0.0",
         "contentHash": "rFtK2KEI9hIe8gtx3a0YDXdHOpedIf9wYCEYtBEmtlyiWVX3XlCNV03JrmmAi/Cdfn7dxK+k0sjjcLv4fpHnqA=="
       },
-      "StackExchange.Redis": {
-        "type": "Transitive",
-        "resolved": "2.9.32",
-        "contentHash": "j5Rjbf7gWz5izrn0UWQy9RlQY4cQDPkwJfVqATnVsOa/+zzJrps12LOgacMsDl/Vit2f01cDiDkG/Rst8v2iGw==",
-        "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
-          "Pipelines.Sockets.Unofficial": "2.2.8"
-        }
-      },
       "System.Buffers": {
         "type": "Transitive",
         "resolved": "4.5.1",
@@ -603,15 +475,6 @@
         "type": "Transitive",
         "resolved": "10.0.0",
         "contentHash": "0KdBK+h7G13PuOSC2R/DalAoFMvdYMznvGRuICtkdcUMXgl/gYXsG6z4yUvTxHSMACorWgHCU1Faq0KUHU6yAQ=="
-      },
-      "System.IdentityModel.Tokens.Jwt": {
-        "type": "Transitive",
-        "resolved": "8.0.1",
-        "contentHash": "GJw3bYkWpOgvN3tJo5X4lYUeIFA2HD293FPUhKmp7qxS+g5ywAb34Dnd3cDAFLkcMohy5XTpoaZ4uAHuw0uSPQ==",
-        "dependencies": {
-          "Microsoft.IdentityModel.JsonWebTokens": "8.0.1",
-          "Microsoft.IdentityModel.Tokens": "8.0.1"
-        }
       },
       "System.IO.Pipelines": {
         "type": "Transitive",
@@ -650,17 +513,6 @@
           "RestoRate.SharedKernel": "[1.0.0, )"
         }
       },
-      "restorate.auth": {
-        "type": "Project",
-        "dependencies": {
-          "Ardalis.GuardClauses": "[5.0.0, )",
-          "Aspire.Keycloak.Authentication": "[13.1.0-preview.1.25616.3, )",
-          "Microsoft.AspNetCore.OpenApi": "[9.0.11, )",
-          "Microsoft.Extensions.ServiceDiscovery": "[10.1.0, )",
-          "RestoRate.Abstractions": "[1.0.0, )",
-          "RestoRate.ServiceDefaults": "[1.0.0, )"
-        }
-      },
       "restorate.buildingblocks": {
         "type": "Project",
         "dependencies": {
@@ -679,32 +531,10 @@
           "RestoRate.SharedKernel": "[1.0.0, )"
         }
       },
-      "restorate.contracts": {
-        "type": "Project",
-        "dependencies": {
-          "RestoRate.Abstractions": "[1.0.0, )"
-        }
-      },
-      "restorate.ratingservice.application": {
-        "type": "Project",
-        "dependencies": {
-          "MassTransit": "[8.5.7, 9.0.0)",
-          "Mediator.Abstractions": "[3.0.1, )",
-          "RestoRate.Contracts": "[1.0.0, )",
-          "RestoRate.RatingService.Domain": "[1.0.0, )"
-        }
-      },
       "restorate.ratingservice.domain": {
         "type": "Project",
         "dependencies": {
           "RestoRate.SharedKernel": "[1.0.0, )"
-        }
-      },
-      "restorate.ratingservice.infrastructure": {
-        "type": "Project",
-        "dependencies": {
-          "RestoRate.BuildingBlocks": "[1.0.0, )",
-          "RestoRate.RatingService.Domain": "[1.0.0, )"
         }
       },
       "restorate.servicedefaults": {
@@ -790,16 +620,6 @@
           "Ardalis.Specification": "9.3.1",
           "Microsoft.EntityFrameworkCore": "9.0.8",
           "Microsoft.EntityFrameworkCore.Relational": "9.0.8"
-        }
-      },
-      "Aspire.Keycloak.Authentication": {
-        "type": "CentralTransitive",
-        "requested": "[13.1.0-preview.1.25616.3, )",
-        "resolved": "13.1.0-preview.1.25616.3",
-        "contentHash": "dh6McYpOyoPnn8vHLqWLr4i3VX+TQoAnctZh3fuOY9+nJAPoPvdxtlgeCIPAFxJ3ObTPCvZD3ec29b8fggzdlQ==",
-        "dependencies": {
-          "Microsoft.AspNetCore.Authentication.JwtBearer": "9.0.11",
-          "Microsoft.AspNetCore.Authentication.OpenIdConnect": "9.0.11"
         }
       },
       "Aspire.MongoDB.Driver": {

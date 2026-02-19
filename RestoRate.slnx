@@ -25,6 +25,9 @@
   </Folder>
   <Folder Name="/src/RatingService/">
     <Project Path="src/RatingService/RestoRate.RatingService.Api/RestoRate.RatingService.Api.csproj" />
+    <Project Path="src/RatingService/RestoRate.RatingService.Application/RestoRate.RatingService.Application.csproj" />
+    <Project Path="src/RatingService/RestoRate.RatingService.Domain/RestoRate.RatingService.Domain.csproj" />
+    <Project Path="src/RatingService/RestoRate.RatingService.Infrastructure/RestoRate.RatingService.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/src/RestaurantService/">
     <Project Path="src/RestaurantService/RestoRate.RestaurantService.Api/RestoRate.RestaurantService.Api.csproj" />

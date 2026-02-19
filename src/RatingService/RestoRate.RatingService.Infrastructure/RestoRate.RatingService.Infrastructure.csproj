@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\RestoRate.BuildingBlocks\RestoRate.BuildingBlocks.csproj" />
+    <ProjectReference Include="..\RestoRate.RatingService.Domain\RestoRate.RatingService.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
