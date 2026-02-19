@@ -9,5 +9,5 @@ namespace RestoRate.ReviewService.Domain.Interfaces;
 
 public interface IReviewRepository : IRepository<Review>
 {
-    Task<PagedResult<List<Review>>> ListAsync(ISpecification<Review> specification, BaseFilter filter, CancellationToken cancellationToken = default);
+    Task<PagedResult<List<Review>>> ListPagedAsync(ISpecification<Review> specification, BaseFilter filter, CancellationToken cancellationToken = default);
 }

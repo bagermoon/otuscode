@@ -1,9 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\..\RestoRate.Abstractions\RestoRate.Abstractions.csproj" />
     <ProjectReference Include="..\..\RestoRate.Contracts\RestoRate.Contracts.csproj" />
-    <ProjectReference Include="..\..\RestoRate.SharedKernel\RestoRate.SharedKernel.csproj" />
-    <ProjectReference Include="..\RestoRate.ReviewService.Domain\RestoRate.ReviewService.Domain.csproj" />
+    <ProjectReference Include="..\RestoRate.RatingService.Domain\RestoRate.RatingService.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -14,4 +12,5 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
+
 </Project>

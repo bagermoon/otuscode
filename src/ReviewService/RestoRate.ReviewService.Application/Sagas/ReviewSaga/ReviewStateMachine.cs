@@ -91,10 +91,12 @@ public class ReviewStateMachine : MassTransitStateMachine<ReviewState>
                     context => context.Message.Approved,
                     thenBinder => thenBinder
                         .ThenAsync(ApproveReviewAsync)
-                        .TransitionTo(ModerationApproved),
+                        .TransitionTo(ModerationApproved)
+                        .Finalize(),
                     elseBinder => elseBinder
                         .ThenAsync(RejectReviewAsync)
-                        .TransitionTo(ModerationRejected))
+                        .TransitionTo(ModerationRejected)
+                        .Finalize())
         );
 
         During(ValidationFailed,
@@ -114,6 +116,8 @@ public class ReviewStateMachine : MassTransitStateMachine<ReviewState>
             Ignore(RestaurantValidationCompleted),
             Ignore(UserValidationCompleted),
             Ignore(ReviewModeratedEvent));
+
+        SetCompletedWhenFinalized();
     }
 
     private EventActivityBinder<ReviewState, TMessage> DecideValidation<TMessage>(EventActivityBinder<ReviewState, TMessage> binder)
@@ -125,7 +129,8 @@ public class ReviewStateMachine : MassTransitStateMachine<ReviewState>
                 .TransitionTo(ValidationOk),
             elseBinder => elseBinder
                 .ThenAsync(RejectReviewAsync)
-                .TransitionTo(ValidationFailed));
+                .TransitionTo(ValidationFailed))
+                .Finalize();
 
     private static async Task MoveReviewToModerationPendingAsync<TMessage>(BehaviorContext<ReviewState, TMessage> context)
         where TMessage : class

@@ -5,10 +5,22 @@ using MongoDB.Bson.IO;
 
 using NodaMoney;
 
-namespace RestoRate.ReviewService.Infrastructure.Serialization;
+namespace RestoRate.BuildingBlocks.Serialization;
 
-internal sealed class MoneyBsonSerializer : SerializerBase<Money>
+public sealed class MoneyBsonSerializer : SerializerBase<Money>
 {
+    private static int registered;
+
+    public static void EnsureRegistered()
+    {
+        if (Interlocked.Exchange(ref registered, 1) == 1)
+        {
+            return;
+        }
+
+        BsonSerializer.RegisterSerializer<Money>(new MoneyBsonSerializer());
+    }
+
     public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, Money value)
     {
         context.Writer.WriteStartDocument();

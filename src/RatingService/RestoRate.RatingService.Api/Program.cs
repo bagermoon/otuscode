@@ -1,18 +1,17 @@
 using RestoRate.ServiceDefaults;
-using RestoRate.Auth.Authentication;
 using StackExchange.Redis;
 using RestoRate.ServiceDefaults.EndpointFilters;
+using RestoRate.Auth.OpenApi;
+using RestoRate.RatingService.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 builder.Services.AddProblemDetailsDefaults();
+// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddOpenApi(opts => opts.AddDocumentTransformer<KeycloakScalarSecurityTransformer>());
 
-builder.AddJwtAuthentication(AppHostProjects.Keycloak);
-
-builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("AdminGroup", policy =>
-        policy.RequireRole("admin")); // Checks for a "roles" claim with value "admin"
+builder.AddRatingApi();
 
 builder.AddRedisClient(AppHostProjects.RedisCache, configureOptions: options =>
 {
@@ -20,8 +19,7 @@ builder.AddRedisClient(AppHostProjects.RedisCache, configureOptions: options =>
 });
 
 // Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+
 
 var app = builder.Build();
 
@@ -56,3 +54,5 @@ api.MapGet("/redis-test", async (IConnectionMultiplexer connectionMux, Cancellat
 .WithName("redis-test");
 
 app.Run();
+
+public partial class Program { }

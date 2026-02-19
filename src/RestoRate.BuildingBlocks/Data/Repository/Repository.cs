@@ -17,7 +17,7 @@ public class Repository<TEntity, TContext> : RepositoryBase<TEntity>, IRepositor
     {
     }
 
-    public virtual async Task<PagedResult<List<TEntity>>> ListAsync(ISpecification<TEntity> specification, BaseFilter filter, CancellationToken cancellationToken)
+    public virtual async Task<PagedResult<List<TEntity>>> ListPagedAsync(ISpecification<TEntity> specification, BaseFilter filter, CancellationToken cancellationToken)
     {
         var count = await ApplySpecification(specification).CountAsync(cancellationToken);
         var pagination = new Pagination(count, filter);

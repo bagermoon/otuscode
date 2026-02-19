@@ -82,12 +82,13 @@ scalar.WithApiReference(moderationApi, options =>
 
 
 #region ServiceRatingApi
+var ratingdb = mongo.AddDatabase(AppHostProjects.RatingDb, "ratingdb");
 var ratingApiBearerAudience = builder.AddParameter("rating-api-bearer-audience", value: "restorate-rating-api", publishValueAsDefault: true);
 var ratingApi = builder.AddProject<RestoRate_RatingService_Api>(AppHostProjects.ServiceRatingApi)
-    .WithReference(keycloak)
-    .WithReference(rabbitmq)
-    .WithReference(redisCache)
-    .WaitFor(keycloak).WaitFor(redisCache)
+    .WithReference(keycloak).WaitFor(keycloak)
+    .WithReference(rabbitmq).WaitFor(rabbitmq)
+    .WithReference(redisCache).WaitFor(redisCache)
+    .WithReference(ratingdb).WaitFor(ratingdb)
     .WithEnvironment("KeycloakSettings__Audience", ratingApiBearerAudience)
     .WithEnvironment("KeycloakSettings__Realm", keycloakRealm);
 

@@ -115,7 +115,7 @@ public class ReviewRepository(ReviewDbContext context)
         return reviews;
     }
 
-    public override async Task<PagedResult<List<Review>>> ListAsync(ISpecification<Review> specification, BaseFilter filter, CancellationToken cancellationToken = default)
+    public override async Task<PagedResult<List<Review>>> ListPagedAsync(ISpecification<Review> specification, BaseFilter filter, CancellationToken cancellationToken = default)
     {
         var context = (ReviewDbContext)DbContext;
         var asNoTracking = specification.AsNoTracking;
@@ -125,7 +125,7 @@ public class ReviewRepository(ReviewDbContext context)
         PagedResult<List<Review>> pagedResult;
         try
         {
-            pagedResult = await base.ListAsync(specification, filter, cancellationToken);
+            pagedResult = await base.ListPagedAsync(specification, filter, cancellationToken);
         }
         finally
         {
