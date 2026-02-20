@@ -37,7 +37,7 @@ public sealed class GetAllReviewsHandler(
             var filter = request.ToFilter();
             var spec = new GetReviewsByStatusReadOnlySpec(filter);
 
-            var filtered = await readRepository.ListAsync(spec, filter, cancellationToken);
+            var filtered = await readRepository.ListPagedAsync(spec, filter, cancellationToken);
 
             var result = filtered.ToContractPagedResult(r => r.ToDto());
 

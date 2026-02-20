@@ -6,6 +6,6 @@ public interface IUnitOfWork
 {
     Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default);
 
-    Task<bool> SaveEntitiesAsync(IClientSessionHandle session, CancellationToken cancellationToken = default);
+    Task<bool> SaveEntitiesAsync(IClientSessionHandle session, bool dispatchEvents = true, CancellationToken cancellationToken = default);
 }
 

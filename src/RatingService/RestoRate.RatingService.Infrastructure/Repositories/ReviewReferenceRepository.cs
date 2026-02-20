@@ -10,7 +10,7 @@ using RestoRate.RatingService.Infrastructure.Data;
 namespace RestoRate.RatingService.Infrastructure.Repositories;
 
 internal sealed class ReviewReferenceRepository(
-    IRatingMongoContext context)
+    IMongoContext context)
     : BaseRepository<ReviewReference>(context), IReviewReferenceRepository
 {
     public Task AddReviewReferenceAsync(ReviewReference reviewReference, CancellationToken cancellationToken = default)

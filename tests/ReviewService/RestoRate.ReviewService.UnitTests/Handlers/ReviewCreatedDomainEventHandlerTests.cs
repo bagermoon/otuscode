@@ -35,8 +35,7 @@ public sealed class ReviewCreatedDomainEventHandlerTests(ITestContextAccessor te
             var review = Review.Create(restaurantId, userId, rating: 4.5m, averageCheck: null, comment: "test");
 
             var handler = new ReviewCreatedDomainEventHandler(
-                scope.ServiceProvider.GetRequiredService<IPublishEndpoint>(),
-                Substitute.For<ILogger<ReviewCreatedDomainEventHandler>>());
+                scope.ServiceProvider.GetRequiredService<IPublishEndpoint>());
 
             await handler.Handle(new ReviewCreatedDomainEvent(review), CancellationToken);
 

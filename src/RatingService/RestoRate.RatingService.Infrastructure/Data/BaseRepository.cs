@@ -6,11 +6,11 @@ namespace RestoRate.RatingService.Infrastructure.Data;
 
 public abstract class BaseRepository<TAggregate> where TAggregate : EntityBase<Guid>, IAggregateRoot, new()
 {
-    protected readonly IRatingMongoContext _context;
+    protected readonly IMongoContext _context;
     protected IMongoCollection<TAggregate> Collection { get; }
 
     protected BaseRepository(
-        IRatingMongoContext context)
+        IMongoContext context)
     {
         _context = context;
         Collection = context.Collection<TAggregate>();
