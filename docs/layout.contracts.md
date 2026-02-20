@@ -25,7 +25,8 @@ RestoRate.Contracts/
 │   │   └── ReviewDto.cs                   # переносимый DTO отзыва (без доменных типов)
 │   └── Events/
 │       ├── ReviewAddedEvent.cs
-│       └── ReviewApprovedEvent.cs
+│       ├── ReviewApprovedEvent.cs
+│       └── ReviewRejectedEvent.cs
 ├── Moderation/
 │   ├── Dtos/
 │   │   └── ModerationTaskDto.cs           # опционально, если нужен обмен DTO

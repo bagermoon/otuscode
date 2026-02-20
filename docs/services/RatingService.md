@@ -84,13 +84,13 @@ public sealed record RatingSummary(decimal AverageRate, int ReviewCount, Money A
 
 ## Интеграционные события
 
-- Подписывается на: `ReviewAddedEvent`, `ReviewApprovedEvent`
+- Подписывается на: `ReviewAddedEvent`, `ReviewApprovedEvent`, `ReviewRejectedEvent`
 - Публикует: `RestaurantRatingRecalculatedEvent`
 
 ```mermaid
 flowchart LR
     %% Входящие события от Review
-    RV[Review Service] -- ReviewAddedEvent / ReviewApprovedEvent --> MQ[(RabbitMQ)]
+    RV[Review Service] -- ReviewAddedEvent / ReviewApprovedEvent / ReviewRejectedEvent --> MQ[(RabbitMQ)]
     MQ --> RT
 
     subgraph Rating_Service[Rating Service]
@@ -138,8 +138,8 @@ sequenceDiagram
     RT->>DBR: (опц.) Fetch Approved Reviews
     RT->>RD: Update Cached Rating (provisional)
 
-    RV->>MQ: Publish ReviewApprovedEvent
-    MQ->>RT: Deliver ReviewApprovedEvent
+    RV->>MQ: Publish ReviewApprovedEvent / ReviewRejectedEvent
+    MQ->>RT: Deliver ReviewApprovedEvent / ReviewRejectedEvent
     RT->>DBR: Fetch Approved Reviews
     RT->>RD: Recalculate & Cache (final)
     RT->>MQ: Publish RestaurantRatingRecalculatedEvent
