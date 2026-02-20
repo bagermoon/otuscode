@@ -58,7 +58,7 @@ public static class InfrastructureServiceExtensions
         builder.Services.TryAddSingleton<IMongoDatabase>(sp =>
             sp.GetRequiredService<IMongoClient>().GetDatabase(databaseName));
 
-        builder.Services.AddRatingDbContext<RatingMongoContext>();
+        builder.Services.AddMongoContext<MongoContext>();
         builder.Services.AddConfiguredMongoDbCollections(Assembly.GetExecutingAssembly());
 
         return builder;

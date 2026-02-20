@@ -19,13 +19,13 @@ namespace RestoRate.RatingService.Infrastructure.Extensions;
 
 public static class MongoExtensions
 {
-    public static IServiceCollection AddRatingDbContext<TContext>(this IServiceCollection services)
-        where TContext : IRatingMongoContext
+    public static IServiceCollection AddMongoContext<TContext>(this IServiceCollection services)
+        where TContext : IMongoContext
     {
         services.TryAddScoped<MongoUnitOfWork>();
         services.TryAddScoped<IMongoCollectionProvider, DiMongoCollectionProvider>();
-        services.TryAddScoped(typeof(IRatingMongoContext), typeof(TContext));
-        services.TryAddScoped<IUnitOfWork>(sp => sp.GetRequiredService<IRatingMongoContext>());
+        services.TryAddScoped(typeof(IMongoContext), typeof(TContext));
+        services.TryAddScoped<IUnitOfWork>(sp => sp.GetRequiredService<IMongoContext>());
         services.TryAddScoped<IDomainEventDispatcher, NoOpDomainEventDispatcher>();
 
         return services;

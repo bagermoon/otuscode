@@ -62,6 +62,12 @@ public class MongoUnitOfWork : IUnitOfWork
     {
         public EntityBase<Guid> Aggregate { get; } = aggregate;
         public EntityState State { get; set; } = state;
+
+        /// <summary>
+        /// True when a delete operation has already been persisted for this aggregate.
+        /// Used to avoid re-deleting while still allowing cleanup after delayed event dispatch.
+        /// </summary>
+        public bool DeleteApplied { get; set; }
     }
 
     public bool TryGet<TAggregate>(Guid id, out TAggregate aggregate)
@@ -90,6 +96,11 @@ public class MongoUnitOfWork : IUnitOfWork
             }
 
             existing.State = state;
+
+            if (state != EntityState.Deleted)
+            {
+                existing.DeleteApplied = false;
+            }
 
             return;
         }
@@ -133,14 +144,34 @@ public class MongoUnitOfWork : IUnitOfWork
         return await SaveEntitiesWithManagedSessionAsync(session, cancellationToken);
     }
 
-    public Task<bool> SaveEntitiesAsync(IClientSessionHandle session, CancellationToken cancellationToken = default)
+    public async Task<bool> SaveEntitiesAsync(
+        IClientSessionHandle session,
+        bool dispatchEvents = true,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(session, nameof(session));
-        if (!HasChanges()) return Task.FromResult(true);
+        if (!HasChanges()) return true;
 
         // External session is typically managed by the caller (e.g., MassTransit MongoDbContext.Session)
         // and may already have an active transaction.
-        return SaveEntitiesWithExternalSessionAsync(session, cancellationToken);
+        if (dispatchEvents)
+        {
+            return await SaveEntitiesWithExternalSessionAsync(session, cancellationToken);
+        }
+
+        // Persist only. Domain events should be flushed explicitly after the external transaction is committed.
+        await SaveChangesAsync(session, cancellationToken);
+        ClearSaved();
+        return true;
+    }
+
+    public async Task FlushDomainEventsAsync(CancellationToken cancellationToken = default)
+    {
+        var dispatched = await TryDispatchDomainEventsAsync(cancellationToken);
+        if (dispatched)
+        {
+            CleanupTombstones();
+        }
     }
 
     private async Task<bool> SaveEntitiesWithManagedSessionAsync(
@@ -218,8 +249,13 @@ public class MongoUnitOfWork : IUnitOfWork
 
     private async Task AfterSavedAsync(CancellationToken cancellationToken)
     {
-        await DispatchDomainEventsBestEffortAsync(cancellationToken);
+        var dispatched = await TryDispatchDomainEventsAsync(cancellationToken);
         ClearSaved();
+
+        if (dispatched)
+        {
+            CleanupTombstones();
+        }
     }
 
     private async Task SaveChangesAsync(IClientSessionHandle? session, CancellationToken cancellationToken)
@@ -251,12 +287,13 @@ public class MongoUnitOfWork : IUnitOfWork
 
                 case EntityState.Deleted:
                     await writer.DeleteAsync(session, aggregate.Id, cancellationToken);
+                    tracked.DeleteApplied = true;
                     break;
             }
         }
     }
 
-    private async Task DispatchDomainEventsBestEffortAsync(CancellationToken cancellationToken = default)
+    private async Task<bool> TryDispatchDomainEventsAsync(CancellationToken cancellationToken)
     {
         var entitiesWithEvents = _trackedEntities.Values
             .Select(x => (IHasDomainEvents)x.Aggregate)
@@ -265,17 +302,36 @@ public class MongoUnitOfWork : IUnitOfWork
 
         if (entitiesWithEvents.Count == 0)
         {
-            return;
+            return false;
         }
 
         try
         {
             await _domainEventDispatcher.DispatchAndClearEvents(entitiesWithEvents);
+            return true;
         }
         catch (Exception ex)
         {
-            // Best-effort: persistence succeeded; allow retry of dispatch.
+            // Best-effort: persistence may have succeeded; allow retry of dispatch.
             MongoUnitOfWorkLogger.LogDomainEventsDispatchFailed(_logger, ex);
+            return false;
+        }
+    }
+
+    private void CleanupTombstones()
+    {
+        var keys = _trackedEntities.Keys.ToList();
+
+        foreach (var key in keys)
+        {
+            var tracked = _trackedEntities[key];
+
+            if (tracked.DeleteApplied
+                && tracked.Aggregate.DomainEvents.Count == 0
+                && (tracked.State == EntityState.Unchanged || tracked.State == EntityState.Deleted))
+            {
+                _trackedEntities.Remove(key);
+            }
         }
     }
 
@@ -289,15 +345,21 @@ public class MongoUnitOfWork : IUnitOfWork
 
             if (tracked.State == EntityState.Deleted)
             {
-                // If dispatch failed, keep deleted aggregates that still have domain events
-                // so we can retry dispatch without re-running the delete.
-                if (tracked.Aggregate.DomainEvents.Count == 0)
+                if (tracked.DeleteApplied)
                 {
-                    _trackedEntities.Remove(key);
+                    // If dispatch failed, keep deleted aggregates that still have domain events
+                    // so we can retry dispatch without re-running the delete.
+                    if (tracked.Aggregate.DomainEvents.Count == 0)
+                    {
+                        _trackedEntities.Remove(key);
+                        continue;
+                    }
+
+                    tracked.State = EntityState.Unchanged;
                     continue;
                 }
 
-                tracked.State = EntityState.Unchanged;
+                // Delete wasn't applied (unexpected in ClearSaved-after-save). Keep as Deleted for retry.
                 continue;
             }
 

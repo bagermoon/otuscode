@@ -5,7 +5,7 @@ using MongoDB.Driver;
 namespace RestoRate.RatingService.Infrastructure.Data;
 /// <summary>
 /// Простая реализация <see cref="IMongoAggregateWriter"/>.
-/// Используется <see cref="RatingMongoContext"/> для получения писателей для агрегатов.
+/// Используется <see cref="MongoContext"/> для получения писателей для агрегатов.
 /// Требуется для отделения логики получения коллекций от логики записи агрегатов в MongoDB.
 /// </summary>
 public sealed class MongoAggregateWriter<TAggregate>(IMongoCollection<TAggregate> collection) : IMongoAggregateWriter

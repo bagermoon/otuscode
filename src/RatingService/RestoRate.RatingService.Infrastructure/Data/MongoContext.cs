@@ -4,10 +4,10 @@ using MongoDB.Driver;
 
 namespace RestoRate.RatingService.Infrastructure.Data;
 
-internal sealed class RatingMongoContext(
+internal sealed class MongoContext(
     MongoUnitOfWork unitOfWork,
     IMongoCollectionProvider collections)
-    : IRatingMongoContext
+    : IMongoContext
 {
     public IMongoCollection<T> Collection<T>() where T : class
         => collections.GetRequiredCollection<T>();
@@ -35,6 +35,12 @@ internal sealed class RatingMongoContext(
     public Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default)
         => unitOfWork.SaveEntitiesAsync(cancellationToken);
 
-    public Task<bool> SaveEntitiesAsync(IClientSessionHandle session, CancellationToken cancellationToken = default)
-        => unitOfWork.SaveEntitiesAsync(session, cancellationToken);
+    public Task<bool> SaveEntitiesAsync(
+        IClientSessionHandle session,
+        bool dispatchEvents = true,
+        CancellationToken cancellationToken = default)
+        => unitOfWork.SaveEntitiesAsync(session, dispatchEvents, cancellationToken);
+    
+    public Task FlushDomainEventsAsync(CancellationToken cancellationToken = default)
+        => unitOfWork.FlushDomainEventsAsync(cancellationToken);
 }
