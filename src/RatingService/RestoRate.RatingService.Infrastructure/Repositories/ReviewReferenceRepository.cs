@@ -102,6 +102,21 @@ internal sealed class ReviewReferenceRepository(
         return new Money(amount, Currency.FromCode(currencyCode));
     }
 
+    public async Task<int> GetReviewsCountByRestaurantIdAsync(
+        Guid restaurantId,
+        bool approvedOnly = true,
+        CancellationToken cancellationToken = default)
+    {
+        var filter = Builders<ReviewReference>.Filter.Eq(x => x.RestaurantId, restaurantId);
+        if (approvedOnly)
+        {
+            filter &= Builders<ReviewReference>.Filter.Eq(x => x.IsApproved, true);
+        }
+
+        var count = await Collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
+        return (int)Math.Min(int.MaxValue, count);
+    }
+
     public Task UpdateReviewReferenceAsync(ReviewReference reviewReference, CancellationToken cancellationToken = default)
     {
         Update(reviewReference);

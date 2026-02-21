@@ -1,12 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\..\RestoRate.Abstractions\RestoRate.Abstractions.csproj" />
+    <ProjectReference Include="..\..\RestoRate.Contracts\RestoRate.Contracts.csproj" />
     <ProjectReference Include="..\RestoRate.RatingService.Domain\RestoRate.RatingService.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MassTransit" />
     <PackageReference Include="Mediator.Abstractions" />
+    <PackageReference Include="NodaMoney" />
     <PackageReference Include="Mediator.SourceGenerator">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>

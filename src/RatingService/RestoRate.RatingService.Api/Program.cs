@@ -13,11 +13,6 @@ builder.Services.AddOpenApi(opts => opts.AddDocumentTransformer<KeycloakScalarSe
 
 builder.AddRatingApi();
 
-builder.AddRedisClient(AppHostProjects.RedisCache, configureOptions: options =>
-{
-    options.DefaultDatabase = 1;
-});
-
 // Add services to the container.
 
 

@@ -11,6 +11,7 @@ using MongoDB.Driver;
 
 using RestoRate.BuildingBlocks.Messaging;
 using RestoRate.RatingService.Domain.Interfaces;
+using RestoRate.RatingService.Infrastructure.Caching;
 using RestoRate.RatingService.Infrastructure.Data;
 using RestoRate.RatingService.Infrastructure.Extensions;
 using RestoRate.RatingService.Infrastructure.Repositories;
@@ -24,6 +25,35 @@ public static class InfrastructureServiceExtensions
         this IHostApplicationBuilder builder,
         params Assembly[] assemblies
     )
+    {
+        AddMassTransitEventBus(builder, assemblies);
+        AddMongoDbServices(builder);
+        AddRedis(builder);
+
+        builder.Services.TryAddScoped<IReviewReferenceRepository, ReviewReferenceRepository>();
+        builder.Services.TryAddScoped<IRestaurantRatingCache, RedisRestaurantRatingCache>();
+
+        return builder;
+    }
+
+    private static IHostApplicationBuilder AddMongoDbServices(
+        this IHostApplicationBuilder builder)
+    {
+        builder.AddMongoDBClient(AppHostProjects.RatingDb);
+        string databaseName = builder.Configuration.GetValue<string>("MONGODB_DATABASENAME") ?? "ratingdb";
+
+        builder.Services.TryAddSingleton<IMongoDatabase>(sp =>
+            sp.GetRequiredService<IMongoClient>().GetDatabase(databaseName));
+
+        builder.Services.AddMongoContext<MongoContext>();
+        builder.Services.AddConfiguredMongoDbCollections(Assembly.GetExecutingAssembly());
+
+        return builder;
+    }
+
+    private static IHostApplicationBuilder AddMassTransitEventBus(
+        this IHostApplicationBuilder builder,
+        params Assembly[] assemblies)
     {
         if (assemblies is null || assemblies.Length == 0)
         {
@@ -43,23 +73,16 @@ public static class InfrastructureServiceExtensions
             }
         );
 
-        AddMongoDbServices(builder);
-
-        builder.Services.TryAddScoped<IReviewReferenceRepository, ReviewReferenceRepository>();
-
         return builder;
     }
 
-    private static IHostApplicationBuilder AddMongoDbServices(this IHostApplicationBuilder builder)
+    private static IHostApplicationBuilder AddRedis(
+        this IHostApplicationBuilder builder)
     {
-        builder.AddMongoDBClient(AppHostProjects.RatingDb);
-        string databaseName = builder.Configuration.GetValue<string>("MONGODB_DATABASENAME") ?? "ratingdb";
-
-        builder.Services.TryAddSingleton<IMongoDatabase>(sp =>
-            sp.GetRequiredService<IMongoClient>().GetDatabase(databaseName));
-
-        builder.Services.AddMongoContext<MongoContext>();
-        builder.Services.AddConfiguredMongoDbCollections(Assembly.GetExecutingAssembly());
+        builder.AddRedisClient(AppHostProjects.RedisCache, configureOptions: options =>
+        {
+            options.DefaultDatabase = 1; // Move to configuration in the future
+        });
 
         return builder;
     }

@@ -28,7 +28,7 @@ public class ReviewReference : EntityBase<Guid>, IAggregateRoot
             IsApproved = false
         };
 
-        review.RegisterDomainEvent(new ReviewAddedDomainEvent(review));
+        review.RegisterDomainEvent(new ReviewReferenceChangedDomainEvent(review));
 
         return review;
     }
@@ -37,7 +37,7 @@ public class ReviewReference : EntityBase<Guid>, IAggregateRoot
     {
         IsApproved = false;
 
-        RegisterDomainEvent(new ReviewRejectedDomainEvent(this));
+        RegisterDomainEvent(new ReviewReferenceChangedDomainEvent(this));
         return this;
     }
 
@@ -50,7 +50,7 @@ public class ReviewReference : EntityBase<Guid>, IAggregateRoot
 
         IsApproved = true;
 
-        RegisterDomainEvent(new ReviewApprovedDomainEvent(this));
+        RegisterDomainEvent(new ReviewReferenceChangedDomainEvent(this));
         return this;
     }
 }
