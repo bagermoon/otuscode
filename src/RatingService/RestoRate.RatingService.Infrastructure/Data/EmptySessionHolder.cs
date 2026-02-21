@@ -4,8 +4,8 @@ namespace RestoRate.RatingService.Infrastructure.Data;
 
 internal sealed class EmptySessionHolder : ISessionHolder
 {
-    public Task<IClientSessionHandle?> GetSession(CancellationToken cancellationToken = default)
-        => Task.FromResult<IClientSessionHandle?>(null);
+    public ValueTask<IClientSessionHandle?> GetSessionAsync(CancellationToken cancellationToken = default)
+        => ValueTask.FromResult<IClientSessionHandle?>(null);
 
     public Task BeginTransactionAsync(CancellationToken cancellationToken = default)
         => Task.CompletedTask;
