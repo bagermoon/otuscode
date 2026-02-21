@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\..\RestoRate.Contracts\RestoRate.Contracts.csproj" />
+    <ProjectReference Include="..\..\RestoRate.Abstractions\RestoRate.Abstractions.csproj" />
     <ProjectReference Include="..\RestoRate.RatingService.Domain\RestoRate.RatingService.Domain.csproj" />
   </ItemGroup>
 

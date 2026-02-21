@@ -690,7 +690,7 @@
         "dependencies": {
           "MassTransit": "[8.5.7, 9.0.0)",
           "Mediator.Abstractions": "[3.0.1, )",
-          "RestoRate.Contracts": "[1.0.0, )",
+          "RestoRate.Abstractions": "[1.0.0, )",
           "RestoRate.RatingService.Domain": "[1.0.0, )"
         }
       },
@@ -703,6 +703,7 @@
       "restorate.ratingservice.infrastructure": {
         "type": "Project",
         "dependencies": {
+          "RestoRate.Abstractions": "[1.0.0, )",
           "RestoRate.BuildingBlocks": "[1.0.0, )",
           "RestoRate.RatingService.Domain": "[1.0.0, )"
         }

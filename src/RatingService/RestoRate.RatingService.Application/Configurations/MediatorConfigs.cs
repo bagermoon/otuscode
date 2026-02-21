@@ -3,6 +3,7 @@ using Ardalis.SharedKernel;
 using Microsoft.Extensions.DependencyInjection;
 
 using RestoRate.Abstractions.Mediation.Behaviors;
+using RestoRate.RatingService.Application.Behaviors;
 
 namespace RestoRate.RatingService.Application.Configurations;
 
@@ -20,7 +21,8 @@ internal static class MediatorConfigs
             ];
             options.PipelineBehaviors = [
                 typeof(RequestLoggingBehavior<,>),
-                typeof(ValidationBehaviour<,>)
+                typeof(ValidationBehaviour<,>),
+                typeof(UnitOfWorkBehavior<,>)
             ];
         });
 

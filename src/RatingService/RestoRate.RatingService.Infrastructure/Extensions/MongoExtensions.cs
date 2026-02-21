@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 
+using RestoRate.Abstractions.Persistence;
 using RestoRate.RatingService.Infrastructure.Configuration;
 using RestoRate.RatingService.Infrastructure.Data;
 using RestoRate.SharedKernel;
@@ -23,10 +24,11 @@ public static class MongoExtensions
         where TContext : IMongoContext
     {
         services.TryAddScoped<MongoUnitOfWork>();
+        services.TryAddScoped<ISessionHolder, EmptySessionHolder>();
+        services.TryAddScoped<ISessionContext>(sp => sp.GetRequiredService<ISessionHolder>());
         services.TryAddScoped<IMongoCollectionProvider, DiMongoCollectionProvider>();
         services.TryAddScoped(typeof(IMongoContext), typeof(TContext));
-        services.TryAddScoped<IUnitOfWork>(sp => sp.GetRequiredService<IMongoContext>());
-        services.TryAddScoped<IDomainEventDispatcher, NoOpDomainEventDispatcher>();
+        services.TryAddScoped<IUnitOfWork>(sp => sp.GetRequiredService<MongoUnitOfWork>());
 
         return services;
     }
