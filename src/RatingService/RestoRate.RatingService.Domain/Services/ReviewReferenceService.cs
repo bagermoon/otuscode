@@ -14,6 +14,13 @@ public sealed class ReviewReferenceService(IReviewReferenceRepository repository
         Money? averageCheck,
         CancellationToken cancellationToken = default)
     {
+        var existing = await repository.GetReviewReferenceByIdAsync(reviewId, cancellationToken);
+        if (existing is not null)
+        {
+            // Idempotency for message retries: if the reference already exists, do not insert again.
+            return;
+        }
+
         var reviewReference = ReviewReference.Create(
             reviewId,
             restaurantId,

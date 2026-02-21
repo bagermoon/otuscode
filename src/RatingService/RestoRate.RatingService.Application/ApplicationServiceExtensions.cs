@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
+using RestoRate.RatingService.Application.Services;
 using RestoRate.RatingService.Application.Configurations;
 using RestoRate.RatingService.Domain.Interfaces;
 using RestoRate.RatingService.Domain.Services;
@@ -13,6 +14,8 @@ public static class ApplicationServiceExtensions
         services.AddMediatorConfigs();
 
         services.AddScoped<IReviewReferenceService, ReviewReferenceService>();
+        services.AddScoped<IRatingCalculatorService, RatingCalculatorService>();
+        services.AddScoped<IRatingProviderService, RatingProviderService>();
 
         return services;
     }

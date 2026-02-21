@@ -11,4 +11,5 @@ public interface IReviewReferenceRepository
 
     Task<decimal?> GetAverageRatingByRestaurantIdAsync(Guid restaurantId, bool approvedOnly = true, CancellationToken cancellationToken = default);
     Task<Money?> GetAverageCheckByRestaurantIdAsync(Guid restaurantId, bool approvedOnly = true, CancellationToken cancellationToken = default);
+    Task<int> GetReviewsCountByRestaurantIdAsync(Guid restaurantId, bool approvedOnly = true, CancellationToken cancellationToken = default);
 }

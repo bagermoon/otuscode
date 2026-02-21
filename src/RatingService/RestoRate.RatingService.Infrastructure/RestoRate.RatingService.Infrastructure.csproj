@@ -1,6 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="Aspire.StackExchange.Redis" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\RestoRate.Abstractions\RestoRate.Abstractions.csproj" />
     <ProjectReference Include="..\..\RestoRate.BuildingBlocks\RestoRate.BuildingBlocks.csproj" />
     <ProjectReference Include="..\RestoRate.RatingService.Domain\RestoRate.RatingService.Domain.csproj" />
