@@ -134,7 +134,7 @@ public class MongoUnitOfWork : IUnitOfWork
     {
         if (!HasPersistenceChanges()) return true;
 
-        var session = await _sessionHolder.GetSession(cancellationToken);
+        var session = await _sessionHolder.GetSessionAsync(cancellationToken);
         await SaveChangesAsync(session, cancellationToken);
         ClearSaved();
         return true;
