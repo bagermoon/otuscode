@@ -31,16 +31,4 @@ internal sealed class MongoContext(
     public void MarkDeleted<TAggregate>(TAggregate aggregate)
         where TAggregate : EntityBase<Guid>
         => unitOfWork.MarkDeleted(aggregate);
-
-    public Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default)
-        => unitOfWork.SaveEntitiesAsync(cancellationToken);
-
-    public Task<bool> SaveEntitiesAsync(
-        IClientSessionHandle session,
-        bool dispatchEvents = true,
-        CancellationToken cancellationToken = default)
-        => unitOfWork.SaveEntitiesAsync(session, dispatchEvents, cancellationToken);
-    
-    public Task FlushDomainEventsAsync(CancellationToken cancellationToken = default)
-        => unitOfWork.FlushDomainEventsAsync(cancellationToken);
 }

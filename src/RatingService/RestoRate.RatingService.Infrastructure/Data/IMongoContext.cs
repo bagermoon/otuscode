@@ -4,11 +4,9 @@ using MongoDB.Driver;
 
 namespace RestoRate.RatingService.Infrastructure.Data;
 
-public interface IMongoContext : IUnitOfWork
+public interface IMongoContext
 {
     IMongoCollection<T> Collection<T>() where T : class;
-
-    Task FlushDomainEventsAsync(CancellationToken cancellationToken = default);
 
     bool TryGet<TAggregate>(Guid id, out TAggregate aggregate)
         where TAggregate : EntityBase<Guid>;

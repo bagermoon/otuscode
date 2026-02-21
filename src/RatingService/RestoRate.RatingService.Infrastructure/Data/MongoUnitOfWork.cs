@@ -1,11 +1,12 @@
 using Ardalis.SharedKernel;
 
+using RestoRate.Abstractions.Persistence;
+
 using MongoDB.Driver;
 
 using Microsoft.Extensions.Logging;
 
 using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
 
 namespace RestoRate.RatingService.Infrastructure.Data;
 
@@ -25,25 +26,22 @@ public enum EntityState
 /// </summary>
 public class MongoUnitOfWork : IUnitOfWork
 {
-    // 0 = unknown, 1 = supported, -1 = not supported (e.g., standalone Mongo).
-    private static int _transactionsSupportedState;
-
-    private readonly IMongoDatabase _database;
     private readonly IDomainEventDispatcher _domainEventDispatcher;
     private readonly ILogger<MongoUnitOfWork> _logger;
     private readonly ReadOnlyDictionary<Type, IMongoAggregateWriter> _writers;
     private readonly Dictionary<string, TrackedEntity> _trackedEntities;
+    private readonly ISessionHolder _sessionHolder;
 
     public MongoUnitOfWork(
-        IMongoDatabase database,
         IEnumerable<IMongoAggregateWriter> writers,
+        ISessionHolder sessionHolder,
         IDomainEventDispatcher domainEventDispatcher,
         ILogger<MongoUnitOfWork> logger
     )
     {
-        _database = database;
         _domainEventDispatcher = domainEventDispatcher;
         _logger = logger;
+        _sessionHolder = sessionHolder;
         _writers = new ReadOnlyDictionary<Type, IMongoAggregateWriter>(
             (writers ?? throw new ArgumentNullException(nameof(writers)))
             .GroupBy(x => x.DocumentType)
@@ -126,40 +124,17 @@ public class MongoUnitOfWork : IUnitOfWork
         Attach(aggregate, EntityState.Deleted);
     }
 
-    public bool HasChanges() => _trackedEntities.Values.Any(x =>
-        x.State != EntityState.Unchanged || x.Aggregate.DomainEvents.Count > 0);
+    private bool HasPersistenceChanges() => _trackedEntities.Values.Any(x =>
+        x.State != EntityState.Unchanged);
+
+    private bool HasDomainEvents() => _trackedEntities.Values.Any(x =>
+        ((IHasDomainEvents)x.Aggregate).DomainEvents.Count > 0);
 
     public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default)
     {
-        if (!HasChanges()) return true;
+        if (!HasPersistenceChanges()) return true;
 
-        // If transactions are known to be unsupported (standalone Mongo), avoid creating sessions entirely.
-        if (Volatile.Read(ref _transactionsSupportedState) < 0)
-        {
-            return await SaveEntitiesWithoutSessionAsync(cancellationToken);
-        }
-
-        using var session = await _database.Client.StartSessionAsync(cancellationToken: cancellationToken);
-
-        return await SaveEntitiesWithManagedSessionAsync(session, cancellationToken);
-    }
-
-    public async Task<bool> SaveEntitiesAsync(
-        IClientSessionHandle session,
-        bool dispatchEvents = true,
-        CancellationToken cancellationToken = default)
-    {
-        ArgumentNullException.ThrowIfNull(session, nameof(session));
-        if (!HasChanges()) return true;
-
-        // External session is typically managed by the caller (e.g., MassTransit MongoDbContext.Session)
-        // and may already have an active transaction.
-        if (dispatchEvents)
-        {
-            return await SaveEntitiesWithExternalSessionAsync(session, cancellationToken);
-        }
-
-        // Persist only. Domain events should be flushed explicitly after the external transaction is committed.
+        var session = await _sessionHolder.GetSession(cancellationToken);
         await SaveChangesAsync(session, cancellationToken);
         ClearSaved();
         return true;
@@ -167,95 +142,13 @@ public class MongoUnitOfWork : IUnitOfWork
 
     public async Task FlushDomainEventsAsync(CancellationToken cancellationToken = default)
     {
-        var dispatched = await TryDispatchDomainEventsAsync(cancellationToken);
-        if (dispatched)
+        if (!HasDomainEvents())
         {
-            CleanupTombstones();
-        }
-    }
-
-    private async Task<bool> SaveEntitiesWithManagedSessionAsync(
-        [NotNull] IClientSessionHandle session,
-        CancellationToken cancellationToken)
-    {
-        if (session.IsInTransaction)
-        {
-            throw new InvalidOperationException(
-                "MongoUnitOfWork cannot manage a transaction for a session that is already in a transaction. " +
-                "Call SaveEntitiesAsync(session, ...) when the transaction is managed externally.");
+            return;
         }
 
-        try
-        {
-            var cachedState = Volatile.Read(ref _transactionsSupportedState);
-            if (cachedState < 0)
-            {
-                // Transactions are known to be unsupported. Avoid session usage entirely.
-                await SaveChangesAsync(session: null, cancellationToken);
-            }
-            else
-            {
-                // Try transaction first; on first unsupported error cache the result and fall back.
-                session.StartTransaction();
-                try
-                {
-                    await SaveChangesAsync(session, cancellationToken);
-                    await session.CommitTransactionAsync(cancellationToken);
-                    Interlocked.CompareExchange(ref _transactionsSupportedState, 1, 0);
-                }
-                catch (MongoException ex) when (IsTransactionNotSupported(ex))
-                {
-                    Volatile.Write(ref _transactionsSupportedState, -1);
-
-                    if (session.IsInTransaction)
-                    {
-                        await session.AbortTransactionAsync(cancellationToken);
-                    }
-
-                    await SaveChangesAsync(session: null, cancellationToken);
-                }
-            }
-
-            await AfterSavedAsync(cancellationToken);
-            return true;
-        }
-        catch (Exception)
-        {
-            if (session.IsInTransaction)
-            {
-                await session.AbortTransactionAsync(cancellationToken);
-            }
-            throw;
-        }
-    }
-
-    private async Task<bool> SaveEntitiesWithExternalSessionAsync(
-        [NotNull] IClientSessionHandle session,
-        CancellationToken cancellationToken)
-    {
-        // Caller manages the session/transaction (e.g., MassTransit transactional outbox).
-        await SaveChangesAsync(session, cancellationToken);
-        await AfterSavedAsync(cancellationToken);
-        return true;
-    }
-
-    private async Task<bool> SaveEntitiesWithoutSessionAsync(CancellationToken cancellationToken)
-    {
-        // Standalone Mongo: no sessions, no transactions.
-        await SaveChangesAsync(session: null, cancellationToken);
-        await AfterSavedAsync(cancellationToken);
-        return true;
-    }
-
-    private async Task AfterSavedAsync(CancellationToken cancellationToken)
-    {
-        var dispatched = await TryDispatchDomainEventsAsync(cancellationToken);
-        ClearSaved();
-
-        if (dispatched)
-        {
-            CleanupTombstones();
-        }
+        await DispatchDomainEventsAsync(cancellationToken);
+        CleanupTombstones();
     }
 
     private async Task SaveChangesAsync(IClientSessionHandle? session, CancellationToken cancellationToken)
@@ -293,7 +186,7 @@ public class MongoUnitOfWork : IUnitOfWork
         }
     }
 
-    private async Task<bool> TryDispatchDomainEventsAsync(CancellationToken cancellationToken)
+    private async Task DispatchDomainEventsAsync(CancellationToken cancellationToken)
     {
         var entitiesWithEvents = _trackedEntities.Values
             .Select(x => (IHasDomainEvents)x.Aggregate)
@@ -302,19 +195,17 @@ public class MongoUnitOfWork : IUnitOfWork
 
         if (entitiesWithEvents.Count == 0)
         {
-            return false;
+            return;
         }
 
         try
         {
             await _domainEventDispatcher.DispatchAndClearEvents(entitiesWithEvents);
-            return true;
         }
         catch (Exception ex)
         {
-            // Best-effort: persistence may have succeeded; allow retry of dispatch.
             MongoUnitOfWorkLogger.LogDomainEventsDispatchFailed(_logger, ex);
-            return false;
+            throw;
         }
     }
 
@@ -388,13 +279,5 @@ public class MongoUnitOfWork : IUnitOfWork
                 $"No IMongoAggregateWriter registered for aggregate type '{aggregateType.FullName}'.");
     }
 
-    private static bool IsTransactionNotSupported(MongoException ex)
-    {
-        // Common server message when MongoDB is not a replica set / mongos.
-        var msg = ex.Message ?? string.Empty;
-        return msg.Contains("Transaction numbers are only allowed", StringComparison.OrdinalIgnoreCase)
-            || msg.Contains("replica set", StringComparison.OrdinalIgnoreCase)
-            || msg.Contains("mongos", StringComparison.OrdinalIgnoreCase);
-    }
 }
 
