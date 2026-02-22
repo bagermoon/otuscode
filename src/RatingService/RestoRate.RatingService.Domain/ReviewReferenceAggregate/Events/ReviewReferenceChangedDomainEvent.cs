@@ -8,4 +8,5 @@ public sealed class ReviewReferenceChangedDomainEvent(ReviewReference reviewRefe
 
     public Guid ReviewId => ReviewReference.Id;
     public Guid RestaurantId => ReviewReference.RestaurantId;
+    public bool IsApproved => ReviewReference.IsApproved;
 }

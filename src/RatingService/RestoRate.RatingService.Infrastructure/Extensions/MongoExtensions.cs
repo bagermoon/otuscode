@@ -26,7 +26,7 @@ public static class MongoExtensions
         services.TryAddScoped<MongoUnitOfWork>();
         services.TryAddScoped<ISessionHolder, EmptySessionHolder>();
         services.TryAddScoped<ISessionContext>(sp => sp.GetRequiredService<ISessionHolder>());
-        services.TryAddScoped<IMongoCollectionProvider, DiMongoCollectionProvider>();
+        services.TryAddTransient<IMongoCollectionProvider, DiMongoCollectionProvider>();
         services.TryAddScoped(typeof(IMongoContext), typeof(TContext));
         services.TryAddScoped<IUnitOfWork>(sp => sp.GetRequiredService<MongoUnitOfWork>());
 

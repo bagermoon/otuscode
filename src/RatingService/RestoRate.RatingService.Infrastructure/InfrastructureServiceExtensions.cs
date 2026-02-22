@@ -30,8 +30,9 @@ public static class InfrastructureServiceExtensions
         AddMongoDbServices(builder);
         AddRedis(builder);
 
-        builder.Services.TryAddScoped<IReviewReferenceRepository, ReviewReferenceRepository>();
-        builder.Services.TryAddScoped<IRestaurantRatingCache, RedisRestaurantRatingCache>();
+        builder.Services.TryAddTransient<IReviewReferenceRepository, ReviewReferenceRepository>();
+        builder.Services.TryAddTransient<IRestaurantRatingCache, RedisRestaurantRatingCache>();
+        builder.Services.TryAddTransient<IRatingRecalculationDebouncer, RedisRatingRecalculationDebouncer>();
 
         return builder;
     }

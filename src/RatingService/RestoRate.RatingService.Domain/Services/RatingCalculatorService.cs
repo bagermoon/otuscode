@@ -1,3 +1,5 @@
+using NodaMoney;
+
 using RestoRate.RatingService.Domain.Interfaces;
 using RestoRate.RatingService.Domain.Models;
 
@@ -5,57 +7,34 @@ namespace RestoRate.RatingService.Domain.Services;
 
 public sealed class RatingCalculatorService(IReviewReferenceRepository repository) : IRatingCalculatorService
 {
-    public async Task<RestaurantRatingSnapshot> CalculateAsync(Guid restaurantId, CancellationToken cancellationToken = default)
+    public async Task<RestaurantRatingSnapshot> CalculateAsync(Guid restaurantId, bool approvedOnly, CancellationToken cancellationToken = default)
     {
         var approvedAvgRatingTask = repository.GetAverageRatingByRestaurantIdAsync(
             restaurantId,
-            approvedOnly: true,
+            approvedOnly,
             cancellationToken);
         var approvedCountTask = repository.GetReviewsCountByRestaurantIdAsync(
             restaurantId,
-            approvedOnly: true,
+            approvedOnly,
             cancellationToken);
         var approvedAvgCheckTask = repository.GetAverageCheckByRestaurantIdAsync(
             restaurantId,
-            approvedOnly: true,
-            cancellationToken);
-
-        var provisionalAvgRatingTask = repository.GetAverageRatingByRestaurantIdAsync(
-            restaurantId,
-            approvedOnly: false,
-            cancellationToken);
-        var provisionalCountTask = repository.GetReviewsCountByRestaurantIdAsync(
-            restaurantId,
-            approvedOnly: false,
-            cancellationToken);
-        var provisionalAvgCheckTask = repository.GetAverageCheckByRestaurantIdAsync(
-            restaurantId,
-            approvedOnly: false,
+            approvedOnly,
             cancellationToken);
 
         await Task.WhenAll(
             approvedAvgRatingTask,
             approvedCountTask,
-            approvedAvgCheckTask,
-            provisionalAvgRatingTask,
-            provisionalCountTask,
-            provisionalAvgCheckTask);
+            approvedAvgCheckTask);
 
         var approvedAverageRating = approvedAvgRatingTask.Result ?? 0m;
         var approvedReviewsCount = approvedCountTask.Result;
-        var approvedAverageCheck = approvedAvgCheckTask.Result;
-
-        var provisionalAverageRating = provisionalAvgRatingTask.Result ?? 0m;
-        var provisionalReviewsCount = provisionalCountTask.Result;
-        var provisionalAverageCheck = provisionalAvgCheckTask.Result;
+        var approvedAverageCheck = approvedAvgCheckTask.Result ?? Money.Zero;
 
         return new RestaurantRatingSnapshot(
             RestaurantId: restaurantId,
-            ApprovedAverageRating: approvedAverageRating,
-            ApprovedReviewsCount: approvedReviewsCount,
-            ApprovedAverageCheck: approvedAverageCheck,
-            ProvisionalAverageRating: provisionalAverageRating,
-            ProvisionalReviewsCount: provisionalReviewsCount,
-            ProvisionalAverageCheck: provisionalAverageCheck);
+            AverageRating: approvedAverageRating,
+            ReviewsCount: approvedReviewsCount,
+            AverageCheck: approvedAverageCheck);
     }
 }

@@ -1,8 +1,11 @@
 using RestoRate.ServiceDefaults;
-using StackExchange.Redis;
 using RestoRate.ServiceDefaults.EndpointFilters;
 using RestoRate.Auth.OpenApi;
+using RestoRate.Auth.Authorization;
 using RestoRate.RatingService.Api;
+using RestoRate.RatingService.Application.Services;
+
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,14 +42,15 @@ app.MapDefaultEndpoints();
 var api = app.MapGroup("/")
     .AddEndpointFilter<ResultEndpointFilter>();
 
-api.MapGet("/redis-test", async (IConnectionMultiplexer connectionMux, CancellationToken cancellationToken) =>
-{
-    await connectionMux.GetDatabase().StringSetAsync("lastForecastGenerated", DateTime.UtcNow.ToString("o"));
-    var result = await connectionMux.GetDatabase().StringGetAsync("lastForecastGenerated");
-
-    return result;
-})
-.WithName("redis-test");
+api.MapGroup("/ratings")
+    .WithTags("Ratings")
+    .RequireAuthorization(PolicyNames.RequireAdminRole)
+    .MapGet("/{restaurantId:guid}", async (
+        Guid restaurantId,
+        [FromServices] IRatingProviderService ratingProviderService,
+        CancellationToken cancellationToken) =>
+        await ratingProviderService.GetRatingAsync(restaurantId, cancellationToken))
+    .WithName("GetRestaurantRating");
 
 app.Run();
 

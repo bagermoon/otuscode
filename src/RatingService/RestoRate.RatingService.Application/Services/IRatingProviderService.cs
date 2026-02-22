@@ -1,9 +1,8 @@
-using RestoRate.RatingService.Domain.Models;
+using RestoRate.RatingService.Application.Models;
 
 namespace RestoRate.RatingService.Application.Services;
 
 public interface IRatingProviderService
 {
-    Task<RestaurantRatingSnapshot> GetRatingAsync(Guid restaurantId, CancellationToken cancellationToken = default);
-    Task<RestaurantRatingSnapshot> RefreshRatingAsync(Guid restaurantId, CancellationToken cancellationToken = default);
+    Task<RatingRecalculationResult> GetRatingAsync(Guid restaurantId, CancellationToken cancellationToken = default);
 }

@@ -4,5 +4,5 @@ namespace RestoRate.RatingService.Domain.Services;
 
 public interface IRatingCalculatorService
 {
-	Task<RestaurantRatingSnapshot> CalculateAsync(Guid restaurantId, CancellationToken cancellationToken = default);
+	Task<RestaurantRatingSnapshot> CalculateAsync(Guid restaurantId, bool approvedOnly, CancellationToken cancellationToken = default);
 }

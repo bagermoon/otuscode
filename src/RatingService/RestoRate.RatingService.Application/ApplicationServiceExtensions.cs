@@ -13,9 +13,10 @@ public static class ApplicationServiceExtensions
     {
         services.AddMediatorConfigs();
 
-        services.AddScoped<IReviewReferenceService, ReviewReferenceService>();
-        services.AddScoped<IRatingCalculatorService, RatingCalculatorService>();
-        services.AddScoped<IRatingProviderService, RatingProviderService>();
+        services.AddTransient<IReviewReferenceService, ReviewReferenceService>();
+        services.AddTransient<IRatingCalculatorService, RatingCalculatorService>();
+        services.AddTransient<IRatingProviderService, RatingProviderService>();
+        services.AddTransient<IStatsCalculator, StatsCalculator>();
 
         return services;
     }
