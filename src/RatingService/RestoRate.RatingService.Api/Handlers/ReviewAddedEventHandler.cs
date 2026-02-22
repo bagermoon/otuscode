@@ -3,7 +3,7 @@ using MassTransit;
 using Mediator;
 
 using RestoRate.Contracts.Review.Events;
-using RestoRate.RatingService.Api.Mappings;
+using RestoRate.RatingService.Application.Mappings;
 using RestoRate.RatingService.Application.UseCases.Review.Add;
 
 namespace RestoRate.RatingService.Api.Handlers;
