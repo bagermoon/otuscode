@@ -1,11 +1,8 @@
 using RestoRate.ServiceDefaults;
 using RestoRate.ServiceDefaults.EndpointFilters;
 using RestoRate.Auth.OpenApi;
-using RestoRate.Auth.Authorization;
 using RestoRate.RatingService.Api;
-using RestoRate.RatingService.Application.Services;
-
-using Microsoft.AspNetCore.Mvc;
+using RestoRate.RatingService.Api.Endpoints.Ratings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,15 +39,11 @@ app.MapDefaultEndpoints();
 var api = app.MapGroup("/")
     .AddEndpointFilter<ResultEndpointFilter>();
 
-api.MapGroup("/ratings")
+api
+    .MapGroup("/ratings")
     .WithTags("Ratings")
-    .RequireAuthorization(PolicyNames.RequireAdminRole)
-    .MapGet("/{restaurantId:guid}", async (
-        Guid restaurantId,
-        [FromServices] IRatingProviderService ratingProviderService,
-        CancellationToken cancellationToken) =>
-        await ratingProviderService.GetRatingAsync(restaurantId, cancellationToken))
-    .WithName("GetRestaurantRating");
+    .RequireAuthorization()
+    .MapRatingsEndpoints();
 
 app.Run();
 

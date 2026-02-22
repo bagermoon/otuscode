@@ -1,3 +1,4 @@
+using RestoRate.Contracts.Rating.Dtos;
 using RestoRate.Contracts.Rating.Events;
 using RestoRate.RatingService.Application.Models;
 
@@ -11,6 +12,21 @@ public static class RatingRecalculationResultMapper
         var provisional = result.Provisional;
 
         return new RestaurantRatingRecalculatedEvent(
+            RestaurantId: approved.RestaurantId,
+            ApprovedAverageRating: approved.AverageRating,
+            ApprovedReviewsCount: approved.ReviewsCount,
+            ApprovedAverageCheck: approved.AverageCheck.ToDto(),
+            ProvisionalAverageRating: provisional.AverageRating,
+            ProvisionalReviewsCount: provisional.ReviewsCount,
+            ProvisionalAverageCheck: provisional.AverageCheck.ToDto());
+    }
+
+    public static RestaurantRatingDto ToDto(this RatingRecalculationResult result)
+    {
+        var approved = result.Approved;
+        var provisional = result.Provisional;
+
+        return new RestaurantRatingDto(
             RestaurantId: approved.RestaurantId,
             ApprovedAverageRating: approved.AverageRating,
             ApprovedReviewsCount: approved.ReviewsCount,
