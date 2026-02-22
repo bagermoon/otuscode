@@ -1,50 +1,36 @@
 using Microsoft.Extensions.Logging;
 
+using RestoRate.RatingService.Application.Models;
 using RestoRate.RatingService.Domain.Interfaces;
-using RestoRate.RatingService.Domain.Models;
-using RestoRate.RatingService.Domain.Services;
 
 namespace RestoRate.RatingService.Application.Services;
 
 public sealed class RatingProviderService(
     IRestaurantRatingCache ratingCache,
-    IRatingCalculatorService ratingCalculator,
-    ILogger<RatingProviderService> logger)
+    IStatsCalculator statsCalculator)
     : IRatingProviderService
 {
-    public async Task<RestaurantRatingSnapshot> GetRatingAsync(Guid restaurantId, CancellationToken cancellationToken = default)
+    public async Task<RatingRecalculationResult> GetRatingAsync(
+        Guid restaurantId,
+        CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var cached = await ratingCache.GetAsync(restaurantId, cancellationToken);
-            if (cached is not null)
-            {
-                return cached;
-            }
-        }
-        catch (Exception ex)
-        {
-            // Cache is a derived read model; do not fail reads because Redis is down.
-            logger.LogWarning(ex, "Failed to read rating cache for restaurant {RestaurantId}", restaurantId);
-        }
+        var approvedSnapshot = await ratingCache.GetAsync(restaurantId, approvedOnly: true, cancellationToken);
+        var provisionalSnapshot = await ratingCache.GetAsync(restaurantId, approvedOnly: false, cancellationToken);
 
-        return await RefreshRatingAsync(restaurantId, cancellationToken);
-    }
-
-    public async Task<RestaurantRatingSnapshot> RefreshRatingAsync(Guid restaurantId, CancellationToken cancellationToken = default)
-    {
-        var snapshot = await ratingCalculator.CalculateAsync(restaurantId, cancellationToken);
-
-        try
+        if (approvedSnapshot is null || provisionalSnapshot is null)
         {
-            await ratingCache.SetAsync(snapshot, cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            // Cache is best-effort; return computed snapshot anyway.
-            logger.LogWarning(ex, "Failed to update rating cache for restaurant {RestaurantId}", restaurantId);
+            var recalculated = await statsCalculator.RecalculateAsync(
+                restaurantId,
+                requestedApprovedOnly: false,
+                cancellationToken);
+
+            approvedSnapshot = recalculated.Approved;
+            provisionalSnapshot = recalculated.Provisional;
         }
 
-        return snapshot;
+        return new RatingRecalculationResult(
+                Approved: approvedSnapshot,
+                Provisional: provisionalSnapshot
+        );
     }
 }

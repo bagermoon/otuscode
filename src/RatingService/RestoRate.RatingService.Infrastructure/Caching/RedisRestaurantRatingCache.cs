@@ -15,6 +15,8 @@ internal sealed class RedisRestaurantRatingCache(
     : IRestaurantRatingCache
 {
     private const string KeyPrefix = "rating:restaurant:";
+    private const string ApprovedSuffix = ":approved";
+    private const string ProvisionalSuffix = ":provisional";
 
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
@@ -23,10 +25,13 @@ internal sealed class RedisRestaurantRatingCache(
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
-    public async Task<RestaurantRatingSnapshot?> GetAsync(Guid restaurantId, CancellationToken cancellationToken = default)
+    public async Task<RestaurantRatingSnapshot?> GetAsync(
+        Guid restaurantId,
+        bool approvedOnly,
+        CancellationToken cancellationToken = default)
     {
         var db = redis.GetDatabase();
-        var key = new RedisKey($"{KeyPrefix}{restaurantId}");
+        var key = BuildKey(restaurantId, approvedOnly);
 
         var raw = await db.StringGetAsync(key).WaitAsync(cancellationToken);
         if (raw.IsNullOrEmpty)
@@ -34,10 +39,10 @@ internal sealed class RedisRestaurantRatingCache(
             return null;
         }
 
-        RestaurantRatingCacheDto? dto;
+        RestaurantRatingSnapshotCacheDto? dto;
         try
         {
-            dto = JsonSerializer.Deserialize<RestaurantRatingCacheDto>(raw!, SerializerOptions);
+            dto = JsonSerializer.Deserialize<RestaurantRatingSnapshotCacheDto>(raw!, SerializerOptions);
         }
         catch
         {
@@ -49,44 +54,40 @@ internal sealed class RedisRestaurantRatingCache(
             return null;
         }
 
+        var averageCheck = FromCachedMoney(dto.AverageCheck);
+
         return new RestaurantRatingSnapshot(
             RestaurantId: dto.RestaurantId,
-            ApprovedAverageRating: dto.ApprovedAverageRating,
-            ApprovedReviewsCount: dto.ApprovedReviewsCount,
-            ApprovedAverageCheck: FromCachedMoney(dto.ApprovedAverageCheck),
-            ProvisionalAverageRating: dto.ProvisionalAverageRating,
-            ProvisionalReviewsCount: dto.ProvisionalReviewsCount,
-            ProvisionalAverageCheck: FromCachedMoney(dto.ProvisionalAverageCheck)
-        );
+            AverageRating: dto.AverageRating,
+            ReviewsCount: dto.ReviewsCount,
+            AverageCheck: averageCheck);
     }
 
-    public async Task SetAsync(RestaurantRatingSnapshot snapshot, CancellationToken cancellationToken = default)
+    public async Task SetAsync(
+        RestaurantRatingSnapshot snapshot,
+        bool approvedOnly,
+        CancellationToken cancellationToken = default)
     {
         var db = redis.GetDatabase();
 
-        var dto = new RestaurantRatingCacheDto(
+        var dto = new RestaurantRatingSnapshotCacheDto(
             RestaurantId: snapshot.RestaurantId,
-            ApprovedAverageRating: snapshot.ApprovedAverageRating,
-            ApprovedReviewsCount: snapshot.ApprovedReviewsCount,
-            ApprovedAverageCheck: ToCachedMoney(snapshot.ApprovedAverageCheck),
-            ProvisionalAverageRating: snapshot.ProvisionalAverageRating,
-            ProvisionalReviewsCount: snapshot.ProvisionalReviewsCount,
-            ProvisionalAverageCheck: ToCachedMoney(snapshot.ProvisionalAverageCheck),
+            AverageRating: snapshot.AverageRating,
+            ReviewsCount: snapshot.ReviewsCount,
+            AverageCheck: ToCachedMoney(snapshot.AverageCheck),
             UpdatedAtUtc: DateTimeOffset.UtcNow);
 
         var json = JsonSerializer.Serialize(dto, SerializerOptions);
 
-        var key = new RedisKey($"{KeyPrefix}{snapshot.RestaurantId}");
+        var key = BuildKey(snapshot.RestaurantId, approvedOnly);
         await db.StringSetAsync(key, json).WaitAsync(cancellationToken);
     }
 
-    private static Money? FromCachedMoney(CachedMoney? money)
-    {
-        if (money is null)
-        {
-            return null;
-        }
+    private static RedisKey BuildKey(Guid restaurantId, bool approvedOnly)
+        => new($"{KeyPrefix}{restaurantId}{(approvedOnly ? ApprovedSuffix : ProvisionalSuffix)}");
 
+    private static Money FromCachedMoney(CachedMoney money)
+    {
         try
         {
             var currency = Currency.FromCode(money.Currency);
@@ -94,22 +95,18 @@ internal sealed class RedisRestaurantRatingCache(
         }
         catch
         {
-            return null;
+            return Money.Zero;
         }
     }
 
-    private static CachedMoney? ToCachedMoney(Money? money) => money is null
-                    ? null
-                    : new CachedMoney(money.Value.Amount, money.Value.Currency.Code);
+    private static CachedMoney ToCachedMoney(Money money)
+        => new(money.Amount, money.Currency.Code);
 
-    private sealed record RestaurantRatingCacheDto(
+    private sealed record RestaurantRatingSnapshotCacheDto(
         Guid RestaurantId,
-        decimal ApprovedAverageRating,
-        int ApprovedReviewsCount,
-        CachedMoney? ApprovedAverageCheck,
-        decimal ProvisionalAverageRating,
-        int ProvisionalReviewsCount,
-        CachedMoney? ProvisionalAverageCheck,
+        decimal AverageRating,
+        int ReviewsCount,
+        CachedMoney AverageCheck,
         DateTimeOffset UpdatedAtUtc);
 
     private sealed record CachedMoney(decimal Amount, string Currency);
