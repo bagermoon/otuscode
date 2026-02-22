@@ -14,7 +14,6 @@ using MongoDB.Driver;
 using RestoRate.Abstractions.Persistence;
 using RestoRate.RatingService.Infrastructure.Configuration;
 using RestoRate.RatingService.Infrastructure.Data;
-using RestoRate.SharedKernel;
 
 namespace RestoRate.RatingService.Infrastructure.Extensions;
 

@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using MongoDB.Driver;
 
 using RestoRate.BuildingBlocks.Messaging;
+using RestoRate.BuildingBlocks.Serialization;
 using RestoRate.RatingService.Domain.Interfaces;
 using RestoRate.RatingService.Infrastructure.Caching;
 using RestoRate.RatingService.Infrastructure.Data;
@@ -40,6 +41,7 @@ public static class InfrastructureServiceExtensions
     private static IHostApplicationBuilder AddMongoDbServices(
         this IHostApplicationBuilder builder)
     {
+        CommonSerializers.EnsureRegistered();
         builder.AddMongoDBClient(AppHostProjects.RatingDb);
         string databaseName = builder.Configuration.GetValue<string>("MONGODB_DATABASENAME") ?? "ratingdb";
 

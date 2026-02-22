@@ -3,7 +3,6 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 
-using RestoRate.BuildingBlocks.Serialization;
 using RestoRate.RatingService.Domain.ReviewReferenceAggregate;
 
 namespace RestoRate.RatingService.Infrastructure.Configuration;
@@ -11,8 +10,6 @@ internal sealed class ReviewConfiguration : IMongoCollectionConfiguration<Review
 {
     public void Configure(IMongoCollection<ReviewReference> collection)
     {
-        MoneyBsonSerializer.EnsureRegistered();
-
         if (!BsonClassMap.IsClassMapRegistered(typeof(ReviewReference)))
         {
             BsonClassMap.RegisterClassMap<ReviewReference>(cfg =>

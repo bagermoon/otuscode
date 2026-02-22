@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using RestoRate.Abstractions.Mediation.Behaviors;
 using RestoRate.RatingService.Application.Behaviors;
+using RestoRate.RatingService.Domain.ReviewReferenceAggregate;
 
 namespace RestoRate.RatingService.Application.Configurations;
 
@@ -17,6 +18,7 @@ internal static class MediatorConfigs
             options.Namespace = "RestoRate.RatingService.Application";
             options.ServiceLifetime = ServiceLifetime.Scoped;
             options.Assemblies = [
+                typeof(ReviewReference),
                 typeof(ApplicationServiceExtensions)
             ];
             options.PipelineBehaviors = [

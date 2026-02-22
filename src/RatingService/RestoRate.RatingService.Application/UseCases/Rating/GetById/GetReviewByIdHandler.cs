@@ -9,7 +9,7 @@ using RestoRate.RatingService.Application.Services;
 namespace RestoRate.RatingService.Application.UseCases.Ratings.GetById;
 
 public sealed class GetRatingByIdHandler(
-    RatingProviderService ratingProvider)
+    IRatingProviderService ratingProvider)
     : IQueryHandler<GetRatingByIdQuery, Result<RestaurantRatingDto>>
 {
     public async ValueTask<Result<RestaurantRatingDto>> Handle(GetRatingByIdQuery request, CancellationToken cancellationToken)
