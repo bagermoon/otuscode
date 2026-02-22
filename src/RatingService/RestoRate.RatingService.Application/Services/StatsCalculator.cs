@@ -62,7 +62,7 @@ public sealed class StatsCalculator(
         catch (Exception ex)
         {
             // Fail-open: if Redis is down, compute immediately (no debounce).
-            logger.LogWarning(ex, "Failed to debounce rating recalculation for restaurant {RestaurantId}", restaurantId);
+            logger.FailedToDebounce(ex, restaurantId);
             return true;
         }
     }
@@ -78,7 +78,7 @@ public sealed class StatsCalculator(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Failed to read rating cache for restaurant {RestaurantId}", restaurantId);
+            logger.FailedToReadCache(ex, restaurantId);
             return null;
         }
     }
@@ -94,7 +94,7 @@ public sealed class StatsCalculator(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Failed to update rating cache for restaurant {RestaurantId}", snapshot.RestaurantId);
+            logger.FailedToUpdateCache(ex, snapshot.RestaurantId);
         }
     }
 }
