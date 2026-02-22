@@ -17,6 +17,18 @@ builder.Services.AddOptions<KeycloakSettingsOptions>()
 
 builder.AddGatewayJwtAuthentication(AppHostProjects.Keycloak);
 
+builder.AddRedisOutputCache(AppHostProjects.RedisCache);
+
+builder.Services.AddOutputCache(options =>
+{
+    options.AddPolicy("GatewayPublicCache", builder =>
+    {
+        builder.Expire(TimeSpan.FromMinutes(5));
+        builder.SetVaryByQuery("pageNumber", "pageSize", "searchTerm", "cuisineType", "tag");
+        builder.With(c => true);
+    });
+});
+
 builder.Services
     .AddServiceDiscovery()
     .AddHttpForwarderWithServiceDiscovery()
@@ -27,6 +39,21 @@ builder.Services.AddAuthorizationBuilder()
     .AddDefaultAuthenticationPolicy();
 
 var app = builder.Build();
+
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path.StartsWithSegments("/api/restaurants") &&
+        context.Request.Method == HttpMethods.Get)
+    {
+        context.Request.Headers.Remove("Cache-Control");
+        context.Request.Headers.Remove("Pragma");
+        context.Request.Headers.Remove("Authorization");
+        context.Request.Headers.Remove("Cookie");
+    }
+    await next();
+});
+
+app.UseOutputCache();
 
 // Ensure authentication/authorization run before proxying
 app.UseAuthentication();

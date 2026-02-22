@@ -55,9 +55,13 @@ public static class AppHostResourceExtensions
     }
 
     public static IResourceBuilder<RedisResource> AddRedisResource(
-        this IDistributedApplicationBuilder builder, RedisConfig config, bool useVolumes, bool useDedicatedPorts)
+        this IDistributedApplicationBuilder builder,
+        string name,
+        RedisConfig config,
+        bool useVolumes,
+        bool useDedicatedPorts)
     {
-        var redis = builder.AddRedis("redis",
+        var redis = builder.AddRedis(name,
             port: useDedicatedPorts ? 6380 : null)
             .WithImageTag(config.ImageTag)
             .WithLifetime(config.LifetimePersistent ? ContainerLifetime.Persistent : ContainerLifetime.Session);
