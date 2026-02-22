@@ -18,4 +18,12 @@ public static class ContainerConfigurationHelpers
             ["Aspire:MongoDB:Driver:DisableTracing"] = true.ToString(),
             [$"ConnectionStrings:{connectionName}"] = connectionString,
         };
+
+    public static IEnumerable<KeyValuePair<string, string?>> GetRedisConfiguration(string connectionString, string connectionName)
+        => new Dictionary<string, string?>
+        {
+            ["Aspire:StackExchange:Redis:DisableHealthChecks"] = true.ToString(),
+            ["Aspire:StackExchange:Redis:DisableTracing"] = true.ToString(),
+            [$"ConnectionStrings:{connectionName}"] = connectionString,
+        };
 }

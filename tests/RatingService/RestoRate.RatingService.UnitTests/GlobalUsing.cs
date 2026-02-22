@@ -1,0 +1,1 @@
+global using RestoRate.RatingService.Domain.ReviewReferenceAggregate;
