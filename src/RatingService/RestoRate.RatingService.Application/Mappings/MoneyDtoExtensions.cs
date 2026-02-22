@@ -2,7 +2,7 @@ using NodaMoney;
 
 using RestoRate.Contracts.Common.Dtos;
 
-namespace RestoRate.RatingService.Api.Mappings;
+namespace RestoRate.RatingService.Application.Mappings;
 
 public static class MoneyDtoExtensions
 {
