@@ -30,8 +30,7 @@ public sealed class ReviewEventsFlowTests : IClassFixture<RatingWebApplicationFa
     public async ValueTask InitializeAsync()
     {
         Harness = _factory.Services.GetRequiredService<ITestHarness>();
-        await Harness.Stop(CancellationToken);
-        await Harness.Start();
+        await Harness.RestartHostedServices(CancellationToken);
     }
     public async ValueTask DisposeAsync()
     {

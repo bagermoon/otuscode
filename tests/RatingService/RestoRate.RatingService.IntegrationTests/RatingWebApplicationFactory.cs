@@ -42,8 +42,6 @@ public class RatingWebApplicationFactory
                 )
             );
 
-            // Ensure MassTransit uses in-memory transport in tests, even if CI/environment
-            // provides a RabbitMQ connection string.
             config.AddInMemoryCollection(new Dictionary<string, string?>
             {
                 [$"ConnectionStrings:{AppHostProjects.RabbitMQ}"] = string.Empty,
@@ -66,6 +64,9 @@ public class RatingWebApplicationFactory
             logging.ClearProviders();
         });
 
-        builder.AddMassTransitInMemoryTestHarness();
+        builder.AddMassTransitInMemoryTestHarness((cfg) =>
+        {
+            cfg.SetTestTimeouts(testInactivityTimeout: TimeSpan.FromSeconds(15));
+        });
     }
 }
