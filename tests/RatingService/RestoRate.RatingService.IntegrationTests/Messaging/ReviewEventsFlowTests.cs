@@ -30,7 +30,8 @@ public sealed class ReviewEventsFlowTests : IClassFixture<RatingWebApplicationFa
     public async ValueTask InitializeAsync()
     {
         Harness = _factory.Services.GetRequiredService<ITestHarness>();
-        await Harness.RestartHostedServices(CancellationToken);
+        await Harness.Stop(CancellationToken);
+        await Harness.Start();
     }
     public async ValueTask DisposeAsync()
     {
@@ -69,7 +70,9 @@ public sealed class ReviewEventsFlowTests : IClassFixture<RatingWebApplicationFa
         // Rating event should be published; approved should be zero, provisional should reflect the unapproved review
         (await Harness.Published.Any<RestaurantRatingRecalculatedEvent>(CancellationToken)).Should().BeTrue();
 
-        var published = Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken).Last().Context.Message;
+        var published = Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken)
+            .Last(x => x.Context.Message.RestaurantId == restaurantId)
+            .Context.Message;
         published.RestaurantId.Should().Be(restaurantId);
         published.ApprovedReviewsCount.Should().Be(0);
         published.ApprovedAverageRating.Should().Be(0m);
@@ -125,7 +128,9 @@ public sealed class ReviewEventsFlowTests : IClassFixture<RatingWebApplicationFa
             Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken).Count().Should().BeGreaterThanOrEqualTo(2);
         }, timeout: TimeSpan.FromSeconds(5));
 
-        var last = Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken).Last().Context.Message;
+        var last = Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken)
+            .Last(x => x.Context.Message.RestaurantId == restaurantId)
+            .Context.Message;
         last.RestaurantId.Should().Be(restaurantId);
         last.ApprovedReviewsCount.Should().Be(1);
         last.ApprovedAverageRating.Should().Be(5.0m);
@@ -172,7 +177,9 @@ public sealed class ReviewEventsFlowTests : IClassFixture<RatingWebApplicationFa
             Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken).Count().Should().BeGreaterThanOrEqualTo(2);
         }, timeout: TimeSpan.FromSeconds(5));
 
-        var last = Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken).Last().Context.Message;
+        var last = Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken)
+            .Last(x => x.Context.Message.RestaurantId == restaurantId)
+            .Context.Message;
         last.RestaurantId.Should().Be(restaurantId);
         last.ProvisionalReviewsCount.Should().Be(0);
         last.ApprovedReviewsCount.Should().Be(0);

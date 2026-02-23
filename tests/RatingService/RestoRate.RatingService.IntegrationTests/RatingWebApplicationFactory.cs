@@ -42,6 +42,13 @@ public class RatingWebApplicationFactory
                 )
             );
 
+            // Ensure MassTransit uses in-memory transport in tests, even if CI/environment
+            // provides a RabbitMQ connection string.
+            config.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                [$"ConnectionStrings:{AppHostProjects.RabbitMQ}"] = string.Empty,
+            });
+
             config.AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["MassTransit:UseMongoDbSagaOutbox"] = "false",
