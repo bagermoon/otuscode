@@ -26,7 +26,7 @@ var restaurantDb = postgres.AddDatabase(AppHostProjects.RestaurantDb, "Restauran
 var mongo = builder.AddMongoResource(appHostConfig.Mongo, useVolumes, useDedicatedPorts);
 
 // Redis resource setup via extension method
-var redisCache = builder.AddRedisResource(appHostConfig.Redis, useVolumes, useDedicatedPorts);
+var redisCache = builder.AddRedisResource(AppHostProjects.RedisCache, appHostConfig.Redis, useVolumes, useDedicatedPorts);
 
 // Keycloak resource setup via extension method
 var keycloakRealm = builder.AddParameter("keycloak-realm", value: "restorate", publishValueAsDefault: true);
@@ -54,7 +54,8 @@ var restaurantApi = builder.AddProject<RestoRate_RestaurantService_Api>(AppHostP
     .WithReference(keycloak)
     .WithReference(restaurantDb)
     .WithReference(rabbitmq)
-    .WaitFor(keycloak).WaitFor(migrations)
+    .WaitFor(keycloak)
+    .WaitFor(migrations)
     .WithEnvironment("KeycloakSettings__Audience", restaurantApiBearerAudience)
     .WithEnvironment("KeycloakSettings__Realm", keycloakRealm);
 
@@ -125,6 +126,8 @@ var gatewayAudience = builder.AddParameter("gateway-bearer-audience", value: "re
 var gateway = builder.AddProject<RestoRate_Gateway>(AppHostProjects.Gateway)
     .WithReference(keycloak)
     .WaitFor(keycloak)
+    .WithReference(redisCache)
+    .WaitFor(redisCache)
     .WithReference(restaurantApi)
     .WithReference(moderationApi)
     .WithReference(ratingApi)

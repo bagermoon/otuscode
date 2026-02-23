@@ -2,6 +2,7 @@ using RestoRate.ServiceDefaults;
 using RestoRate.Auth.Authentication;
 using RestoRate.Auth.Authorization;
 using RestoRate.Gateway.Configurations;
+using RestoRate.Gateway.OutputCaching;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,13 @@ builder.Services.AddOptions<KeycloakSettingsOptions>()
 
 builder.AddGatewayJwtAuthentication(AppHostProjects.Keycloak);
 
+builder.AddRedisOutputCache(AppHostProjects.RedisCache);
+
+builder.Services.AddOutputCache(options =>
+{
+    options.AddPolicy("RestaurantsAuthenticatedOutputCachePolicy", new RestaurantsAuthenticatedOutputCachePolicy(5));
+});
+
 builder.Services
     .AddServiceDiscovery()
     .AddHttpForwarderWithServiceDiscovery()
@@ -28,11 +36,15 @@ builder.Services.AddAuthorizationBuilder()
 
 var app = builder.Build();
 
-// Ensure authentication/authorization run before proxying
+// 1)  incoming JWT first.
 app.UseAuthentication();
 app.UseAuthorization();
 
-// IMPORTANT: Token exchange AFTER authentication
+// 2) Cache only after the request has been authorized.
+//    This allows cached responses to short-circuit BEFORE token exchange.
+app.UseOutputCache();
+
+// 3) Exchange token only when we actually need to proxy (cache miss).
 app.UseTokenExchange();
 
 if (app.Environment.IsProduction())
