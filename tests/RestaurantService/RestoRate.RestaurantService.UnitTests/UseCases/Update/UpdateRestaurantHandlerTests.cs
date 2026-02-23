@@ -51,7 +51,7 @@ public class UpdateRestaurantHandlerTests
             .UpdateRestaurantAsync(
                 restaurantId,
                 Arg.Any<string>(),
-                Arg.Any<string>(),
+                Arg.Any<string?>(),
                 Arg.Any<PhoneNumber>(),
                 Arg.Any<Email>(),
                 Arg.Any<Address>(),
