@@ -6,7 +6,6 @@ using RestoRate.Contracts.Rating.Dtos;
 
 namespace RestoRate.RatingService.IntegrationTests.Api;
 
-[Collection("RatingService collection")]
 public sealed class GetRatingByIdEmptyTests : IClassFixture<RatingWebApplicationFactory>
 {
     private readonly RatingWebApplicationFactory _factory;

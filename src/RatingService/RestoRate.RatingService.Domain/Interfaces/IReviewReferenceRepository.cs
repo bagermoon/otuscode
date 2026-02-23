@@ -1,4 +1,5 @@
 using NodaMoney;
+
 using RestoRate.RatingService.Domain.ReviewReferenceAggregate;
 
 namespace RestoRate.RatingService.Domain.Interfaces;

@@ -11,10 +11,14 @@ public sealed class StatsCalculator(
     IRatingCalculatorService ratingCalculator,
     IRestaurantRatingCache ratingCache,
     IRatingRecalculationDebouncer debouncer,
-    ILogger<StatsCalculator> logger)
+    ILogger<StatsCalculator> logger,
+    TimeSpan debounceWindow)
     : IStatsCalculator
 {
-    private static readonly TimeSpan DebounceWindow = TimeSpan.FromSeconds(1);
+    private static readonly TimeSpan DefaultDebounceWindow = TimeSpan.FromSeconds(1);
+    private readonly TimeSpan _debounceWindow = debounceWindow > TimeSpan.Zero
+        ? debounceWindow
+        : DefaultDebounceWindow;
 
     public async Task<bool> RecalculateDebouncedAsync(
         Guid restaurantId,
@@ -57,7 +61,7 @@ public sealed class StatsCalculator(
     {
         try
         {
-            return await debouncer.TryEnterWindowAsync(restaurantId, DebounceWindow, cancellationToken);
+            return await debouncer.TryEnterWindowAsync(restaurantId, _debounceWindow, cancellationToken);
         }
         catch (Exception ex)
         {

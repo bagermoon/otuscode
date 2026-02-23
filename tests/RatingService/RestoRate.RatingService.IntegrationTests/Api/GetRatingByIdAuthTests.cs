@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace RestoRate.RatingService.IntegrationTests.Api;
 
-[Collection("RatingService collection")]
 public sealed class GetRatingByIdAuthTests : IClassFixture<RatingWebApplicationFactory>
 {
     private readonly WebApplicationFactory<Program> _factory;
