@@ -2,6 +2,7 @@ using RestoRate.ServiceDefaults;
 using RestoRate.Auth.Authentication;
 using RestoRate.Auth.Authorization;
 using RestoRate.Gateway.Configurations;
+using RestoRate.Gateway.OutputCaching;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,12 +22,7 @@ builder.AddRedisOutputCache(AppHostProjects.RedisCache);
 
 builder.Services.AddOutputCache(options =>
 {
-    options.AddPolicy("GatewayPublicCache", builder =>
-    {
-        builder.Expire(TimeSpan.FromMinutes(5));
-        builder.SetVaryByQuery("pageNumber", "pageSize", "searchTerm", "cuisineType", "tag");
-        builder.With(c => true);
-    });
+    options.AddPolicy("RestaurantsAuthenticatedOutputCachePolicy", new RestaurantsAuthenticatedOutputCachePolicy(5));
 });
 
 builder.Services
@@ -40,26 +36,15 @@ builder.Services.AddAuthorizationBuilder()
 
 var app = builder.Build();
 
-app.Use(async (context, next) =>
-{
-    if (context.Request.Path.StartsWithSegments("/api/restaurants") &&
-        context.Request.Method == HttpMethods.Get)
-    {
-        context.Request.Headers.Remove("Cache-Control");
-        context.Request.Headers.Remove("Pragma");
-        context.Request.Headers.Remove("Authorization");
-        context.Request.Headers.Remove("Cookie");
-    }
-    await next();
-});
-
-app.UseOutputCache();
-
-// Ensure authentication/authorization run before proxying
+// 1)  incoming JWT first.
 app.UseAuthentication();
 app.UseAuthorization();
 
-// IMPORTANT: Token exchange AFTER authentication
+// 2) Cache only after the request has been authorized.
+//    This allows cached responses to short-circuit BEFORE token exchange.
+app.UseOutputCache();
+
+// 3) Exchange token only when we actually need to proxy (cache miss).
 app.UseTokenExchange();
 
 if (app.Environment.IsProduction())

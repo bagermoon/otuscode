@@ -16,7 +16,6 @@ internal static class ListTagsEndpoint
             return Results.Ok(result);
         })
         .WithName("ListTags")
-        .AllowAnonymous()
         .WithSummary("Получить список всех тэгов")
         .Produces<List<TagDto>>(StatusCodes.Status200OK);
     }
