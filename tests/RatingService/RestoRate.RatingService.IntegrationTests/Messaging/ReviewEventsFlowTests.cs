@@ -14,6 +14,7 @@ using RestoRate.Testing.Common.Helpers;
 
 namespace RestoRate.RatingService.IntegrationTests.Messaging;
 
+[Collection(RatingServiceMessagingFlowCollection.Name)]
 public sealed class ReviewEventsFlowTests : IClassFixture<RatingWebApplicationFactory>, IAsyncLifetime
 {
     private readonly WebApplicationFactory<Program> _factory;
@@ -30,7 +31,9 @@ public sealed class ReviewEventsFlowTests : IClassFixture<RatingWebApplicationFa
     public async ValueTask InitializeAsync()
     {
         Harness = _factory.Services.GetRequiredService<ITestHarness>();
-        await Harness.RestartHostedServices(CancellationToken);
+
+        await Harness.Stop(CancellationToken);
+        await Harness.Start();
     }
     public async ValueTask DisposeAsync()
     {
@@ -56,7 +59,14 @@ public sealed class ReviewEventsFlowTests : IClassFixture<RatingWebApplicationFa
 
         await Harness.Bus.Publish(evt, CancellationToken);
 
-        (await Harness.Consumed.Any<ReviewAddedEvent>(CancellationToken)).Should().BeTrue();
+        await Eventually.SucceedsAsync(() =>
+        {
+            Harness.Consumed.Select<ReviewAddedEvent>(CancellationToken)
+                .Any(x => x.Context.Message.ReviewId == reviewId)
+                .Should().BeTrue();
+
+            return Task.CompletedTask;
+        }, timeout: TimeSpan.FromSeconds(15));
 
         await Eventually.SucceedsAsync(async () =>
         {
@@ -67,7 +77,14 @@ public sealed class ReviewEventsFlowTests : IClassFixture<RatingWebApplicationFa
         }, timeout: TimeSpan.FromSeconds(5));
 
         // Rating event should be published; approved should be zero, provisional should reflect the unapproved review
-        (await Harness.Published.Any<RestaurantRatingRecalculatedEvent>(CancellationToken)).Should().BeTrue();
+        await Eventually.SucceedsAsync(() =>
+        {
+            Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken)
+                .Any(x => x.Context.Message.RestaurantId == restaurantId)
+                .Should().BeTrue();
+
+            return Task.CompletedTask;
+        }, timeout: TimeSpan.FromSeconds(15));
 
         var published = Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken)
             .Last(x => x.Context.Message.RestaurantId == restaurantId)
@@ -102,16 +119,27 @@ public sealed class ReviewEventsFlowTests : IClassFixture<RatingWebApplicationFa
         var approved = new ReviewApprovedEvent(reviewId);
 
         await Harness.Bus.Publish(added, CancellationToken);
-        (await Harness.Consumed.Any<ReviewAddedEvent>(CancellationToken)).Should().BeTrue();
+        await Eventually.SucceedsAsync(() =>
+        {
+            Harness.Consumed.Select<ReviewAddedEvent>(CancellationToken)
+                .Any(x => x.Context.Message.ReviewId == reviewId)
+                .Should().BeTrue();
+
+            return Task.CompletedTask;
+        }, timeout: TimeSpan.FromSeconds(15));
         // Wait over debounce window before approving so we get a second publish deterministically
         await Task.Delay(250, CancellationToken);
 
         await Harness.Bus.Publish(approved, CancellationToken);
 
-        await Eventually.SucceedsAsync(async () =>
+        await Eventually.SucceedsAsync(() =>
         {
-            Harness.Consumed.Select<ReviewApprovedEvent>(CancellationToken).Any().Should().BeTrue();
-        }, timeout: TimeSpan.FromSeconds(5));
+            Harness.Consumed.Select<ReviewApprovedEvent>(CancellationToken)
+                .Any(x => x.Context.Message.ReviewId == reviewId)
+                .Should().BeTrue();
+
+            return Task.CompletedTask;
+        }, timeout: TimeSpan.FromSeconds(15));
 
         // Poll Mongo until approved
         await Eventually.SucceedsAsync(async () =>
@@ -122,9 +150,10 @@ public sealed class ReviewEventsFlowTests : IClassFixture<RatingWebApplicationFa
         }, timeout: TimeSpan.FromSeconds(5));
 
         // Expect at least 2 recalculated events (one for add, one for approve)
-        await Eventually.SucceedsAsync(async () =>
+        await Eventually.SucceedsAsync(() =>
         {
             Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken).Count().Should().BeGreaterThanOrEqualTo(2);
+            return Task.CompletedTask;
         }, timeout: TimeSpan.FromSeconds(5));
 
         var last = Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken)
@@ -155,13 +184,27 @@ public sealed class ReviewEventsFlowTests : IClassFixture<RatingWebApplicationFa
         var rejected = new ReviewRejectedEvent(reviewId);
 
         await Harness.Bus.Publish(added, CancellationToken);
-        (await Harness.Consumed.Any<ReviewAddedEvent>(CancellationToken)).Should().BeTrue();
+        await Eventually.SucceedsAsync(() =>
+        {
+            Harness.Consumed.Select<ReviewAddedEvent>(CancellationToken)
+                .Any(x => x.Context.Message.ReviewId == reviewId)
+                .Should().BeTrue();
+
+            return Task.CompletedTask;
+        }, timeout: TimeSpan.FromSeconds(15));
 
         // Wait over debounce window before rejecting so we get a second publish deterministically
         await Task.Delay(350, CancellationToken);
 
         await Harness.Bus.Publish(rejected, CancellationToken);
-        (await Harness.Consumed.Any<ReviewRejectedEvent>(CancellationToken)).Should().BeTrue();
+        await Eventually.SucceedsAsync(() =>
+        {
+            Harness.Consumed.Select<ReviewRejectedEvent>(CancellationToken)
+                .Any(x => x.Context.Message.ReviewId == reviewId)
+                .Should().BeTrue();
+
+            return Task.CompletedTask;
+        }, timeout: TimeSpan.FromSeconds(15));
 
         // Poll Mongo until deleted
         await Eventually.SucceedsAsync(async () =>
@@ -171,9 +214,10 @@ public sealed class ReviewEventsFlowTests : IClassFixture<RatingWebApplicationFa
         }, timeout: TimeSpan.FromSeconds(5));
 
         // Expect at least 2 recalculated events (one for add, one for reject)
-        await Eventually.SucceedsAsync(async () =>
+        await Eventually.SucceedsAsync(() =>
         {
             Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken).Count().Should().BeGreaterThanOrEqualTo(2);
+            return Task.CompletedTask;
         }, timeout: TimeSpan.FromSeconds(5));
 
         var last = Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken)
@@ -197,14 +241,22 @@ public sealed class ReviewEventsFlowTests : IClassFixture<RatingWebApplicationFa
         await Harness.Bus.Publish(first, CancellationToken);
         await Harness.Bus.Publish(second, CancellationToken);
 
-        (await Harness.Consumed.Any<ReviewAddedEvent>(CancellationToken)).Should().BeTrue();
+        await Eventually.SucceedsAsync(() =>
+        {
+            Harness.Consumed.Select<ReviewAddedEvent>(CancellationToken)
+                .Count(x => x.Context.Message.RestaurantId == restaurantId)
+                .Should().BeGreaterThanOrEqualTo(2);
+
+            return Task.CompletedTask;
+        }, timeout: TimeSpan.FromSeconds(15));
 
         // Wait until the first recalculation event appears
-        await Eventually.SucceedsAsync(async () =>
+        await Eventually.SucceedsAsync(() =>
         {
             var count = Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken)
                 .Count(x => x.Context.Message.RestaurantId == restaurantId);
             count.Should().BeGreaterThanOrEqualTo(1);
+            return Task.CompletedTask;
         }, timeout: TimeSpan.FromSeconds(5));
 
         var countWithinWindow = Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken)
@@ -218,11 +270,12 @@ public sealed class ReviewEventsFlowTests : IClassFixture<RatingWebApplicationFa
         var third = new ReviewAddedEvent(Guid.NewGuid(), restaurantId, Guid.NewGuid(), 3.0m, null, null, null);
         await Harness.Bus.Publish(third, CancellationToken);
 
-        await Eventually.SucceedsAsync(async () =>
+        await Eventually.SucceedsAsync(() =>
         {
             var count = Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken)
                 .Count(x => x.Context.Message.RestaurantId == restaurantId);
             count.Should().BeGreaterThanOrEqualTo(2);
+            return Task.CompletedTask;
         }, timeout: TimeSpan.FromSeconds(5));
     }
 }
