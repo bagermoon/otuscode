@@ -64,9 +64,6 @@ public class RatingWebApplicationFactory
             logging.ClearProviders();
         });
 
-        builder.AddMassTransitInMemoryTestHarness(cfg =>
-        {
-            cfg.SetTestTimeouts(testInactivityTimeout: TimeSpan.FromSeconds(20));
-        });
+        builder.AddMassTransitInMemoryTestHarness();
     }
 }
