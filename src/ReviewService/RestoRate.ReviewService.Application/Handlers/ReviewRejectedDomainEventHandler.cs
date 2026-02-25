@@ -1,20 +1,20 @@
 using Ardalis.SharedKernel;
 
-using Microsoft.Extensions.Logging;
-
+using RestoRate.Abstractions.Messaging;
+using RestoRate.Contracts.Review.Events;
 using RestoRate.ReviewService.Domain.Events;
 
 namespace RestoRate.ReviewService.Application.Handlers;
 
 public sealed class ReviewRejectedDomainEventHandler(
-    ILogger<ReviewRejectedDomainEventHandler> logger)
+    IIntegrationEventBus integrationEventBus)
     : IDomainEventHandler<ReviewRejectedDomainEvent>
 {
-    public ValueTask Handle(ReviewRejectedDomainEvent notification, CancellationToken cancellationToken)
+    public async ValueTask Handle(ReviewRejectedDomainEvent notification, CancellationToken cancellationToken)
     {
         var review = notification.Review;
-        logger.LogReviewRejected(review.Id, review.RestaurantId, review.UserId);
 
-        return ValueTask.CompletedTask;
+        var integrationEvent = new ReviewRejectedEvent(ReviewId: review.Id);
+        await integrationEventBus.PublishAsync(integrationEvent, cancellationToken);
     }
 }

@@ -64,7 +64,8 @@ public static class WebApplicationFactoryExtensions
     }
 
     public static IWebHostBuilder AddMassTransitInMemoryTestHarness(
-        this IWebHostBuilder builder
+        this IWebHostBuilder builder,
+        Action<IBusRegistrationConfigurator>? configure = null
         )
     {
         builder.ConfigureTestServices(services =>
@@ -80,6 +81,7 @@ public static class WebApplicationFactoryExtensions
                     busCfg.UseSendFilter(typeof(SendUserContextFilter<>), context);
                     busCfg.ConfigureEndpoints(context);
                 });
+                configure?.Invoke(cfg);
             });
 
             // TestHarness doesn't know about our application abstraction. Ensure publishes go through MassTransit.

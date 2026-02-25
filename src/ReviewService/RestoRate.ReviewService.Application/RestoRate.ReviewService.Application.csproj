@@ -8,9 +8,6 @@
 
   <ItemGroup>
     <PackageReference Include="MassTransit" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Mediator.Abstractions" />
     <PackageReference Include="Mediator.SourceGenerator">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

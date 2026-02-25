@@ -34,7 +34,7 @@ public class GetAllReviewsHandlerTests
         var query = new GetAllReviewsQuery(1, 10);
 
         readRepository
-            .ListAsync(Arg.Any<ISpecification<Review>>(), Arg.Any<BaseFilter>(), Arg.Any<CancellationToken>())
+            .ListPagedAsync(Arg.Any<ISpecification<Review>>(), Arg.Any<BaseFilter>(), Arg.Any<CancellationToken>())
             .Returns(new PagedResult<List<Review>>(new PagedInfo(1, 10, 1, 3), reviews));
 
         var handler = new GetAllReviewsHandler(readRepository, logger);
@@ -71,7 +71,7 @@ public class GetAllReviewsHandlerTests
         var query = new GetAllReviewsQuery(2, 10);
 
         readRepository
-            .ListAsync(Arg.Any<ISpecification<Review>>(), Arg.Any<BaseFilter>(), Arg.Any<CancellationToken>())
+            .ListPagedAsync(Arg.Any<ISpecification<Review>>(), Arg.Any<BaseFilter>(), Arg.Any<CancellationToken>())
             .Returns(new PagedResult<List<Review>>(new PagedInfo(2, 10, 2, 12), pageItems));
 
         var handler = new GetAllReviewsHandler(readRepository, logger);

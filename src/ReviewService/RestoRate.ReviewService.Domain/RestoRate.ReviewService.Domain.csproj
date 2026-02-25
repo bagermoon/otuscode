@@ -3,7 +3,4 @@
     <ProjectReference Include="..\..\RestoRate.Contracts\RestoRate.Contracts.csproj" />
     <ProjectReference Include="..\..\RestoRate.SharedKernel\RestoRate.SharedKernel.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Interfaces\" />
-  </ItemGroup>
 </Project>
