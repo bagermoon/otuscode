@@ -11,5 +11,6 @@ public record ReviewDto(
     MoneyDto? AverageCheck,
     string Comment,
     DateTime CreatedAt,
-    DateTime? UpdatedAt
+    DateTime? UpdatedAt,
+    RestoRate.SharedKernel.Enums.ReviewStatus Status
 );
