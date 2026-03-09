@@ -2,8 +2,10 @@ using MassTransit;
 
 using Microsoft.Extensions.Logging;
 
+using System.Linq;
 using RestoRate.Contracts.Review.Events;
-using RestoRate.ModerationService.Application.Interfaces;
+using RestoRate.ModerationService.Domain.Abstractions;
+using Ardalis.Result;
 
 namespace RestoRate.ModerationService.Infrastructure.Consumers
 {
@@ -25,20 +27,27 @@ namespace RestoRate.ModerationService.Infrastructure.Consumers
             var message = context.Message;
             _logger.LogInformation("Начата модерация отзыва {ReviewId}", message.ReviewId);
 
-            var (isApproved, reason) = _moderator.Moderate(message.Comment);
+            var result = _moderator.Moderate(message.Comment);
 
-            if (isApproved)
+            if (result.Status == ResultStatus.Ok)
             {
                 _logger.LogInformation("Отзыв {ReviewId} успешно прошел модерацию", message.ReviewId);
-
                 await context.Publish(new ReviewModerationPassedIntegrationEvent(message.ReviewId));
+                return;
             }
-            else
-            {
-                _logger.LogWarning("Отзыв {ReviewId} отклонен модератором. Причина: {Reason}", message.ReviewId, reason);
 
-                await context.Publish(new ReviewModerationRejectedIntegrationEvent(message.ReviewId, reason!));
+            if (result.Status == ResultStatus.Invalid)
+            {
+                var reason = string.Join(';', result.Errors);
+                _logger.LogWarning("Отзыв {ReviewId} отклонен модератором. Причина: {Reason}", message.ReviewId, reason);
+                await context.Publish(new ReviewModerationRejectedIntegrationEvent(message.ReviewId, reason));
+                return;
             }
+
+            // Treat other statuses as error: log and publish rejection with technical reason
+            var err = result.Errors.Any() ? string.Join(';', result.Errors) : "Internal moderation error";
+            _logger.LogError("Модерация отзыва {ReviewId} завершилась с ошибкой: {Error}", message.ReviewId, err);
+            await context.Publish(new ReviewModerationRejectedIntegrationEvent(message.ReviewId, err));
         }
     }
 }

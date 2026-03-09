@@ -1,8 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 
-using RestoRate.ModerationService.Application.Engine;
-using RestoRate.ModerationService.Application.Interfaces;
-using RestoRate.ModerationService.Application.Rules;
+using RestoRate.ModerationService.Domain.Abstractions;
+using RestoRate.ModerationService.Domain.Rules;
+using RestoRate.ModerationService.Domain.Services;
 
 namespace RestoRate.ModerationService.Application;
 

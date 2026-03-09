@@ -2,7 +2,10 @@ using System.Reflection;
 
 using MassTransit;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using RestoRate.ModerationService.Domain.Abstractions;
+using RestoRate.ModerationService.Infrastructure.Configurations;
 
 using RestoRate.BuildingBlocks.Messaging;
 using RestoRate.ServiceDefaults;
@@ -13,6 +16,8 @@ public static class InfrastructureServiceExtensions
 {
     public static IHostApplicationBuilder AddModerationInfrastructure(this IHostApplicationBuilder builder)
     {
+        builder.Services.AddSingleton<IBadWordsDictionary, OptionsBadWordsDictionary>();
+
         builder.AddMassTransitEventBus(
             AppHostProjects.RabbitMQ,
             configs =>

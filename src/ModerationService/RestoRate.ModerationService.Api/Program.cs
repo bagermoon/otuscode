@@ -2,15 +2,13 @@ using RestoRate.ServiceDefaults;
 using RestoRate.Auth.Authentication;
 using RestoRate.ServiceDefaults.EndpointFilters;
 using RestoRate.ModerationService.Application;
-using RestoRate.ModerationService.Application.Options;
 using RestoRate.ModerationService.Infrastructure;
+using RestoRate.ModerationService.Infrastructure.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 builder.Services.AddProblemDetailsDefaults();
-
-builder.Services.Configure<ModerationSettings>(builder.Configuration.GetSection("ModerationSettings"));
 
 builder.Services.AddModerationApplication();
 builder.AddModerationInfrastructure();
@@ -20,6 +18,9 @@ builder.Services.AddAuthorizationBuilder()
     .AddPolicy("AdminGroup", policy =>
         policy.RequireRole("admin")); // Checks for a "roles" claim with value "admin"
 
+builder.Services.Configure<ModerationSettingsOptions>(
+            builder.Configuration.GetSection("ModerationSettings")
+        );
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

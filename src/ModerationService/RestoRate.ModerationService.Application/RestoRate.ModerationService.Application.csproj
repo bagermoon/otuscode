@@ -8,6 +8,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\RestoRate.Abstractions\RestoRate.Abstractions.csproj" />
+    <ProjectReference Include="..\RestoRate.ModerationService.Domain\RestoRate.ModerationService.Domain.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Ardalis.Result" />
   </ItemGroup>
 
 </Project>
