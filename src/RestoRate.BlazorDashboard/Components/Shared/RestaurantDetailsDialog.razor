@@ -8,10 +8,12 @@
 @using System.Security.Claims
 @using MudBlazor
 @using Microsoft.AspNetCore.Components.Authorization
+@using RestoRate.Abstractions.Identity
 
 @inject RestaurantWebService RestaurantService
 @inject ISnackbar Snackbar
 @inject AuthenticationStateProvider AuthStateProvider
+@inject IUserContext UserContext
 
 <MudDialog Class="rr-modern-dialog" ContentClass="pa-0 dialog-wrapper">
     <DialogContent>
@@ -207,7 +209,7 @@
                         <div class="reviews-scroll-container">
                             @foreach (var review in _reviews)
                             {
-                                if (_currentUserId != null && review.UserId == _currentUserId) continue;
+                                if (review.UserId == _currentUserId) continue;
                                 if (review.Status != ReviewStatus.Approved) continue;
 
                                 <MudPaper Elevation="0" Class="pa-4 mb-4 rounded-xl border-gray">
@@ -362,7 +364,7 @@
 
     private List<ReviewDto>? _reviews;
     private ReviewDto? _myExistingReview;
-    private Guid? _currentUserId;
+    private Guid _currentUserId;
 
     private int _reviewRating = 0;
     private string? _reviewComment;
@@ -374,6 +376,7 @@
     protected override async Task OnInitializedAsync()
     {
         _selectedIndex = 0;
+        _currentUserId = UserContext.UserId;
         await LoadReviewsAndUser();
     }
 
@@ -443,13 +446,6 @@
     {
         try
         {
-            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-            var userClaims = authState.User;
-            var userIdStr = userClaims.FindFirst("sub")?.Value ?? userClaims.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (Guid.TryParse(userIdStr, out var uid))
-                _currentUserId = uid;
-
             var result = await RestaurantService.GetReviewsByRestaurantAsync(Restaurant.RestaurantId);
             if (result != null)
             {
@@ -457,8 +453,8 @@
                     .Where(r => r.RestaurantId == Restaurant.RestaurantId)
                     .ToList();
 
-                if (_currentUserId.HasValue)
-                    _myExistingReview = _reviews.FirstOrDefault(r => r.UserId == _currentUserId.Value);
+                if (UserContext.IsAuthenticated)
+                    _myExistingReview = _reviews.FirstOrDefault(r => r.UserId == _currentUserId);
             }
             else
                 _reviews = new List<ReviewDto>();
@@ -487,7 +483,7 @@
 
         try
         {
-            if (_currentUserId == null)
+            if (!UserContext.IsAuthenticated)
             {
                 Snackbar.Add("Ошибка авторизации", Severity.Error);
                 return;
@@ -499,7 +495,7 @@
 
             var dto = new CreateReviewDto(
                 RestaurantId: Restaurant.RestaurantId,
-                UserId: _currentUserId.Value,
+                UserId: _currentUserId,
                 Rating: (decimal)_reviewRating,
                 AverageCheck: moneyDto,
                 Comment: _reviewComment

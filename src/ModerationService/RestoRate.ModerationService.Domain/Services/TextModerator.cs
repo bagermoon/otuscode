@@ -25,7 +25,7 @@ public class TextModerator : ITextModerator
                 if (result.Status == ResultStatus.Invalid)
                     return Result.Invalid(result.ValidationErrors);
 
-                return Result.Error(string.Join(';', result.Errors));
+                return Result.Invalid(new ValidationError(string.Join(';', result.Errors)));
             }
         }
 
