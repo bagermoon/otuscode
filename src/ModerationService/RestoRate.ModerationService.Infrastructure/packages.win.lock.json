@@ -2,12 +2,6 @@
   "version": 2,
   "dependencies": {
     "net9.0": {
-      "Ardalis.Result": {
-        "type": "Direct",
-        "requested": "[10.1.0, )",
-        "resolved": "10.1.0",
-        "contentHash": "+WgsXh+JRm0d8BZPlBUc5w0+FTda4vbWRa/IF2q4zDoRsU5BXr8w4rTbYEklZIMNgQQZTcNouR/QfBV5I/4XYQ=="
-      },
       "AspNetCore.HealthChecks.MongoDb": {
         "type": "Transitive",
         "resolved": "9.0.0",
@@ -590,6 +584,12 @@
         "requested": "[5.0.0, )",
         "resolved": "5.0.0",
         "contentHash": "jVPRvLw0xIUFto2cMrKgRYADWIHbEEfzZHGiU/swwNgl1zo28Q1zfSa3VUC3C0s9DyhFDPSaF4dEDQRyTZUcyQ=="
+      },
+      "Ardalis.Result": {
+        "type": "CentralTransitive",
+        "requested": "[10.1.0, )",
+        "resolved": "10.1.0",
+        "contentHash": "+WgsXh+JRm0d8BZPlBUc5w0+FTda4vbWRa/IF2q4zDoRsU5BXr8w4rTbYEklZIMNgQQZTcNouR/QfBV5I/4XYQ=="
       },
       "Ardalis.Result.FluentValidation": {
         "type": "CentralTransitive",

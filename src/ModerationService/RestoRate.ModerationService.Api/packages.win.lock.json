@@ -642,7 +642,7 @@
       "restorate.moderationservice.application": {
         "type": "Project",
         "dependencies": {
-          "Ardalis.Result": "[10.1.0, )",
+          "Mediator.Abstractions": "[3.0.1, )",
           "RestoRate.Abstractions": "[1.0.0, )",
           "RestoRate.ModerationService.Domain": "[1.0.0, )"
         }
@@ -656,12 +656,8 @@
       "restorate.moderationservice.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Ardalis.Result": "[10.1.0, )",
-          "RestoRate.Abstractions": "[1.0.0, )",
           "RestoRate.BuildingBlocks": "[1.0.0, )",
-          "RestoRate.Contracts": "[1.0.0, )",
-          "RestoRate.ModerationService.Application": "[1.0.0, )",
-          "RestoRate.ServiceDefaults": "[1.0.0, )"
+          "RestoRate.ModerationService.Domain": "[1.0.0, )"
         }
       },
       "restorate.servicedefaults": {

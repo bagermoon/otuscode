@@ -14,17 +14,18 @@ namespace RestoRate.ModerationService.Infrastructure;
 
 public static class InfrastructureServiceExtensions
 {
-    public static IHostApplicationBuilder AddModerationInfrastructure(this IHostApplicationBuilder builder)
+    public static IHostApplicationBuilder AddModerationInfrastructure(
+        this IHostApplicationBuilder builder,
+        Assembly? consumersAssembly = null)
     {
-        builder.Services.AddSingleton<IBadWordsDictionary, OptionsBadWordsDictionary>();
-
-        builder.AddMassTransitEventBus(
-            AppHostProjects.RabbitMQ,
-            configs =>
-            {
-                configs.AddConsumers(Assembly.GetExecutingAssembly());
-            }
+        builder.Services.Configure<ModerationSettingsOptions>(
+            builder.Configuration.GetSection("ModerationSettings")
         );
+        builder.Services.AddSingleton<IBadWordsDictionary, OptionsBadWordsDictionary>();
+        builder.AddMassTransitEventBus(AppHostProjects.RabbitMQ, configs =>
+        {
+            configs.AddConsumers(consumersAssembly);
+        });
 
         return builder;
     }
