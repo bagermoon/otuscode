@@ -106,17 +106,25 @@ public sealed class ReviewEventsFlowTests : IClassFixture<RatingWebApplicationFa
 
         var restaurantId = Guid.NewGuid();
         var reviewId = Guid.NewGuid();
+        var authorId = Guid.NewGuid();
 
         var added = new ReviewAddedEvent(
             ReviewId: reviewId,
             RestaurantId: restaurantId,
-            AuthorId: Guid.NewGuid(),
+            AuthorId: authorId,
             Rating: 5.0m,
             AverageCheck: null,
             Comment: null,
             Tags: null);
 
-        var approved = new ReviewApprovedEvent(reviewId);
+        var approved = new ReviewApprovedEvent(
+            ReviewId: reviewId,
+            RestaurantId: restaurantId,
+            AuthorId: authorId,
+            Rating: 5.0m,
+            AverageCheck: null,
+            Comment: null,
+            Tags: null);
 
         await Harness.Bus.Publish(added, CancellationToken);
         await Eventually.SucceedsAsync(() =>
@@ -171,17 +179,25 @@ public sealed class ReviewEventsFlowTests : IClassFixture<RatingWebApplicationFa
 
         var restaurantId = Guid.NewGuid();
         var reviewId = Guid.NewGuid();
+        var authorId = Guid.NewGuid();
 
         var added = new ReviewAddedEvent(
             ReviewId: reviewId,
             RestaurantId: restaurantId,
-            AuthorId: Guid.NewGuid(),
+            AuthorId: authorId,
             Rating: 3.0m,
             AverageCheck: null,
             Comment: null,
             Tags: null);
 
-        var rejected = new ReviewRejectedEvent(reviewId);
+        var rejected = new ReviewRejectedEvent(
+            ReviewId: reviewId,
+            RestaurantId: restaurantId,
+            AuthorId: authorId,
+            Rating: 3.0m,
+            AverageCheck: null,
+            Comment: null,
+            Tags: null);
 
         await Harness.Bus.Publish(added, CancellationToken);
         await Eventually.SucceedsAsync(() =>
