@@ -14,7 +14,11 @@ public class Review : EntityBase<Guid>, IAggregateRoot
     public Guid RestaurantId { get; private set; } = default!;
     public Guid UserId { get; private set; } = default!;
     public decimal Rating { get; private set; } = default!;
-    public Money? AverageCheck { get; private set; }
+    public Money? AverageCheck
+    {
+        get => AverageCheckData?.ToMoney();
+        private set => AverageCheckData = ReviewAverageCheck.FromMoney(value);
+    }
     public string? Comment { get; private set; }
     public DateTime CreatedAt { get; private set; } = default!;
     public DateTime? UpdatedAt { get; private set; }
@@ -23,6 +27,7 @@ public class Review : EntityBase<Guid>, IAggregateRoot
     public ReviewStatus Status { get; private set; }
     public RestaurantReference? Restaurant { get; private set; }
     public UserReference? User { get; private set; }
+    private ReviewAverageCheck? AverageCheckData { get; set; }
 
     private Review() { }
 

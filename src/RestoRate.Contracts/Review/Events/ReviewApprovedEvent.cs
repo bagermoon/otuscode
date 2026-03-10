@@ -15,10 +15,10 @@ namespace RestoRate.Contracts.Review.Events;
 /// <param name="Comment">Текстовый комментарий к отзыву (может быть <c>null</c>).</param>
 /// <param name="Tags">Теги отзыва (может быть <c>null</c>).</param>
 public sealed record ReviewApprovedEvent(
-	Guid ReviewId,
-	Guid RestaurantId,
-	Guid AuthorId,
-	decimal Rating,
-	MoneyDto? AverageCheck,
-	string? Comment,
-	string[]? Tags) : IIntegrationEvent;
+    Guid ReviewId,
+    Guid RestaurantId,
+    Guid AuthorId,
+    decimal Rating,
+    MoneyDto? AverageCheck,
+    string? Comment,
+    string[]? Tags) : IIntegrationEvent;
