@@ -157,10 +157,12 @@ public sealed class ReviewEventsFlowTests : IClassFixture<RatingWebApplicationFa
             saved!.IsApproved.Should().BeTrue();
         }, timeout: TimeSpan.FromSeconds(5));
 
-        // Expect at least 2 recalculated events (one for add, one for approve)
+        // Expect at least 2 recalculated events for this restaurant (one for add, one for approve)
         await Eventually.SucceedsAsync(() =>
         {
-            Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken).Count().Should().BeGreaterThanOrEqualTo(2);
+            Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken)
+                .Count(x => x.Context.Message.RestaurantId == restaurantId)
+                .Should().BeGreaterThanOrEqualTo(2);
             return Task.CompletedTask;
         }, timeout: TimeSpan.FromSeconds(5));
 
@@ -170,6 +172,66 @@ public sealed class ReviewEventsFlowTests : IClassFixture<RatingWebApplicationFa
         last.RestaurantId.Should().Be(restaurantId);
         last.ApprovedReviewsCount.Should().Be(1);
         last.ApprovedAverageRating.Should().Be(5.0m);
+    }
+
+    [Fact]
+    public async Task ReviewAddedThenApproved_WithinSameWindow_PublishesFinalApprovedRating()
+    {
+        var restaurantId = Guid.NewGuid();
+        var reviewId = Guid.NewGuid();
+        var authorId = Guid.NewGuid();
+
+        var added = new ReviewAddedEvent(
+            ReviewId: reviewId,
+            RestaurantId: restaurantId,
+            AuthorId: authorId,
+            Rating: 4.6m,
+            AverageCheck: null,
+            Comment: null,
+            Tags: null);
+
+        var approved = new ReviewApprovedEvent(
+            ReviewId: reviewId,
+            RestaurantId: restaurantId,
+            AuthorId: authorId,
+            Rating: 4.6m,
+            AverageCheck: null,
+            Comment: null,
+            Tags: null);
+
+        await Harness.Bus.Publish(added, CancellationToken);
+        await Task.Delay(25, CancellationToken);
+        await Harness.Bus.Publish(approved, CancellationToken);
+
+        await Eventually.SucceedsAsync(() =>
+        {
+            Harness.Consumed.Select<ReviewAddedEvent>(CancellationToken)
+                .Any(x => x.Context.Message.ReviewId == reviewId)
+                .Should().BeTrue();
+
+            Harness.Consumed.Select<ReviewApprovedEvent>(CancellationToken)
+                .Any(x => x.Context.Message.ReviewId == reviewId)
+                .Should().BeTrue();
+
+            return Task.CompletedTask;
+        }, timeout: TimeSpan.FromSeconds(15));
+
+        await Eventually.SucceedsAsync(() =>
+        {
+            var published = Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken)
+                .Where(x => x.Context.Message.RestaurantId == restaurantId)
+                .ToList();
+
+            published.Should().NotBeEmpty();
+
+            var last = published.Last().Context.Message;
+            last.ApprovedReviewsCount.Should().Be(1);
+            last.ApprovedAverageRating.Should().Be(4.6m);
+            last.ProvisionalReviewsCount.Should().Be(1);
+            last.ProvisionalAverageRating.Should().Be(4.6m);
+
+            return Task.CompletedTask;
+        }, timeout: TimeSpan.FromSeconds(15));
     }
 
     [Fact]
@@ -231,10 +293,12 @@ public sealed class ReviewEventsFlowTests : IClassFixture<RatingWebApplicationFa
             saved.IsApproved.Should().BeFalse();
         }, timeout: TimeSpan.FromSeconds(5));
 
-        // Expect at least 2 recalculated events (one for add, one for reject)
+        // Expect at least 2 recalculated events for this restaurant (one for add, one for reject)
         await Eventually.SucceedsAsync(() =>
         {
-            Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken).Count().Should().BeGreaterThanOrEqualTo(2);
+            Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken)
+                .Count(x => x.Context.Message.RestaurantId == restaurantId)
+                .Should().BeGreaterThanOrEqualTo(2);
             return Task.CompletedTask;
         }, timeout: TimeSpan.FromSeconds(5));
 

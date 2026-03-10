@@ -1,6 +1,8 @@
 using RestoRate.RatingService.Api.Configurations;
+using RestoRate.RatingService.Api.Services;
 using RestoRate.RatingService.Infrastructure;
 using RestoRate.RatingService.Application;
+using RestoRate.ServiceDefaults;
 
 using Microsoft.Extensions.Configuration;
 namespace RestoRate.RatingService.Api;
@@ -13,6 +15,12 @@ internal static class ApiServiceExtensions
 
         var debounceWindow = GetStatsCalculatorDebounceWindow(builder.Configuration);
         builder.Services.AddRatingApplication(statsCalculatorDebounceWindow: debounceWindow);
+
+        if (HasRedisConnection(builder.Configuration))
+        {
+            builder.Services.AddSingleton<IHostedService>(sp =>
+                ActivatorUtilities.CreateInstance<RatingRecalculationHostedService>(sp, debounceWindow));
+        }
 
         builder.AddRatingInfrastructure(
             typeof(ApiServiceExtensions).Assembly
@@ -31,4 +39,7 @@ internal static class ApiServiceExtensions
             _ => TimeSpan.FromMilliseconds(ms.Value)
         };
     }
+
+    private static bool HasRedisConnection(IConfiguration configuration)
+        => !string.IsNullOrWhiteSpace(configuration.GetConnectionString(AppHostProjects.RedisCache));
 }

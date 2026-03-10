@@ -18,7 +18,7 @@ public sealed class StatsCalculatorTests(ITestContextAccessor testContextAccesso
     private CancellationToken CancellationToken => testContextAccessor.Current.CancellationToken;
 
     [Fact]
-    public async Task RecalculateDebouncedAsync_WhenDebouncerDenies_ReturnsFalse_AndDoesNotRecalculate()
+    public async Task QueueRecalculationAsync_WhenMarkChangedSucceeds_ReturnsNull_AndDoesNotRecalculate()
     {
         var restaurantId = Guid.NewGuid();
 
@@ -27,18 +27,16 @@ public sealed class StatsCalculatorTests(ITestContextAccessor testContextAccesso
         var debouncer = Substitute.For<IRatingRecalculationDebouncer>();
         var logger = Substitute.For<ILogger<StatsCalculator>>();
 
-        debouncer.TryEnterWindowAsync(restaurantId, Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>()).Returns(false);
-
         var sut = new StatsCalculator(ratingCalculator, cache, debouncer, logger, TimeSpan.FromMilliseconds(50));
 
-        var result = await sut.RecalculateDebouncedAsync(restaurantId, requestedApprovedOnly: true, CancellationToken);
+        await sut.QueueRecalculationAsync(restaurantId, CancellationToken);
 
-        result.Should().BeFalse();
+        await debouncer.Received(1).MarkChangedAsync(restaurantId, Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>());
         await ratingCalculator.DidNotReceiveWithAnyArgs().CalculateAsync(default, default, CancellationToken);
     }
 
     [Fact]
-    public async Task RecalculateDebouncedAsync_WhenDebouncerThrows_FailOpen_ReturnsTrue_AndRecalculates()
+    public async Task QueueRecalculationAsync_WhenDebouncerThrows_FailOpen_ReturnsResult_AndRecalculates()
     {
         var restaurantId = Guid.NewGuid();
 
@@ -47,18 +45,44 @@ public sealed class StatsCalculatorTests(ITestContextAccessor testContextAccesso
         var debouncer = Substitute.For<IRatingRecalculationDebouncer>();
         var logger = Substitute.For<ILogger<StatsCalculator>>();
 
-        debouncer.TryEnterWindowAsync(restaurantId, Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
-            .Returns(Task.FromException<bool>(new InvalidOperationException("redis down")));
+        debouncer.MarkChangedAsync(restaurantId, Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromException(new InvalidOperationException("redis down")));
 
         ratingCalculator.CalculateAsync(restaurantId, Arg.Any<bool>(), Arg.Any<CancellationToken>())
             .Returns(new RestaurantRatingSnapshot(restaurantId, 0m, 0, Money.Zero));
 
         var sut = new StatsCalculator(ratingCalculator, cache, debouncer, logger, TimeSpan.FromMilliseconds(50));
 
-        var result = await sut.RecalculateDebouncedAsync(restaurantId, requestedApprovedOnly: true, CancellationToken);
+        await sut.QueueRecalculationAsync(restaurantId, CancellationToken);
 
-        result.Should().BeTrue();
         await ratingCalculator.Received(2).CalculateAsync(restaurantId, Arg.Any<bool>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task RecalculateLatestAsync_RecomputesApprovedAndProvisionalSnapshots()
+    {
+        var restaurantId = Guid.NewGuid();
+
+        var ratingCalculator = Substitute.For<IRatingCalculatorService>();
+        var cache = Substitute.For<IRestaurantRatingCache>();
+        var debouncer = Substitute.For<IRatingRecalculationDebouncer>();
+        var logger = Substitute.For<ILogger<StatsCalculator>>();
+
+        var approved = new RestaurantRatingSnapshot(restaurantId, 4.7m, 2, Money.Zero);
+        var provisional = new RestaurantRatingSnapshot(restaurantId, 3.5m, 4, Money.Zero);
+
+        ratingCalculator.CalculateAsync(restaurantId, approvedOnly: true, Arg.Any<CancellationToken>()).Returns(approved);
+        ratingCalculator.CalculateAsync(restaurantId, approvedOnly: false, Arg.Any<CancellationToken>()).Returns(provisional);
+
+        var sut = new StatsCalculator(ratingCalculator, cache, debouncer, logger, TimeSpan.FromMilliseconds(50));
+
+        var result = await sut.RecalculateLatestAsync(restaurantId, CancellationToken);
+
+        result.Provisional.AverageRating.Should().Be(3.5m);
+        result.Approved.AverageRating.Should().Be(4.7m);
+
+        await ratingCalculator.Received(1).CalculateAsync(restaurantId, approvedOnly: true, Arg.Any<CancellationToken>());
+        await ratingCalculator.Received(1).CalculateAsync(restaurantId, approvedOnly: false, Arg.Any<CancellationToken>());
     }
 
     [Fact]
