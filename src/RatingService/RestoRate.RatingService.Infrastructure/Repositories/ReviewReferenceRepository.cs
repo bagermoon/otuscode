@@ -13,6 +13,11 @@ internal sealed class ReviewReferenceRepository(
     IMongoContext context)
     : BaseRepository<ReviewReference>(context), IReviewReferenceRepository
 {
+    private static readonly FilterDefinition<ReviewReference> NotRejectedFilter =
+        Builders<ReviewReference>.Filter.Or(
+            Builders<ReviewReference>.Filter.Eq(x => x.IsRejected, false),
+            Builders<ReviewReference>.Filter.Exists(nameof(ReviewReference.IsRejected), false));
+
     public Task AddReviewReferenceAsync(ReviewReference reviewReference, CancellationToken cancellationToken = default)
     {
         Add(reviewReference);
@@ -30,7 +35,7 @@ internal sealed class ReviewReferenceRepository(
 
     public async Task<decimal?> GetAverageRatingByRestaurantIdAsync(Guid restaurantId, bool approvedOnly = true, CancellationToken cancellationToken = default)
     {
-        var filter = Builders<ReviewReference>.Filter.Eq(x => x.RestaurantId, restaurantId);
+        var filter = Builders<ReviewReference>.Filter.Eq(x => x.RestaurantId, restaurantId) & NotRejectedFilter;
         if (approvedOnly)
         {
             filter &= Builders<ReviewReference>.Filter.Eq(x => x.IsApproved, true);
@@ -63,7 +68,8 @@ internal sealed class ReviewReferenceRepository(
     {
         var filter =
             Builders<ReviewReference>.Filter.Eq(x => x.RestaurantId, restaurantId) &
-            Builders<ReviewReference>.Filter.Ne(x => x.AverageCheck, null);
+            Builders<ReviewReference>.Filter.Ne(x => x.AverageCheck, null) &
+            NotRejectedFilter;
 
         if (approvedOnly)
         {
@@ -107,7 +113,7 @@ internal sealed class ReviewReferenceRepository(
         bool approvedOnly = true,
         CancellationToken cancellationToken = default)
     {
-        var filter = Builders<ReviewReference>.Filter.Eq(x => x.RestaurantId, restaurantId);
+        var filter = Builders<ReviewReference>.Filter.Eq(x => x.RestaurantId, restaurantId) & NotRejectedFilter;
         if (approvedOnly)
         {
             filter &= Builders<ReviewReference>.Filter.Eq(x => x.IsApproved, true);

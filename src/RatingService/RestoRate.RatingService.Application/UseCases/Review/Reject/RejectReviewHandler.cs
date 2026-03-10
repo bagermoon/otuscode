@@ -12,7 +12,12 @@ public sealed class RejectReviewHandler(
 {
     public async ValueTask<Result> Handle(RejectReviewCommand request, CancellationToken cancellationToken)
     {
-        await reviewService.RejectAsync(request.ReviewId, cancellationToken);
+        await reviewService.RejectAsync(
+            request.ReviewId,
+            request.RestaurantId,
+            request.Rating,
+            request.AverageCheck,
+            cancellationToken);
         return Result.Success();
     }
 }

@@ -30,10 +30,27 @@ public sealed class ReviewReferenceService(IReviewReferenceRepository repository
         await repository.AddReviewReferenceAsync(reviewReference, cancellationToken);
     }
 
-    public async Task ApproveAsync(Guid reviewId, CancellationToken cancellationToken = default)
+    public async Task ApproveAsync(
+        Guid reviewId,
+        Guid restaurantId,
+        decimal rating,
+        Money? averageCheck,
+        CancellationToken cancellationToken = default)
     {
         var existing = await repository.GetReviewReferenceByIdAsync(reviewId, cancellationToken);
         if (existing is null)
+        {
+            var reviewReference = ReviewReference.CreateApproved(
+                reviewId,
+                restaurantId,
+                rating,
+                averageCheck);
+
+            await repository.AddReviewReferenceAsync(reviewReference, cancellationToken);
+            return;
+        }
+
+        if (existing.IsApproved || existing.IsRejected)
         {
             return;
         }
@@ -42,15 +59,32 @@ public sealed class ReviewReferenceService(IReviewReferenceRepository repository
         await repository.UpdateReviewReferenceAsync(existing, cancellationToken);
     }
 
-    public async Task RejectAsync(Guid reviewId, CancellationToken cancellationToken = default)
+    public async Task RejectAsync(
+        Guid reviewId,
+        Guid restaurantId,
+        decimal rating,
+        Money? averageCheck,
+        CancellationToken cancellationToken = default)
     {
         var existing = await repository.GetReviewReferenceByIdAsync(reviewId, cancellationToken);
         if (existing is null)
+        {
+            var reviewReference = ReviewReference.CreateRejected(
+                reviewId,
+                restaurantId,
+                rating,
+                averageCheck);
+
+            await repository.AddReviewReferenceAsync(reviewReference, cancellationToken);
+            return;
+        }
+
+        if (existing.IsRejected)
         {
             return;
         }
 
         existing.Reject();
-        await repository.DeleteReviewReferenceAsync(reviewId, cancellationToken);
+        await repository.UpdateReviewReferenceAsync(existing, cancellationToken);
     }
 }

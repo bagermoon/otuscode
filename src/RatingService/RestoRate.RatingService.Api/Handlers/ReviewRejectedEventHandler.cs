@@ -3,6 +3,7 @@ using MassTransit;
 using Mediator;
 
 using RestoRate.Contracts.Review.Events;
+using RestoRate.RatingService.Application.Mappings;
 using RestoRate.RatingService.Application.UseCases.Review.Reject;
 
 namespace RestoRate.RatingService.Api.Handlers;
@@ -13,7 +14,13 @@ public sealed class ReviewRejectedEventHandler(
 {
     public Task Consume(ConsumeContext<ReviewRejectedEvent> context)
     {
-        var command = new RejectReviewCommand(context.Message.ReviewId);
+        var message = context.Message;
+
+        var command = new RejectReviewCommand(
+            ReviewId: message.ReviewId,
+            RestaurantId: message.RestaurantId,
+            Rating: message.Rating,
+            AverageCheck: message.AverageCheck?.ToDomainMoney());
         return sender.Send(command, context.CancellationToken).AsTask();
     }
 }

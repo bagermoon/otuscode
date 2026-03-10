@@ -222,11 +222,13 @@ public sealed class ReviewEventsFlowTests : IClassFixture<RatingWebApplicationFa
             return Task.CompletedTask;
         }, timeout: TimeSpan.FromSeconds(15));
 
-        // Poll Mongo until deleted
+        // Poll Mongo until marked rejected
         await Eventually.SucceedsAsync(async () =>
         {
             var saved = await collection.Find(x => x.Id == reviewId).FirstOrDefaultAsync(CancellationToken);
-            saved.Should().BeNull();
+            saved.Should().NotBeNull();
+            saved!.IsRejected.Should().BeTrue();
+            saved.IsApproved.Should().BeFalse();
         }, timeout: TimeSpan.FromSeconds(5));
 
         // Expect at least 2 recalculated events (one for add, one for reject)
@@ -242,6 +244,175 @@ public sealed class ReviewEventsFlowTests : IClassFixture<RatingWebApplicationFa
         last.RestaurantId.Should().Be(restaurantId);
         last.ProvisionalReviewsCount.Should().Be(0);
         last.ApprovedReviewsCount.Should().Be(0);
+    }
+
+    [Fact]
+    public async Task ReviewApprovedEvent_BeforeReviewAddedEvent_UpsertsApprovedReference_WithoutDuplicateRecalculation()
+    {
+        var collection = _factory.Services.GetRequiredService<IMongoCollection<ReviewReference>>();
+
+        var restaurantId = Guid.NewGuid();
+        var reviewId = Guid.NewGuid();
+        var authorId = Guid.NewGuid();
+
+        var approved = new ReviewApprovedEvent(
+            ReviewId: reviewId,
+            RestaurantId: restaurantId,
+            AuthorId: authorId,
+            Rating: 4.8m,
+            AverageCheck: new MoneyDto(80m, "USD"),
+            Comment: null,
+            Tags: null);
+
+        var added = new ReviewAddedEvent(
+            ReviewId: reviewId,
+            RestaurantId: restaurantId,
+            AuthorId: authorId,
+            Rating: 4.8m,
+            AverageCheck: new MoneyDto(80m, "USD"),
+            Comment: null,
+            Tags: null);
+
+        await Harness.Bus.Publish(approved, CancellationToken);
+
+        await Eventually.SucceedsAsync(() =>
+        {
+            Harness.Consumed.Select<ReviewApprovedEvent>(CancellationToken)
+                .Any(x => x.Context.Message.ReviewId == reviewId)
+                .Should().BeTrue();
+
+            return Task.CompletedTask;
+        }, timeout: TimeSpan.FromSeconds(15));
+
+        await Eventually.SucceedsAsync(async () =>
+        {
+            var saved = await collection.Find(x => x.Id == reviewId).FirstOrDefaultAsync(CancellationToken);
+            saved.Should().NotBeNull();
+            saved!.IsApproved.Should().BeTrue();
+            saved.IsRejected.Should().BeFalse();
+            saved.RestaurantId.Should().Be(restaurantId);
+        }, timeout: TimeSpan.FromSeconds(5));
+
+        await Eventually.SucceedsAsync(() =>
+        {
+            Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken)
+                .Any(x => x.Context.Message.RestaurantId == restaurantId)
+                .Should().BeTrue();
+
+            return Task.CompletedTask;
+        }, timeout: TimeSpan.FromSeconds(15));
+
+        var publishedCountBeforeAdd = Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken)
+            .Count(x => x.Context.Message.RestaurantId == restaurantId);
+
+        await Harness.Bus.Publish(added, CancellationToken);
+
+        await Eventually.SucceedsAsync(() =>
+        {
+            Harness.Consumed.Select<ReviewAddedEvent>(CancellationToken)
+                .Any(x => x.Context.Message.ReviewId == reviewId)
+                .Should().BeTrue();
+
+            return Task.CompletedTask;
+        }, timeout: TimeSpan.FromSeconds(15));
+
+        await Task.Delay(350, CancellationToken);
+
+        var savedAfterAdd = await collection.Find(x => x.Id == reviewId).ToListAsync(CancellationToken);
+        savedAfterAdd.Should().HaveCount(1);
+        savedAfterAdd[0].IsApproved.Should().BeTrue();
+        savedAfterAdd[0].IsRejected.Should().BeFalse();
+
+        var publishedCountAfterAdd = Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken)
+            .Count(x => x.Context.Message.RestaurantId == restaurantId);
+        publishedCountAfterAdd.Should().Be(publishedCountBeforeAdd);
+    }
+
+    [Fact]
+    public async Task ReviewRejectedEvent_BeforeReviewAddedEvent_PreservesRejectedTombstone_And_ZeroVisibleRatings()
+    {
+        var collection = _factory.Services.GetRequiredService<IMongoCollection<ReviewReference>>();
+
+        var restaurantId = Guid.NewGuid();
+        var reviewId = Guid.NewGuid();
+        var authorId = Guid.NewGuid();
+
+        var rejected = new ReviewRejectedEvent(
+            ReviewId: reviewId,
+            RestaurantId: restaurantId,
+            AuthorId: authorId,
+            Rating: 2.1m,
+            AverageCheck: null,
+            Comment: null,
+            Tags: null);
+
+        var added = new ReviewAddedEvent(
+            ReviewId: reviewId,
+            RestaurantId: restaurantId,
+            AuthorId: authorId,
+            Rating: 2.1m,
+            AverageCheck: null,
+            Comment: null,
+            Tags: null);
+
+        await Harness.Bus.Publish(rejected, CancellationToken);
+
+        await Eventually.SucceedsAsync(() =>
+        {
+            Harness.Consumed.Select<ReviewRejectedEvent>(CancellationToken)
+                .Any(x => x.Context.Message.ReviewId == reviewId)
+                .Should().BeTrue();
+
+            return Task.CompletedTask;
+        }, timeout: TimeSpan.FromSeconds(15));
+
+        await Eventually.SucceedsAsync(async () =>
+        {
+            var saved = await collection.Find(x => x.Id == reviewId).FirstOrDefaultAsync(CancellationToken);
+            saved.Should().NotBeNull();
+            saved!.IsRejected.Should().BeTrue();
+            saved.IsApproved.Should().BeFalse();
+        }, timeout: TimeSpan.FromSeconds(5));
+
+        await Eventually.SucceedsAsync(() =>
+        {
+            Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken)
+                .Any(x => x.Context.Message.RestaurantId == restaurantId)
+                .Should().BeTrue();
+
+            return Task.CompletedTask;
+        }, timeout: TimeSpan.FromSeconds(15));
+
+        var publishedCountBeforeAdd = Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken)
+            .Count(x => x.Context.Message.RestaurantId == restaurantId);
+
+        await Harness.Bus.Publish(added, CancellationToken);
+
+        await Eventually.SucceedsAsync(() =>
+        {
+            Harness.Consumed.Select<ReviewAddedEvent>(CancellationToken)
+                .Any(x => x.Context.Message.ReviewId == reviewId)
+                .Should().BeTrue();
+
+            return Task.CompletedTask;
+        }, timeout: TimeSpan.FromSeconds(15));
+
+        await Task.Delay(350, CancellationToken);
+
+        var savedAfterAdd = await collection.Find(x => x.Id == reviewId).ToListAsync(CancellationToken);
+        savedAfterAdd.Should().HaveCount(1);
+        savedAfterAdd[0].IsRejected.Should().BeTrue();
+        savedAfterAdd[0].IsApproved.Should().BeFalse();
+
+        var publishedCountAfterAdd = Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken)
+            .Count(x => x.Context.Message.RestaurantId == restaurantId);
+        publishedCountAfterAdd.Should().Be(publishedCountBeforeAdd);
+
+        var last = Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken)
+            .Last(x => x.Context.Message.RestaurantId == restaurantId)
+            .Context.Message;
+        last.ApprovedReviewsCount.Should().Be(0);
+        last.ProvisionalReviewsCount.Should().Be(0);
     }
 
     [Fact]
