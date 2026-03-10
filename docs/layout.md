@@ -1,4 +1,4 @@
-# Структура монорепозитория для микросервисов по DDD (с .NET Aspire и Blazor)
+# Структура монорепозитория для микросервисов по DDD (.NET Aspire и Blazor)
 
 Документ фиксирует рекомендуемую структуру проектов и правила разделения ответственности между `ServiceDefaults`, `Contracts`, `Abstractions`, `BuildingBlocks`, `SharedKernel`, `Common` и константами в контексте .NET 9, .NET Aspire (AppHost, ServiceDefaults), Gateway (YARP) и Blazor Server Dashboard.
 
