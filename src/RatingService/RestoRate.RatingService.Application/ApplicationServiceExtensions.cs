@@ -9,30 +9,15 @@ namespace RestoRate.RatingService.Application;
 
 public static class ApplicationServiceExtensions
 {
-    public static IServiceCollection AddRatingApplication(
-        this IServiceCollection services,
-        TimeSpan? statsCalculatorDebounceWindow = null)
+    public static IServiceCollection AddRatingApplication(this IServiceCollection services)
     {
         services.AddMediatorConfigs();
 
         services.AddTransient<IReviewReferenceService, ReviewReferenceService>();
         services.AddTransient<IRatingCalculatorService, RatingCalculatorService>();
         services.AddTransient<IRatingProviderService, RatingProviderService>();
-
-        var debounceWindow = GetDebounceWindow(statsCalculatorDebounceWindow);
-        services.AddTransient<IStatsCalculator>(sp =>
-            ActivatorUtilities.CreateInstance<StatsCalculator>(sp, debounceWindow));
+        services.AddTransient<IStatsCalculator, StatsCalculator>();
 
         return services;
-    }
-
-    private static TimeSpan GetDebounceWindow(TimeSpan? debounceWindow = null)
-    {
-        return debounceWindow switch
-        {
-            null => TimeSpan.FromSeconds(1),
-            var x when x.Value <= TimeSpan.Zero => TimeSpan.FromSeconds(1),
-            _ => debounceWindow.Value
-        };
     }
 }

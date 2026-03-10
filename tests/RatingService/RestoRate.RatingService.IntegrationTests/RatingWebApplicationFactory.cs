@@ -50,7 +50,7 @@ public class RatingWebApplicationFactory
             config.AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["MassTransit:UseMongoDbSagaOutbox"] = "false",
-                ["RatingService:StatsCalculator:DebounceWindowMs"] = "100",
+                ["RatingService:DebounceWindowMs"] = "100",
             });
         });
 

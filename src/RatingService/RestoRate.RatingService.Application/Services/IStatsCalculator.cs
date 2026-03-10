@@ -4,13 +4,16 @@ namespace RestoRate.RatingService.Application.Services;
 
 public interface IStatsCalculator
 {
-    Task<bool> RecalculateDebouncedAsync(
+    Task QueueRecalculationAsync(
         Guid restaurantId,
-        bool requestedApprovedOnly,
         CancellationToken cancellationToken = default);
 
     Task<RatingRecalculationResult> RecalculateAsync(
         Guid restaurantId,
         bool requestedApprovedOnly,
+        CancellationToken cancellationToken = default);
+
+    Task<RatingRecalculationResult> RecalculateLatestAsync(
+        Guid restaurantId,
         CancellationToken cancellationToken = default);
 }

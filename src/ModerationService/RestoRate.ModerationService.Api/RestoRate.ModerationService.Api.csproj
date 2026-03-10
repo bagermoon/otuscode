@@ -7,7 +7,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\RestoRate.Auth\RestoRate.Auth.csproj" />
+    <ProjectReference Include="..\..\RestoRate.Contracts\RestoRate.Contracts.csproj" />
     <ProjectReference Include="..\..\RestoRate.ServiceDefaults\RestoRate.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\RestoRate.ModerationService.Application\RestoRate.ModerationService.Application.csproj" />
+    <ProjectReference Include="..\RestoRate.ModerationService.Infrastructure\RestoRate.ModerationService.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

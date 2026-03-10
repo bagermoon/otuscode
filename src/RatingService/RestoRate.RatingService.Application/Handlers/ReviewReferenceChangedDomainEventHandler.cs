@@ -8,9 +8,7 @@ using RestoRate.RatingService.Domain.ReviewReferenceAggregate.Events;
 namespace RestoRate.RatingService.Application.Handlers;
 
 public sealed class ReviewReferenceChangedDomainEventHandler(
-    IStatsCalculator statsCalculator,
-    IRatingProviderService ratingProviderService,
-    IIntegrationEventBus integrationEventBus)
+    IStatsCalculator statsCalculator)
     : IDomainEventHandler<ReviewReferenceChangedDomainEvent>
 {
 
@@ -18,17 +16,8 @@ public sealed class ReviewReferenceChangedDomainEventHandler(
         ReviewReferenceChangedDomainEvent domainEvent,
         CancellationToken cancellationToken)
     {
-        var recalculated = await statsCalculator.RecalculateDebouncedAsync(
+        await statsCalculator.QueueRecalculationAsync(
             domainEvent.RestaurantId,
-            requestedApprovedOnly: domainEvent.IsApproved,
             cancellationToken);
-
-        if (!recalculated)
-        {
-            return;
-        }
-
-        var integrationEvent = await ratingProviderService.GetRatingAsync(domainEvent.RestaurantId, cancellationToken);
-        await integrationEventBus.PublishAsync(integrationEvent.ToEvent(), cancellationToken);
     }
 }

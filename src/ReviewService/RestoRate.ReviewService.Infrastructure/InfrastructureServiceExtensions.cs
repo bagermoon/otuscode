@@ -33,8 +33,6 @@ public static class InfrastructureServiceExtensions
             assemblies = [Assembly.GetCallingAssembly()];
         }
 
-        MoneyBsonSerializer.EnsureRegistered();
-
         builder.AddMongoDbContext<ReviewDbContext>(AppHostProjects.ReviewDb);
 
         var reviewDbConnectionString = builder.Configuration.GetConnectionString(AppHostProjects.ReviewDb);

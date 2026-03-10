@@ -16,7 +16,8 @@ public static class ReviewDtoExtensions
             review.AverageCheck?.ToDto(),
             review.Comment ?? string.Empty,
             review.CreatedAt,
-            review.UpdatedAt
+            review.UpdatedAt,
+            review.Status
         );
     }
 }

@@ -8,10 +8,12 @@
 @using System.Security.Claims
 @using MudBlazor
 @using Microsoft.AspNetCore.Components.Authorization
+@using RestoRate.Abstractions.Identity
 
 @inject RestaurantWebService RestaurantService
 @inject ISnackbar Snackbar
 @inject AuthenticationStateProvider AuthStateProvider
+@inject IUserContext UserContext
 
 <MudDialog Class="rr-modern-dialog" ContentClass="pa-0 dialog-wrapper">
     <DialogContent>
@@ -96,14 +98,44 @@
                         <Authorized>
                             @if (_myExistingReview != null)
                             {
-                                <MudText Typo="Typo.h6" Class="mb-4 font-weight-bold" Color="Color.Success">Ваш отзыв</MudText>
-                                <MudPaper Elevation="0" Class="pa-6 rounded-xl mb-8 border-success-light">
+                                @if (_myExistingReview.Status == ReviewStatus.Rejected)
+                                {
+                                    <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Class="mb-6 rounded-xl shadow-sm">
+                                        <MudText Typo="Typo.subtitle1" Class="font-weight-bold mb-1">Ваш отзыв отклонен модератором</MudText>
+                                        <MudText Typo="Typo.body2">
+                                            Мы не смогли опубликовать ваш комментарий. Возможные причины:
+                                            <ul style="margin-top: 4px; padding-left: 20px;">
+                                                <li>Использование ненормативной лексики или оскорблений</li>
+                                                <li>Наличие рекламных ссылок или спама</li>
+                                            </ul>
+                                        </MudText>
+                                    </MudAlert>
+                                }
+                                else if (_myExistingReview.Status == ReviewStatus.Pending || _myExistingReview.Status == ReviewStatus.ModerationPending)
+                                {
+                                    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mb-6 rounded-xl">
+                                        <MudText Typo="Typo.body2" Class="font-weight-bold d-flex align-center">
+                                            <MudIcon Icon="@Icons.Material.Filled.HourglassEmpty" Size="Size.Small" Class="mr-2" />
+                                            Ваш отзыв находится на проверке. Он появится здесь сразу после одобрения.
+                                        </MudText>
+                                    </MudAlert>
+                                }
+                                else
+                                {
+                                    <MudText Typo="Typo.h6" Class="mb-4 font-weight-bold" Color="Color.Success">Ваш отзыв</MudText>
+                                }
+
+                                <MudPaper Elevation="0" Class="pa-6 rounded-xl mb-8 border-gray"
+                                          Style="@(_myExistingReview.Status != ReviewStatus.Approved ? "opacity: 0.6; pointer-events: none;" : "border-color: var(--mud-palette-success-light);")">
                                     <div class="d-flex justify-space-between align-start">
                                         <div class="d-flex align-center">
                                             <MudRating SelectedValue="(int)_myExistingReview.Rating" ReadOnly="true" Size="Size.Large" FullIcon="@Icons.Material.Filled.Star" />
                                             <MudText Typo="Typo.caption" Class="ml-2 text-secondary">@_myExistingReview.CreatedAt.ToString("d MMMM yyyy")</MudText>
                                         </div>
-                                        <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Text">Вы уже оценили это место</MudChip>
+                                        @if (_myExistingReview.Status == ReviewStatus.Approved)
+                                        {
+                                            <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Text">Опубликовано</MudChip>
+                                        }
                                     </div>
 
                                     <MudText Typo="Typo.body1" Class="mt-3 font-weight-medium">@_myExistingReview.Comment</MudText>
@@ -168,7 +200,7 @@
                     {
                         <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Small" />
                     }
-                    else if (!_reviews.Any())
+                    else if (!_reviews.Any(r => r.Status == ReviewStatus.Approved))
                     {
                         <MudText Typo="Typo.body2" Class="text-secondary">Пока нет отзывов. Будьте первым!</MudText>
                     }
@@ -177,7 +209,8 @@
                         <div class="reviews-scroll-container">
                             @foreach (var review in _reviews)
                             {
-                                if (_currentUserId != null && review.UserId == _currentUserId) continue;
+                                if (review.UserId == _currentUserId) continue;
+                                if (review.Status != ReviewStatus.Approved) continue;
 
                                 <MudPaper Elevation="0" Class="pa-4 mb-4 rounded-xl border-gray">
                                     <div class="d-flex align-center mb-2">
@@ -331,7 +364,7 @@
 
     private List<ReviewDto>? _reviews;
     private ReviewDto? _myExistingReview;
-    private Guid? _currentUserId;
+    private Guid _currentUserId;
 
     private int _reviewRating = 0;
     private string? _reviewComment;
@@ -343,6 +376,7 @@
     protected override async Task OnInitializedAsync()
     {
         _selectedIndex = 0;
+        _currentUserId = UserContext.UserId;
         await LoadReviewsAndUser();
     }
 
@@ -412,13 +446,6 @@
     {
         try
         {
-            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-            var userClaims = authState.User;
-            var userIdStr = userClaims.FindFirst("sub")?.Value ?? userClaims.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (Guid.TryParse(userIdStr, out var uid))
-                _currentUserId = uid;
-
             var result = await RestaurantService.GetReviewsByRestaurantAsync(Restaurant.RestaurantId);
             if (result != null)
             {
@@ -426,8 +453,8 @@
                     .Where(r => r.RestaurantId == Restaurant.RestaurantId)
                     .ToList();
 
-                if (_currentUserId.HasValue)
-                    _myExistingReview = _reviews.FirstOrDefault(r => r.UserId == _currentUserId.Value);
+                if (UserContext.IsAuthenticated)
+                    _myExistingReview = _reviews.FirstOrDefault(r => r.UserId == _currentUserId);
             }
             else
                 _reviews = new List<ReviewDto>();
@@ -456,7 +483,7 @@
 
         try
         {
-            if (_currentUserId == null)
+            if (!UserContext.IsAuthenticated)
             {
                 Snackbar.Add("Ошибка авторизации", Severity.Error);
                 return;
@@ -468,7 +495,7 @@
 
             var dto = new CreateReviewDto(
                 RestaurantId: Restaurant.RestaurantId,
-                UserId: _currentUserId.Value,
+                UserId: _currentUserId,
                 Rating: (decimal)_reviewRating,
                 AverageCheck: moneyDto,
                 Comment: _reviewComment
@@ -478,13 +505,30 @@
 
             if (result)
             {
-                Snackbar.Add("Отзыв успешно отправлен!", Severity.Success);
+                Snackbar.Add("Отзыв отправлен на проверку модератору", Severity.Info);
 
                 _reviewRating = 0;
                 _reviewComment = string.Empty;
                 _userAverageCheck = null;
 
-                await LoadReviewsAndUser();
+                int maxAttempts = 6;
+                int currentAttempt = 0;
+                bool isModerationFinished = false;
+
+                while (currentAttempt < maxAttempts && !isModerationFinished)
+                {
+                    await Task.Delay(500);
+                    await LoadReviewsAndUser();
+
+                    if (_myExistingReview != null &&
+                        _myExistingReview.Status != ReviewStatus.Pending &&
+                        _myExistingReview.Status != ReviewStatus.ModerationPending)
+                    {
+                        isModerationFinished = true;
+                    }
+
+                    currentAttempt++;
+                }
             }
             else
                 Snackbar.Add("Не удалось отправить отзыв.", Severity.Error);

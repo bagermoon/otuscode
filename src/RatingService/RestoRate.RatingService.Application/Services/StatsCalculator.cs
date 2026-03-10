@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
+using RestoRate.RatingService.Application.Configurations;
 using RestoRate.RatingService.Application.Models;
 using RestoRate.RatingService.Domain.Interfaces;
 using RestoRate.RatingService.Domain.Models;
@@ -12,27 +14,29 @@ public sealed class StatsCalculator(
     IRestaurantRatingCache ratingCache,
     IRatingRecalculationDebouncer debouncer,
     ILogger<StatsCalculator> logger,
-    TimeSpan debounceWindow)
+    IOptionsMonitor<RatingServiceOptions> options)
     : IStatsCalculator
 {
-    private static readonly TimeSpan DefaultDebounceWindow = TimeSpan.FromSeconds(1);
-    private readonly TimeSpan _debounceWindow = debounceWindow > TimeSpan.Zero
-        ? debounceWindow
-        : DefaultDebounceWindow;
+    private TimeSpan DebounceWindow => options.CurrentValue.DebounceWindow;
 
-    public async Task<bool> RecalculateDebouncedAsync(
+    public async Task QueueRecalculationAsync(
         Guid restaurantId,
-        bool requestedApprovedOnly,
         CancellationToken cancellationToken = default)
     {
-        if (!await ShouldRecalculateAsync(restaurantId, cancellationToken))
+        try
         {
-            return false;
+            await debouncer.MarkChangedAsync(restaurantId, DebounceWindow, cancellationToken);
         }
-
-        _ = await RecalculateAsync(restaurantId, requestedApprovedOnly, cancellationToken);
-        return true;
+        catch (Exception ex)
+        {
+            logger.FailedToDebounce(ex, restaurantId);
+        }
     }
+
+    public Task<RatingRecalculationResult> RecalculateLatestAsync(
+        Guid restaurantId,
+        CancellationToken cancellationToken = default)
+        => RecalculateFreshAsync(restaurantId, cancellationToken);
 
     public async Task<RatingRecalculationResult> RecalculateAsync(
         Guid restaurantId,
@@ -57,18 +61,17 @@ public sealed class StatsCalculator(
         return new RatingRecalculationResult(approvedSnapshot, provisionalSnapshot);
     }
 
-    private async Task<bool> ShouldRecalculateAsync(Guid restaurantId, CancellationToken cancellationToken)
+    private async Task<RatingRecalculationResult> RecalculateFreshAsync(
+        Guid restaurantId,
+        CancellationToken cancellationToken)
     {
-        try
-        {
-            return await debouncer.TryEnterWindowAsync(restaurantId, _debounceWindow, cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            // Fail-open: if Redis is down, compute immediately (no debounce).
-            logger.FailedToDebounce(ex, restaurantId);
-            return true;
-        }
+        var approvedSnapshot = await ratingCalculator.CalculateAsync(restaurantId, approvedOnly: true, cancellationToken);
+        await TryCacheAsync(approvedSnapshot, approvedOnly: true, cancellationToken);
+
+        var provisionalSnapshot = await ratingCalculator.CalculateAsync(restaurantId, approvedOnly: false, cancellationToken);
+        await TryCacheAsync(provisionalSnapshot, approvedOnly: false, cancellationToken);
+
+        return new RatingRecalculationResult(approvedSnapshot, provisionalSnapshot);
     }
 
     private async Task<RestaurantRatingSnapshot?> TryGetCachedAsync(

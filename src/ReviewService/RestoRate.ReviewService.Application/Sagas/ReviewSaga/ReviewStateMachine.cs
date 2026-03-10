@@ -129,8 +129,8 @@ public class ReviewStateMachine : MassTransitStateMachine<ReviewState>
                 .TransitionTo(ValidationOk),
             elseBinder => elseBinder
                 .ThenAsync(RejectReviewAsync)
-                .TransitionTo(ValidationFailed))
-                .Finalize();
+                .TransitionTo(ValidationFailed)
+                .Finalize());
 
     private static async Task MoveReviewToModerationPendingAsync<TMessage>(BehaviorContext<ReviewState, TMessage> context)
         where TMessage : class

@@ -5,7 +5,7 @@ using RestoRate.ReviewService.Domain.ReviewAggregate;
 
 namespace RestoRate.ReviewService.Infrastructure.Configuration;
 
-internal sealed class ReviewConfiguration : IEntityTypeConfiguration<Review>
+internal sealed class ReviewConfiguration() : IEntityTypeConfiguration<Review>
 {
     public void Configure(EntityTypeBuilder<Review> builder)
     {
@@ -22,7 +22,21 @@ internal sealed class ReviewConfiguration : IEntityTypeConfiguration<Review>
         builder.Property(r => r.Rating)
             .IsRequired();
 
-        builder.Property(r => r.AverageCheck)
+        builder.Ignore(r => r.AverageCheck);
+
+        builder.OwnsOne<ReviewAverageCheck>("AverageCheckData", averageCheck =>
+        {
+            averageCheck.HasElementName("AverageCheck");
+
+            averageCheck.Property(m => m.Amount)
+                .IsRequired();
+
+            averageCheck.Property(m => m.Currency)
+                .IsRequired()
+                .HasMaxLength(3);
+        });
+
+        builder.Navigation("AverageCheckData")
             .IsRequired(false);
 
         builder.Property(r => r.Comment)

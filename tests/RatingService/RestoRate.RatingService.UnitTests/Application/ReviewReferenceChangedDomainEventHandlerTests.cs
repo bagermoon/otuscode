@@ -2,11 +2,8 @@ using FluentAssertions;
 
 using NSubstitute;
 
-using RestoRate.Abstractions.Messaging;
 using RestoRate.RatingService.Application.Handlers;
-using RestoRate.RatingService.Application.Models;
 using RestoRate.RatingService.Application.Services;
-using RestoRate.RatingService.Domain.Models;
 using RestoRate.RatingService.Domain.ReviewReferenceAggregate.Events;
 
 namespace RestoRate.RatingService.UnitTests.Application;
@@ -23,43 +20,32 @@ public sealed class ReviewReferenceChangedDomainEventHandlerTests(ITestContextAc
         review.Approve();
 
         var statsCalculator = Substitute.For<IStatsCalculator>();
-        var ratingProvider = Substitute.For<IRatingProviderService>();
-        var eventBus = Substitute.For<IIntegrationEventBus>();
 
-        statsCalculator.RecalculateDebouncedAsync(restaurantId, Arg.Any<bool>(), Arg.Any<CancellationToken>())
-            .Returns(false);
+        statsCalculator.QueueRecalculationAsync(restaurantId, Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
 
-        var sut = new ReviewReferenceChangedDomainEventHandler(statsCalculator, ratingProvider, eventBus);
+        var sut = new ReviewReferenceChangedDomainEventHandler(statsCalculator);
 
         await sut.Handle(new ReviewReferenceChangedDomainEvent(review), CancellationToken);
 
-        eventBus.ReceivedCalls().Should().BeEmpty();
+        await statsCalculator.Received(1).QueueRecalculationAsync(restaurantId, Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task Handle_WhenRecalculated_PublishesRestaurantRatingRecalculatedEvent()
+    public async Task Handle_WhenReviewChanges_QueuesRecalculationWithoutPublishingIntegrationEvent()
     {
         var restaurantId = Guid.NewGuid();
         var review = ReviewReference.Create(Guid.NewGuid(), restaurantId, 4.0m, averageCheck: null);
 
         var statsCalculator = Substitute.For<IStatsCalculator>();
-        var ratingProvider = Substitute.For<IRatingProviderService>();
-        var eventBus = Substitute.For<IIntegrationEventBus>();
 
-        statsCalculator.RecalculateDebouncedAsync(restaurantId, Arg.Any<bool>(), Arg.Any<CancellationToken>())
-            .Returns(true);
+        statsCalculator.QueueRecalculationAsync(restaurantId, Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
 
-        ratingProvider.GetRatingAsync(restaurantId, Arg.Any<CancellationToken>())
-            .Returns(new RatingRecalculationResult(
-                Approved: new RestaurantRatingSnapshot(restaurantId, 4.5m, 10, NodaMoney.Money.Zero),
-                Provisional: new RestaurantRatingSnapshot(restaurantId, 4.2m, 12, NodaMoney.Money.Zero)));
-
-        var sut = new ReviewReferenceChangedDomainEventHandler(statsCalculator, ratingProvider, eventBus);
+        var sut = new ReviewReferenceChangedDomainEventHandler(statsCalculator);
 
         await sut.Handle(new ReviewReferenceChangedDomainEvent(review), CancellationToken);
 
-        await eventBus.Received(1).PublishAsync(
-            Arg.Is<RestoRate.Contracts.Rating.Events.RestaurantRatingRecalculatedEvent>(e => e.RestaurantId == restaurantId),
-            Arg.Any<CancellationToken>());
+        await statsCalculator.Received(1).QueueRecalculationAsync(restaurantId, Arg.Any<CancellationToken>());
     }
 }
