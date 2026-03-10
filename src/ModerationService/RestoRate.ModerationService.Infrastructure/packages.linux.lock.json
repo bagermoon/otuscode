@@ -531,16 +531,10 @@
           "RestoRate.SharedKernel": "[1.0.0, )"
         }
       },
-      "restorate.contracts": {
+      "restorate.moderationservice.domain": {
         "type": "Project",
         "dependencies": {
-          "RestoRate.Abstractions": "[1.0.0, )"
-        }
-      },
-      "restorate.moderationservice.application": {
-        "type": "Project",
-        "dependencies": {
-          "RestoRate.Abstractions": "[1.0.0, )"
+          "RestoRate.SharedKernel": "[1.0.0, )"
         }
       },
       "restorate.servicedefaults": {
