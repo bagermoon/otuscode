@@ -531,20 +531,6 @@
           "RestoRate.SharedKernel": "[1.0.0, )"
         }
       },
-      "restorate.contracts": {
-        "type": "Project",
-        "dependencies": {
-          "RestoRate.Abstractions": "[1.0.0, )"
-        }
-      },
-      "restorate.moderationservice.application": {
-        "type": "Project",
-        "dependencies": {
-          "Ardalis.Result": "[10.1.0, )",
-          "RestoRate.Abstractions": "[1.0.0, )",
-          "RestoRate.ModerationService.Domain": "[1.0.0, )"
-        }
-      },
       "restorate.moderationservice.domain": {
         "type": "Project",
         "dependencies": {
