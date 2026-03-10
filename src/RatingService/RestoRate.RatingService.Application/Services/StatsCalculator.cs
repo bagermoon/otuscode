@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
+using RestoRate.RatingService.Application.Configurations;
 using RestoRate.RatingService.Application.Models;
 using RestoRate.RatingService.Domain.Interfaces;
 using RestoRate.RatingService.Domain.Models;
@@ -12,13 +14,10 @@ public sealed class StatsCalculator(
     IRestaurantRatingCache ratingCache,
     IRatingRecalculationDebouncer debouncer,
     ILogger<StatsCalculator> logger,
-    TimeSpan debounceWindow)
+    IOptionsMonitor<RatingServiceOptions> options)
     : IStatsCalculator
 {
-    private static readonly TimeSpan DefaultDebounceWindow = TimeSpan.FromSeconds(1);
-    private readonly TimeSpan _debounceWindow = debounceWindow > TimeSpan.Zero
-        ? debounceWindow
-        : DefaultDebounceWindow;
+    private TimeSpan DebounceWindow => options.CurrentValue.DebounceWindow;
 
     public async Task QueueRecalculationAsync(
         Guid restaurantId,
@@ -26,7 +25,7 @@ public sealed class StatsCalculator(
     {
         try
         {
-            await debouncer.MarkChangedAsync(restaurantId, _debounceWindow, cancellationToken);
+            await debouncer.MarkChangedAsync(restaurantId, DebounceWindow, cancellationToken);
         }
         catch (Exception ex)
         {

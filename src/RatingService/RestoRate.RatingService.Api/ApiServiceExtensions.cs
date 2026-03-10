@@ -1,26 +1,21 @@
 using RestoRate.RatingService.Api.Configurations;
-using RestoRate.RatingService.Api.Services;
-using RestoRate.RatingService.Infrastructure;
+using RestoRate.RatingService.Api.Workers;
 using RestoRate.RatingService.Application;
+using RestoRate.RatingService.Application.Configurations;
+using RestoRate.RatingService.Infrastructure;
 using RestoRate.ServiceDefaults;
-
-using Microsoft.Extensions.Configuration;
 namespace RestoRate.RatingService.Api;
 
 internal static class ApiServiceExtensions
 {
     public static IHostApplicationBuilder AddRatingApi(this IHostApplicationBuilder builder)
     {
+        builder.Services.ConfigureRatingOptions(builder.Configuration);
+
         builder.ConfigureAuthentication();
+        builder.Services.AddRatingApplication();
 
-        var debounceWindow = GetStatsCalculatorDebounceWindow(builder.Configuration);
-        builder.Services.AddRatingApplication(statsCalculatorDebounceWindow: debounceWindow);
-
-        if (HasRedisConnection(builder.Configuration))
-        {
-            builder.Services.AddSingleton<IHostedService>(sp =>
-                ActivatorUtilities.CreateInstance<RatingRecalculationHostedService>(sp, debounceWindow));
-        }
+        builder.Services.AddRecalculationHostedServiceIfNeeded(builder.Configuration);
 
         builder.AddRatingInfrastructure(
             typeof(ApiServiceExtensions).Assembly
@@ -29,15 +24,20 @@ internal static class ApiServiceExtensions
         return builder;
     }
 
-    private static TimeSpan GetStatsCalculatorDebounceWindow(IConfiguration configuration)
+    private static void ConfigureRatingOptions(this IServiceCollection services, IConfiguration configuration)
     {
-        var ms = configuration.GetValue<int?>("RatingService:StatsCalculator:DebounceWindowMs");
+        services.AddOptions<RatingServiceOptions>()
+            .Bind(configuration.GetSection(RatingServiceOptions.SectionName));
+        services.PostConfigure<RatingServiceOptions>(options =>
+            options.DebounceWindowMs = RatingServiceOptions.NormalizeDebounceWindowMs(options.DebounceWindowMs));
+    }
 
-        return ms switch
+    private static void AddRecalculationHostedServiceIfNeeded(this IServiceCollection services, IConfiguration configuration)
+    {
+        if (HasRedisConnection(configuration))
         {
-            null or <= 0 => TimeSpan.Zero,
-            _ => TimeSpan.FromMilliseconds(ms.Value)
-        };
+            services.AddHostedService<RecalculationHostedService>();
+        }
     }
 
     private static bool HasRedisConnection(IConfiguration configuration)

@@ -1,18 +1,20 @@
 using Mediator;
 
+using Microsoft.Extensions.Options;
+
+using RestoRate.RatingService.Application.Configurations;
 using RestoRate.RatingService.Application.UseCases.Rating.Recalculate;
 using RestoRate.RatingService.Domain.Interfaces;
 
-namespace RestoRate.RatingService.Api.Services;
+namespace RestoRate.RatingService.Api.Workers;
 
-internal sealed class RatingRecalculationHostedService(
+internal sealed class RecalculationHostedService(
     IServiceScopeFactory scopeFactory,
     IRatingRecalculationDebouncer debouncer,
-    ILogger<RatingRecalculationHostedService> logger,
-    TimeSpan debounceWindow)
+    ILogger<RecalculationHostedService> logger,
+    IOptionsMonitor<RatingServiceOptions> options)
     : BackgroundService
 {
-    private static readonly TimeSpan DefaultDebounceWindow = TimeSpan.FromSeconds(1);
     private static readonly Action<ILogger, Exception?> LogDueRecalculationProcessingFailed =
         LoggerMessage.Define(
             LogLevel.Warning,
@@ -21,12 +23,10 @@ internal sealed class RatingRecalculationHostedService(
 
     private const int BatchSize = 32;
 
-    private readonly TimeSpan _debounceWindow = debounceWindow > TimeSpan.Zero
-        ? debounceWindow
-        : DefaultDebounceWindow;
+    private TimeSpan DebounceWindow => options.CurrentValue.DebounceWindow;
 
     private TimeSpan PollInterval => TimeSpan.FromMilliseconds(
-        Math.Clamp((int)(_debounceWindow.TotalMilliseconds / 2), 25, 250));
+        Math.Clamp((int)(DebounceWindow.TotalMilliseconds / 2), 25, 250));
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
