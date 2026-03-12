@@ -18,14 +18,16 @@ internal static class GetAllRestaurantsEndpoint
             int pageSize = 20,
             string? searchTerm = null,
             string? cuisineType = null,
-            string? tag = null) =>
+            string? tag = null,
+            string? sortBy = null) =>
         {
             var query = new GetAllRestaurantsQuery(
                 pageNumber,
                 pageSize,
                 searchTerm,
                 cuisineType,
-                tag);
+                tag,
+                sortBy);
 
             var result = await sender.Send(query, ct);
 

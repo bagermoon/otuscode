@@ -12,5 +12,6 @@ public sealed record GetAllRestaurantsQuery(
     int PageSize = 20,
     string? SearchTerm = null,
     string? CuisineType = null,
-    string? Tag = null
+    string? Tag = null,
+    string? SortBy = null
 ) : IQuery<Result<Contracts.Common.PagedResult<RestaurantDto>>>;

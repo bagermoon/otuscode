@@ -16,7 +16,8 @@ public class RestaurantWebService(IHttpClientFactory httpClientFactory)
         int pageSize = 20,
         string? searchTerm = null,
         string? cuisineType = null,
-        string? tag = null)
+        string? tag = null,
+        string? sortBy = null)
     {
         var query = $"restaurants?pageNumber={pageNumber}&pageSize={pageSize}";
         if (!string.IsNullOrWhiteSpace(searchTerm))
@@ -25,6 +26,8 @@ public class RestaurantWebService(IHttpClientFactory httpClientFactory)
             query += $"&cuisineType={Uri.EscapeDataString(cuisineType)}";
         if (!string.IsNullOrWhiteSpace(tag))
             query += $"&tag={Uri.EscapeDataString(tag)}";
+        if (!string.IsNullOrWhiteSpace(sortBy))
+            query += $"&sortBy={Uri.EscapeDataString(sortBy)}";
 
         var response = await _httpClient.GetAsync(query);
         response.EnsureSuccessStatusCode();

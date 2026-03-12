@@ -17,6 +17,7 @@ internal sealed class RestaurantsAuthenticatedOutputCachePolicy : IOutputCachePo
         "searchTerm",
         "cuisineType",
         "tag",
+        "sortBy"
     ];
 
     private readonly TimeSpan _expiration;

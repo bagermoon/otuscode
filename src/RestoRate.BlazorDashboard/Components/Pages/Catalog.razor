@@ -56,6 +56,7 @@
 
 @code {
     [Parameter] public Guid? Id { get; set; }
+    [SupplyParameterFromQuery] public string? SortBy { get; set; }
 
     private Contracts.Common.PagedResult<RestaurantDto>? pagedRestaurants;
     private bool loading = true;
@@ -65,6 +66,7 @@
 
     private string? _initialSearchTerm;
     private string? _initialCuisine;
+    private string? _previousSortBy;
 
     protected override void OnInitialized()
     {
@@ -80,15 +82,29 @@
     {
         if (firstRender)
         {
-            if (filters != null && (!string.IsNullOrEmpty(_initialCuisine) || !string.IsNullOrEmpty(_initialSearchTerm)))
-                await filters.SetValues(_initialSearchTerm, _initialCuisine);
+            if (filters != null)
+                await filters.SetValues(_initialSearchTerm, _initialCuisine, SortBy);
 
+            _previousSortBy = SortBy;
             await Load();
         }
     }
 
     protected override async Task OnParametersSetAsync()
     {
+        if (SortBy != _previousSortBy && !loading)
+        {
+            _previousSortBy = SortBy;
+
+            if (filters != null)
+            {
+                var currentF = filters.GetFilters();
+                await filters.SetValues(currentF.SearchTerm, currentF.CuisineType, SortBy);
+            }
+
+            await Reload();
+        }
+
         if (Id.HasValue && _dialogReference == null)
         {
             await Task.Yield();
@@ -116,7 +132,11 @@
 
     private async Task ResetAll()
     {
-        if (filters != null) await filters.ResetFilters();
+        if (filters != null)
+            await filters.ResetFilters();
+
+        if (!string.IsNullOrEmpty(SortBy))
+            Nav.NavigateTo("/catalog");
     }
 
     private async Task ChangePage(int page)
@@ -130,20 +150,20 @@
         loading = true;
         StateHasChanged();
 
-        var f = filters?.GetFilters() ?? (_initialSearchTerm, _initialCuisine, null);
+        var f = filters != null
+            ? filters.GetFilters()
+            : (SearchTerm: _initialSearchTerm, CuisineType: _initialCuisine, Tag: (string?)null, SortBy: SortBy);
 
         pagedRestaurants = await RestaurantService.GetRestaurantsAsync(
             currentPage,
             12,
             f.SearchTerm,
             f.CuisineType,
-            f.Tag);
+            f.Tag,
+            f.SortBy);
 
         loading = false;
         StateHasChanged();
-
-        if (Id.HasValue && _dialogReference == null)
-            _ = OnParametersSetAsync();
     }
 
     private void OpenDetails(Guid restaurantId, RestaurantDto restaurant)
