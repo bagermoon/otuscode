@@ -10,8 +10,10 @@ using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 
 using RestoRate.Contracts.Moderation.Events;
-using RestoRate.Contracts.Review.Events;
+using RestoRate.ReviewService.Application.Sagas.RestaurantValidationSaga.Messages;
 using RestoRate.ReviewService.Application.Sagas.ReviewSaga;
+using RestoRate.ReviewService.Application.Sagas.ReviewSaga.Messages;
+using RestoRate.ReviewService.Application.Sagas.UserValidationSaga.Messages;
 using RestoRate.ReviewService.Application.UseCases.Reviews.Approve;
 using RestoRate.ReviewService.Application.UseCases.Reviews.MoveToModerationPending;
 using RestoRate.ReviewService.Application.UseCases.Reviews.Reject;

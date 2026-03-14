@@ -8,8 +8,8 @@ using Microsoft.Extensions.Logging;
 
 using NSubstitute;
 
-using RestoRate.Contracts.Review.Events;
 using RestoRate.ReviewService.Application.Handlers;
+using RestoRate.ReviewService.Application.Sagas.ReviewSaga.Messages;
 using RestoRate.ReviewService.Domain.Events;
 
 namespace RestoRate.ReviewService.UnitTests.Handlers;
