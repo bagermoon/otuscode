@@ -5,9 +5,12 @@ using MassTransit;
 
 using Mediator;
 
+using Microsoft.Extensions.Options;
+
 using RestoRate.Contracts.Restaurant;
 using RestoRate.Contracts.Restaurant.Requests;
 using RestoRate.ReviewService.Application.Mappings;
+using RestoRate.ReviewService.Application.Configurations;
 using RestoRate.Contracts.Review.Events;
 using RestoRate.ReviewService.Application.UseCases.RestaurantReferences.UpsertRestaurant;
 using RestoRate.ReviewService.Domain.RestaurantReferenceAggregate;
@@ -20,7 +23,8 @@ public sealed class RestaurantReferenceValidationHandler(
     IRepository<RestaurantReference> repository,
     IRequestClient<GetRestaurantStatusRequest> requestClient,
     ISender sender,
-    IPublishEndpoint publishEndpoint)
+    IPublishEndpoint publishEndpoint,
+    IOptions<RestaurantProjectionOptions> projectionOptions)
     : ICommandHandler<RestaurantReferenceValidationCommand, Result<bool>>
 {
     public async ValueTask<Result<bool>> Handle(
@@ -36,24 +40,22 @@ public sealed class RestaurantReferenceValidationHandler(
 
         if (knownStatus is not null)
         {
-            // If the caller already knows the status (e.g. RestaurantCreated/Updated event),
-            // it is safe to assume the restaurant exists unless explicitly stated otherwise.
             resolvedExists = request.Exists ?? true;
 
-            var result = await sender.Send(
-                new UpsertRestaurantCommand(restaurantId, knownStatus.ToContract()),
+            await sender.Send(
+                new UpsertRestaurantCommand(restaurantId, knownStatus.ToContract(), DateTime.UtcNow),
                 cancellationToken);
 
-            resolvedContractStatus = result.IsOk() ? result.Value : RestaurantStatus.Unknown;
+            resolvedContractStatus = knownStatus.ToContract();
         }
         else
         {
             var restaurantReference = await repository.GetByIdAsync(restaurantId, cancellationToken);
 
-            if (restaurantReference is not null && restaurantReference.RestaurantStatus != DomainRestaurantStatus.Unknown)
+            if (IsFresh(restaurantReference))
             {
                 resolvedExists = true;
-                resolvedContractStatus = restaurantReference.RestaurantStatus.ToContract();
+                resolvedContractStatus = restaurantReference!.RestaurantStatus.ToContract();
             }
             else
             {
@@ -73,6 +75,21 @@ public sealed class RestaurantReferenceValidationHandler(
         bool resolvedExists)
         => resolvedContractStatus.ToDomain().IsVisiblePublicly() && resolvedExists;
 
+    private bool IsFresh(RestaurantReference? restaurantReference)
+    {
+        if (restaurantReference is null || restaurantReference.RestaurantStatus == DomainRestaurantStatus.Unknown)
+        {
+            return false;
+        }
+
+        if (!restaurantReference.LastSynchronizedAt.HasValue)
+        {
+            return false;
+        }
+
+        return DateTime.UtcNow - restaurantReference.LastSynchronizedAt.Value <= projectionOptions.Value.FreshnessTtl;
+    }
+
     private async Task<GetRestaurantStatusResponse> QueryRestaurantStatus(
         Guid restaurantId,
         CancellationToken cancellationToken)
@@ -82,8 +99,8 @@ public sealed class RestaurantReferenceValidationHandler(
             cancellationToken);
 
         await sender.Send(
-                new UpsertRestaurantCommand(restaurantId, response.Message.Status),
-                cancellationToken);
+            new UpsertRestaurantCommand(restaurantId, response.Message.Status, DateTime.UtcNow),
+            cancellationToken);
 
         return response.Message;
     }

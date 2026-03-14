@@ -19,6 +19,9 @@ public class RestaurantReferenceConfiguration : IEntityTypeConfiguration<Restaur
         builder.Property(rr => rr.RestaurantStatus)
             .IsRequired();
 
+        builder.Property(rr => rr.LastSynchronizedAt)
+            .IsRequired(false);
+
         builder.Property(r => r.RestaurantStatus)
             .IsRequired()
             .HasConversion(

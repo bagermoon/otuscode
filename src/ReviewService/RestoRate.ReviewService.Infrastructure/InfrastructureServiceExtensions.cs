@@ -14,6 +14,7 @@ using RestoRate.BuildingBlocks.Data;
 using RestoRate.BuildingBlocks.Messaging;
 using RestoRate.BuildingBlocks.Serialization;
 using RestoRate.Contracts.Restaurant.Requests;
+using RestoRate.ReviewService.Application.Configurations;
 using RestoRate.ReviewService.Domain.Interfaces;
 using RestoRate.ReviewService.Infrastructure.Data;
 using RestoRate.ReviewService.Infrastructure.Repositories;
@@ -32,6 +33,11 @@ public static class InfrastructureServiceExtensions
         {
             assemblies = [Assembly.GetCallingAssembly()];
         }
+
+        builder.Services.AddOptions<RestaurantProjectionOptions>()
+            .Bind(builder.Configuration.GetSection(RestaurantProjectionOptions.SectionName))
+            .Validate(options => options.FreshnessTtl > TimeSpan.Zero, "Restaurant projection freshness TTL must be greater than zero.")
+            .ValidateOnStart();
 
         builder.AddMongoDbContext<ReviewDbContext>(AppHostProjects.ReviewDb);
 
