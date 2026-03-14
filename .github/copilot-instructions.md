@@ -52,6 +52,7 @@ Goal: Make AI agents productive immediately in this .NET 9 + Aspire microservice
 
 ## Gotchas
 - Mediator source generator: Handlers live in `Application`. Ensure `Mediator.Abstractions` + `Mediator.SourceGenerator` are referenced in the project that defines handlers so they are generated and discoverable; handlers can stay `internal`.
+- MassTransit `IConsumer<T>` implementations belong in API projects under `Consumers` and should use the `*Consumer` suffix to avoid mixing them with Mediator/Application handlers.
 - Layering: `Domain` is framework‑free; no EF/MQ/HTTP clients. `Infrastructure` wires providers and implements ports. Cross‑service exchange only via `RestoRate.Contracts`. `RestoRate.Abstractions` is an application‑level package and may depend on `SharedKernel`, but `SharedKernel` never references higher layers and `Domain` never depends on `Abstractions`.
 - Domain events: Aggregates raise events using `SharedKernel` primitives; the Application layer (after persistence succeeds) dispatches them through the Mediator adapter. Keep `Domain` unaware of Mediator interfaces.
 - Service boundaries: keep Gateway “dumb” (route/transform/auth). Prefer events over cross‑domain synchronous calls.

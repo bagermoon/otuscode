@@ -12,7 +12,7 @@ using RestoRate.RestaurantService.IntegrationTests.Helpers;
 
 namespace RestoRate.RestaurantService.IntegrationTests.Api;
 
-public class GetRestaurantStatusRequestHandlerTests : IClassFixture<RestaurantWebApplicationFactory>
+public class GetRestaurantStatusRequestConsumerTests : IClassFixture<RestaurantWebApplicationFactory>
 {
     private readonly WebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
@@ -20,7 +20,7 @@ public class GetRestaurantStatusRequestHandlerTests : IClassFixture<RestaurantWe
 
     private CancellationToken CancellationToken => _testContextAccessor.Current.CancellationToken;
 
-    public GetRestaurantStatusRequestHandlerTests(
+    public GetRestaurantStatusRequestConsumerTests(
         RestaurantWebApplicationFactory factory,
         ITestContextAccessor testContextAccessor)
     {

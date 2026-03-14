@@ -4,19 +4,19 @@ using Mediator;
 
 using RestoRate.Contracts.Review.Events;
 using RestoRate.RatingService.Application.Mappings;
-using RestoRate.RatingService.Application.UseCases.Review.Approve;
+using RestoRate.RatingService.Application.UseCases.Review.Reject;
 
-namespace RestoRate.RatingService.Api.Handlers;
+namespace RestoRate.RatingService.Api.Consumers;
 
-public sealed class ReviewApprovedEventHandler(
+public sealed class ReviewRejectedEventConsumer(
     ISender sender)
-    : IConsumer<ReviewApprovedEvent>
+    : IConsumer<ReviewRejectedEvent>
 {
-    public Task Consume(ConsumeContext<ReviewApprovedEvent> context)
+    public Task Consume(ConsumeContext<ReviewRejectedEvent> context)
     {
         var message = context.Message;
 
-        var command = new ApproveReviewCommand(
+        var command = new RejectReviewCommand(
             ReviewId: message.ReviewId,
             RestaurantId: message.RestaurantId,
             Rating: message.Rating,

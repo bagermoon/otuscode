@@ -121,16 +121,16 @@ public class MongoDbReviewRepository : IReviewRepository
 await publish.Publish(new ReviewAddedEvent(reviewId, restaurantId, authorId, rating, null, text, tags));
 
 // Consumer (например, в Moderation Service)
-public sealed class ReviewAddedConsumer : IConsumer<ReviewAddedEvent>
+public sealed class ReviewAddedEventConsumer : IConsumer<ReviewAddedEvent>
 {
-    public Task Consume(ConsumeContext<ReviewAddedEvent> ctx)
-        => HandleAsync(ctx.Message);
+    public Task Consume(ConsumeContext<ReviewAddedEvent> context)
+        => HandleAsync(context.Message);
 }
 
 // Minimal setup (в любом сервисе)
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<ReviewAddedConsumer>();
+    x.AddConsumer<ReviewAddedEventConsumer>();
     x.UsingRabbitMq((ctx, cfg) => cfg.ConfigureEndpoints(ctx));
 });
 ```
@@ -312,13 +312,13 @@ public class ModerationTask
 ## Детали реализации Moderation Service
 
 ```csharp
-// Автоматическая проверка на запрещенные слова + создание задачи
-public class ReviewAddedEventHandler
+// MassTransit consumer: автоматическая проверка на запрещенные слова + создание задачи
+public class ReviewAddedEventConsumer
 {
     private readonly IModerationTaskRepository _repository;
     private readonly IProfanityFilter _filter;
 
-    public async Task Handle(ReviewAddedEvent @event)
+    public async Task Consume(ReviewAddedEvent @event)
     {
         // Авто-проверка
         var autoCheck = _filter.Check(@event.Text);

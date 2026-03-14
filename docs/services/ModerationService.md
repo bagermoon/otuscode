@@ -89,7 +89,7 @@ flowchart LR
     RV[Review Service] -- ReviewAddedEvent --> MQ[(RabbitMQ)]
 
     subgraph Moderation_Service[Moderation Service]
-        MS[Workers/Handlers]
+        MS[Consumers]
     end
 
     MQ --> MS

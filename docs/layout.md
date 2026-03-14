@@ -161,6 +161,7 @@
 - Application DI: `Add<Context>Application()` в `<Context>.Application` (пространство имён `Microsoft.Extensions.DependencyInjection` или используемое из проекта).
 - API host: `Add<Context>Api(this IHostApplicationBuilder)` в `<Context>.Api` (пространство имён `Microsoft.Extensions.Hosting`).
 - Папка с обработчиками событий/уведомлений в Application — `Handlers`.
+- MassTransit `IConsumer<T>` в API-проектах размещаются в папке `Consumers` и используют суффикс `Consumer`.
 
 - Быстрые правила выбора:
   - Нужен общий доменный базовый тип/утилита? → `SharedKernel`.

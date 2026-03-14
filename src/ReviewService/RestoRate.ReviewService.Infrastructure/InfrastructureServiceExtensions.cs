@@ -60,20 +60,11 @@ public static class InfrastructureServiceExtensions
                 }
                 configs.AddRequestClient<GetRestaurantStatusRequest>();
 
-                // Для работы MongoDbSagaOutbox требуется MongoDb в режиме ReplicaSet. 
-                // Этот режим не поддерживается в Aspire на момент разработки.
-                var useMongoDbSagaOutbox = builder.Configuration.GetValue("MassTransit:UseMongoDbSagaOutbox", false);
-
-                if (useMongoDbSagaOutbox
-                    && reviewMongoUrl is not null
-                    && !string.IsNullOrWhiteSpace(reviewMongoUrl.DatabaseName))
-                {
-                    configs.SetMongoDbSagaOutbox(reviewMongoUrl);
-                }
-                else
-                {
-                    configs.SetInMemorySagaOutbox();
-                }
+                // В идеале перевести этот сервис MongoDb Driver вместо EF Core,
+                // тогда можно будет включить настоящий Outbox, а не InMemory.
+                // Так же это упростит серилизацию полей. Все в принципе готово в серивсе Rating,
+                // но пока оставляем как есть.
+                configs.SetInMemorySagaOutbox();
             }
         );
 

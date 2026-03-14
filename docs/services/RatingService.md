@@ -94,7 +94,7 @@ flowchart LR
     MQ --> RT
 
     subgraph Rating_Service[Rating Service]
-        RT[Workers/Handlers]
+        RT[Consumers]
     end
 
     %% Исходящая проекция рейтинга
