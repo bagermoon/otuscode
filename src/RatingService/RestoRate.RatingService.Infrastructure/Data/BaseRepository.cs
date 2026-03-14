@@ -7,12 +7,15 @@ namespace RestoRate.RatingService.Infrastructure.Data;
 public abstract class BaseRepository<TAggregate> where TAggregate : EntityBase<Guid>, IAggregateRoot, new()
 {
     protected readonly IMongoContext _context;
+    protected readonly ISessionHolder _sessionHolder;
     protected IMongoCollection<TAggregate> Collection { get; }
 
     protected BaseRepository(
-        IMongoContext context)
+        IMongoContext context,
+        ISessionHolder sessionHolder)
     {
         _context = context;
+        _sessionHolder = sessionHolder;
         Collection = context.Collection<TAggregate>();
     }
 
@@ -105,5 +108,45 @@ public abstract class BaseRepository<TAggregate> where TAggregate : EntityBase<G
             var stub = new TAggregate { Id = id };
             _context.MarkDeleted(stub);
         }
+    }
+
+    protected async Task<bool> InsertDirectAsync(TAggregate aggregate, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var session = await _sessionHolder.GetSessionAsync(cancellationToken);
+            if (session is null)
+            {
+                await Collection.InsertOneAsync(aggregate, cancellationToken: cancellationToken);
+            }
+            else
+            {
+                await Collection.InsertOneAsync(session, aggregate, cancellationToken: cancellationToken);
+            }
+
+            return true;
+        }
+        catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
+        {
+            return false;
+        }
+    }
+
+    protected async Task<bool> UpdateDirectAsync(
+        FilterDefinition<TAggregate> filter,
+        UpdateDefinition<TAggregate> update,
+        CancellationToken cancellationToken)
+    {
+        var session = await _sessionHolder.GetSessionAsync(cancellationToken);
+        var result = session is null
+            ? await Collection.UpdateOneAsync(filter, update, cancellationToken: cancellationToken)
+            : await Collection.UpdateOneAsync(session, filter, update, cancellationToken: cancellationToken);
+
+        return result.ModifiedCount > 0;
+    }
+
+    protected void TrackPersisted(TAggregate aggregate)
+    {
+        _context.Attach(aggregate, EntityState.Unchanged);
     }
 }
