@@ -21,7 +21,7 @@ public static class PlaywrightAuthHelper
         await page.Locator("input[name='password']").FillAsync(password);
         await page.Locator("button[name='login']").ClickAsync();
         await page.GetByRole(AriaRole.Toolbar).Locator("a[href='user-claims']").IsVisibleAsync();
-        
+
 
         await context.StorageStateAsync(new() { Path = GetAuthStatePath(user) });
         await browser.CloseAsync();
