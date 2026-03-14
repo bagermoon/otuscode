@@ -13,16 +13,22 @@ public sealed class GetAllRestaurantsSpec : Specification<Restaurant>
         int pageSize,
         string? searchTerm = null,
         string? cuisineType = null,
-        string? tag = null)
+        string? tag = null,
+        string? sortBy = null)
     {
         Query
+            .Include(r => r.Rating)
             .Include(r => r.Images)
             .Include(r => r.CuisineTypes)
             .Include(r => r.Tags)
                 .ThenInclude(rt => rt.Tag)
             .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
-            .OrderBy(r => r.Name);
+            .Take(pageSize);
+
+        if (!string.IsNullOrWhiteSpace(sortBy) && sortBy.Equals("rating", StringComparison.OrdinalIgnoreCase))
+            Query.OrderByDescending(r => r.Rating.AverageRate);
+        else
+            Query.OrderBy(r => r.Name);
 
 #pragma warning disable CA1862 // EF query does not support string comparisons directly
         if (!string.IsNullOrWhiteSpace(searchTerm))

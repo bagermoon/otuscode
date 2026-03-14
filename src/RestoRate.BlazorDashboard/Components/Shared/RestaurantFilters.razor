@@ -4,12 +4,13 @@
 @using MudBlazor
 @using RestoRate.Contracts.Restaurant.DTOs
 @using RestoRate.BlazorDashboard.Services
+
 @inject RestaurantWebService RestaurantService
 
 <MudPaper Class="filter-container pa-6 mb-8" Elevation="0">
-    <MudGrid Spacing="3" Class="align-center">
+    <MudGrid Spacing="3" Class="align-center justify-center">
 
-        <MudItem xs="12" md="5">
+        <MudItem xs="12" md="3">
             <MudAutocomplete T="string"
                              Label="Поиск ресторана"
                              Value="searchTerm"
@@ -26,7 +27,7 @@
                              Placeholder="Название, например 'Мама Рома'" />
         </MudItem>
 
-        <MudItem xs="12" md="3">
+        <MudItem xs="12" md="2">
             <MudSelect T="string"
                        Label="Кухня"
                        Value="selectedCuisineName"
@@ -45,7 +46,7 @@
             </MudSelect>
         </MudItem>
 
-        <MudItem xs="12" md="3">
+        <MudItem xs="12" md="2">
             @if (_tags == null)
             {
                 <MudSkeleton Width="100%" Height="56px" Class="rounded-pill" />
@@ -73,6 +74,20 @@
             }
         </MudItem>
 
+        <MudItem xs="12" md="2">
+            <MudSelect T="string"
+                       Label="Сортировка"
+                       Value="sortByValue"
+                       ValueChanged="OnSortChanged"
+                       Variant="Variant.Outlined"
+                       AdornmentIcon="@Icons.Material.Filled.Sort"
+                       AdornmentColor="Color.Primary"
+                       Class="rr-input">
+                <MudSelectItem T="string" Value="@((string?)null)">По имени</MudSelectItem>
+                <MudSelectItem T="string" Value="@("rating")">По рейтингу</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+
         <MudItem xs="12" md="1" Class="d-flex justify-start pl-2">
             <MudTooltip Text="Сбросить все фильтры">
                 <MudIconButton Icon="@Icons.Material.Filled.Refresh"
@@ -91,6 +106,7 @@
     private string? searchTerm;
     private string? selectedCuisineName;
     private string? selectedTag;
+    private string? sortByValue;
     private List<TagDto>? _tags;
 
     protected override async Task OnInitializedAsync()
@@ -105,11 +121,14 @@
         }
     }
 
-    public async Task SetValues(string? search, string? cuisine)
+    public async Task SetValues(string? search, string? cuisine, string? sort)
     {
         searchTerm = search;
         selectedCuisineName = cuisine;
+        sortByValue = sort;
         StateHasChanged();
+
+        await Task.CompletedTask;
     }
 
     private Task<IEnumerable<string>> SearchRestaurants(string value, CancellationToken token)
@@ -137,16 +156,24 @@
         await OnFiltersChanged.InvokeAsync();
     }
 
+    private async Task OnSortChanged(string? value)
+    {
+        sortByValue = value;
+        await OnFiltersChanged.InvokeAsync();
+    }
+
     public async Task ResetFilters()
     {
         searchTerm = null;
         selectedCuisineName = null;
         selectedTag = null;
+        sortByValue = null;
+
         await OnFiltersChanged.InvokeAsync();
     }
 
-    public (string? SearchTerm, string? CuisineType, string? Tag) GetFilters()
+    public (string? SearchTerm, string? CuisineType, string? Tag, string? SortBy) GetFilters()
     {
-        return (searchTerm, selectedCuisineName, selectedTag);
+        return (searchTerm, selectedCuisineName, selectedTag, sortByValue);
     }
 }

@@ -31,7 +31,8 @@ public sealed class GetAllRestaurantsHandler(
                 request.PageSize,
                 request.SearchTerm,
                 request.CuisineType,
-                request.Tag);
+                request.Tag,
+                request.SortBy);
 
             var restaurants = await readRepository.ListAsync(spec, cancellationToken);
             var totalCount = await readRepository.CountAsync(spec, cancellationToken);

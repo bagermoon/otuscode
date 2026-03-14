@@ -13,7 +13,7 @@ public static class AppTheme
             theme.PaletteLight = new PaletteLight
             {
                 Primary = "#77BEF0",
-                Secondary = "#FFCB61",
+                Secondary = "#E36A6A",
                 Background = "#f8fbff",
                 Surface = "#ffffff",
                 AppbarBackground = "rgba(255,255,255,0.8)",
