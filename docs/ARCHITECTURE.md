@@ -3,11 +3,18 @@
 - Proposal and system overview: [docs/proposal.md](./proposal.md)
 - Diagrams (High-level, C4, Sequence, Events): [docs/diagrams.md](./diagrams.md)
 - Layout and layering (structure, responsibilities): [docs/layout.md](./layout.md)
+- Contracts structure and package rules: [docs/layout.contracts.md](./layout.contracts.md)
 - Common hosting defaults (telemetry/auth/resilience): `RestoRate.ServiceDefaults`
+- Shared auth and identity helpers: `RestoRate.Auth`
 - Cross-service contracts (integration events & DTOs): `RestoRate.Contracts`
 - Reusable infrastructure & technical helpers (messaging, migrations, seeding, MassTransit, EF helpers): `RestoRate.BuildingBlocks`
 - Application‑level abstractions and pipeline behaviors: `RestoRate.Abstractions` (may depend on `SharedKernel`; contains Mediation behaviors and app‑level contracts; no transports/ORM/web frameworks). `SharedKernel` remains framework‑free and independent of higher layers.
 - Testing and integration tests: [docs/testing.md](./testing.md)
+
+Bounded contexts
+
+- Current service contexts in `src/`: RestaurantService, ReviewService, RatingService, ModerationService.
+- Each context is organized into `Domain`, `Application`, `Infrastructure`, and `Api` projects.
 
 Diagnostics
 

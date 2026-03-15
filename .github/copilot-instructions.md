@@ -5,8 +5,8 @@ Goal: Make AI agents productive immediately in this .NET 9 + Aspire microservice
 ## Big Picture
 - Solution: `RestoRate.slnx` (code under `src/`). Docs in `docs/` (`ARCHITECTURE.md`, `layout.md`, `diagrams.md`, `proposal.md`).
 - Orchestration: Aspire AppHost (`src/RestoRate.AppHost`) runs services and applies shared hosting defaults from `RestoRate.ServiceDefaults`.
-- Services (per bounded context): `<Context>.Api` → `<Context>.Application` → `<Context>.Domain`; `<Context>.Infrastructure` implements ports. Current contexts: RestaurantService (all 4 layers), ModerationService/RatingService (Api placeholders), ReviewService.
-- Data/Infra: RestaurantService → PostgreSQL; ReviewService → MongoDB; RatingService → Redis; Messaging via RabbitMQ (planned, see diagrams).
+- Services (per bounded context): `<Context>.Api` → `<Context>.Application` → `<Context>.Domain`; `<Context>.Infrastructure` implements ports. Current contexts: RestaurantService, ReviewService, RatingService, ModerationService — each with all 4 layers.
+- Data/Infra: RestaurantService → PostgreSQL; ReviewService → MongoDB; RatingService → Redis; Messaging via RabbitMQ/MassTransit for integration events (see diagrams).
 - Auth: Keycloak as IdP; API Gateway validates/exchanges tokens before proxying.
 
 ## Build & Run
@@ -65,6 +65,7 @@ Goal: Make AI agents productive immediately in this .NET 9 + Aspire microservice
 
 ## Extension Naming
 - Application DI: `Add<Context>Application()` in `<Context>.Application`.
+- Infrastructure DI: `Add<Context>Infrastructure()` in `<Context>.Infrastructure`.
 - API host: `Add<Context>Api(this IHostApplicationBuilder)` in `<Context>.Api` under `Microsoft.Extensions.Hosting`.
 
 ## Key Files
@@ -72,7 +73,7 @@ Goal: Make AI agents productive immediately in this .NET 9 + Aspire microservice
 - Service defaults: `src/RestoRate.ServiceDefaults/Extensions.cs`
 - Gateway: `src/RestoRate.Gateway/Program.cs`, `TokenExchangeMiddleware.cs`
 - Restaurant API example endpoint: `src/RestaurantService/RestoRate.RestaurantService.Api/Endpoints/Restaurants/CreateRestaurantEndpoint.cs`
-- Architecture index: `docs/ARCHITECTURE.md`; Layout rules: `docs/layout.md`; Diagrams: `docs/diagrams.md`; Testing: `docs/testing.md`
+- Architecture index: `docs/ARCHITECTURE.md`; Layout rules: `docs/layout.md`; Contracts layout: `docs/layout.contracts.md`; Diagrams: `docs/diagrams.md`; Testing: `docs/testing.md`
 - Testing & OpenAPI docs: `.github/copilot-testing.md`
 
 ## When updating architecture

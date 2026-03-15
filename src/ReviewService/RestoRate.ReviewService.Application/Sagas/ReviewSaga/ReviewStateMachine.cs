@@ -11,6 +11,7 @@ using Mediator;
 
 using Microsoft.Extensions.DependencyInjection;
 using RestoRate.Contracts.Moderation.Events;
+using RestoRate.ReviewService.Domain.ReviewAggregate;
 
 namespace RestoRate.ReviewService.Application.Sagas.ReviewSaga;
 
@@ -96,7 +97,7 @@ public class ReviewStateMachine : MassTransitStateMachine<ReviewState>
                         .TransitionTo(ModerationApproved)
                         .Finalize(),
                     elseBinder => elseBinder
-                        .ThenAsync(RejectReviewAsync)
+                        .ThenAsync(RejectReviewAfterModerationAsync)
                         .TransitionTo(ModerationRejected)
                         .Finalize())
         );
@@ -130,7 +131,7 @@ public class ReviewStateMachine : MassTransitStateMachine<ReviewState>
                 .ThenAsync(MoveReviewToModerationPendingAsync)
                 .TransitionTo(ValidationOk),
             elseBinder => elseBinder
-                .ThenAsync(RejectReviewAsync)
+                .ThenAsync(RejectReviewAfterValidationAsync)
                 .TransitionTo(ValidationFailed)
                 .Finalize());
 
@@ -144,14 +145,24 @@ public class ReviewStateMachine : MassTransitStateMachine<ReviewState>
             new MoveReviewToModerationPendingCommand(context.Saga.CorrelationId),
             context.CancellationToken);
     }
-    private static async Task RejectReviewAsync<TMessage>(BehaviorContext<ReviewState, TMessage> context)
+    private static Task RejectReviewAfterValidationAsync<TMessage>(BehaviorContext<ReviewState, TMessage> context)
+        where TMessage : class
+        => RejectReviewAsync(context, ReviewRejectionSource.Validation);
+
+    private static Task RejectReviewAfterModerationAsync<TMessage>(BehaviorContext<ReviewState, TMessage> context)
+        where TMessage : class
+        => RejectReviewAsync(context, ReviewRejectionSource.Moderation);
+
+    private static async Task RejectReviewAsync<TMessage>(
+        BehaviorContext<ReviewState, TMessage> context,
+        ReviewRejectionSource rejectionSource)
         where TMessage : class
     {
         var provider = context.GetPayload<IServiceProvider>();
         var sender = provider.GetRequiredService<ISender>();
 
         await sender.Send(
-            new RejectReviewCommand(context.Saga.CorrelationId),
+            new RejectReviewCommand(context.Saga.CorrelationId, rejectionSource),
             context.CancellationToken);
     }
     private static async Task ApproveReviewAsync<TMessage>(BehaviorContext<ReviewState, TMessage> context)

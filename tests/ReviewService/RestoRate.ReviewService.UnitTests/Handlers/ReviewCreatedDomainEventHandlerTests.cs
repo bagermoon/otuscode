@@ -34,6 +34,8 @@ public sealed class ReviewCreatedDomainEventHandlerTests(ITestContextAccessor te
             var userId = Guid.NewGuid();
             var review = Review.Create(restaurantId, userId, rating: 4.5m, averageCheck: null, comment: "test");
 
+            review.RejectionSource.Should().Be(ReviewRejectionSource.None);
+
             var handler = new ReviewCreatedDomainEventHandler(
                 scope.ServiceProvider.GetRequiredService<IPublishEndpoint>());
 

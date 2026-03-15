@@ -25,6 +25,7 @@ public class Review : EntityBase<Guid>, IAggregateRoot
 
     // Optionally, add moderation status, e.g.:
     public ReviewStatus Status { get; private set; }
+    public ReviewRejectionSource RejectionSource { get; private set; }
     public RestaurantReference? Restaurant { get; private set; }
     public UserReference? User { get; private set; }
     private ReviewAverageCheck? AverageCheckData { get; set; }
@@ -41,6 +42,7 @@ public class Review : EntityBase<Guid>, IAggregateRoot
         Comment = comment;
         CreatedAt = DateTime.UtcNow;
         Status = ReviewStatus.Pending;
+        RejectionSource = ReviewRejectionSource.None;
     }
 
     public static Review Create(Guid restaurantId, Guid userId, decimal rating, Money? averageCheck, string? comment)
@@ -59,13 +61,14 @@ public class Review : EntityBase<Guid>, IAggregateRoot
         }
 
         Status = ReviewStatus.ModerationPending;
+        RejectionSource = ReviewRejectionSource.None;
         UpdatedAt = DateTime.UtcNow;
         RegisterDomainEvent(new ReviewModerationPendingDomainEvent(this));
 
         return this;
     }
 
-    public Review Reject()
+    public Review Reject(ReviewRejectionSource rejectionSource)
     {
         if (Status == ReviewStatus.Rejected)
         {
@@ -73,8 +76,9 @@ public class Review : EntityBase<Guid>, IAggregateRoot
         }
 
         Status = ReviewStatus.Rejected;
+        RejectionSource = rejectionSource;
         UpdatedAt = DateTime.UtcNow;
-        RegisterDomainEvent(new ReviewRejectedDomainEvent(this));
+        RegisterDomainEvent(new ReviewRejectedDomainEvent(this, rejectionSource));
 
         return this;
     }
@@ -87,6 +91,7 @@ public class Review : EntityBase<Guid>, IAggregateRoot
         }
 
         Status = ReviewStatus.Approved;
+        RejectionSource = ReviewRejectionSource.None;
         UpdatedAt = DateTime.UtcNow;
         RegisterDomainEvent(new ReviewApprovedDomainEvent(this));
 
