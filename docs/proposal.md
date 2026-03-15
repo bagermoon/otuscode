@@ -90,13 +90,13 @@ dotnet run --project src/RestoRate.AppHost
 
 Для развития системы важно держать `proposal.md` компактным и стабильным: здесь должен оставаться только архитектурный контекст, а не хрупкие детали реализации. Более глубокие документы:
 
-- [docs/diagrams.md](docs/diagrams.md) — визуальные схемы архитектуры, потоков и событий.
-- [docs/layout.md](docs/layout.md) — структура репозитория, границы слоёв и правила зависимостей.
-- [docs/services/RestaurantService.md](docs/services/RestaurantService.md) — сервисные интеграции каталога ресторанов.
-- [docs/services/ReviewService.md](docs/services/ReviewService.md) — жизненный цикл отзыва и внешние взаимодействия.
-- [docs/services/RatingService.md](docs/services/RatingService.md) — модель пересчёта рейтинга и публикации snapshot.
-- [docs/services/ModerationService.md](docs/services/ModerationService.md) — роль потока модерации и его внешние события.
-- [docs/migrations.md](docs/migrations.md) и [docs/testing.md](docs/testing.md) — операционные детали, которые не стоит дублировать в proposal.
+- [docs/diagrams.md](./diagrams.md) — визуальные схемы архитектуры, потоков и событий.
+- [docs/layout.md](./layout.md) — структура репозитория, границы слоёв и правила зависимостей.
+- [docs/services/RestaurantService.md](./services/RestaurantService.md) — сервисные интеграции каталога ресторанов.
+- [docs/services/ReviewService.md](./services/ReviewService.md) — жизненный цикл отзыва и внешние взаимодействия.
+- [docs/services/RatingService.md](./services/RatingService.md) — модель пересчёта рейтинга и публикации snapshot.
+- [docs/services/ModerationService.md](./services/ModerationService.md) — роль потока модерации и его внешние события.
+- [docs/migrations.md](./migrations.md) и [docs/testing.md](./testing.md) — операционные детали, которые не стоит дублировать в proposal.
 
 ## Что считать архитектурным инвариантом
 
