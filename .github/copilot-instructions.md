@@ -3,17 +3,17 @@
 Goal: Make AI agents productive immediately in this .NET 9 + Aspire microservices mono‑repo.
 
 ## Big Picture
-- Solution: `RestoRate.slnx` (code under `src/`). Docs in `docs/` (`ARCHITECTURE.md`, `layout.md`, `diagrams.md`, `proposal.md`).
-- Orchestration: Aspire AppHost (`src/RestoRate.AppHost`) runs services and applies shared hosting defaults from `RestoRate.ServiceDefaults`.
-- Services (per bounded context): `<Context>.Api` → `<Context>.Application` → `<Context>.Domain`; `<Context>.Infrastructure` implements ports. Current contexts: RestaurantService, ReviewService, RatingService, ModerationService — each with all 4 layers.
-- Data/Infra: RestaurantService → PostgreSQL; ReviewService → MongoDB; RatingService → Redis; Messaging via RabbitMQ/MassTransit for integration events (see diagrams).
-- Auth: Keycloak as IdP; API Gateway validates/exchanges tokens before proxying.
+- Solution: `RestoRate.slnx` (code under `src/`).
+- Start with `docs/proposal.md` for system context and `docs/diagrams.md` for visual flows.
+- Aspire AppHost (`src/RestoRate.AppHost`) runs the local environment and applies shared hosting defaults from `RestoRate.ServiceDefaults`.
+- Bounded contexts: RestaurantService, ReviewService, RatingService, ModerationService. Each follows the `<Context>.Api` → `<Context>.Application` → `<Context>.Domain` split, with `<Context>.Infrastructure` implementing ports.
+- Authentication is centralized in the API Gateway: it validates requests, handles token exchange, and forwards trusted identities to services.
 
 ## Build & Run
 - Build all: `dotnet build RestoRate.slnx`
 - Run everything (preferred): `dotnet run --project src/RestoRate.AppHost`
 - Run a service: `dotnet run --project src/<Service>/<Service>.csproj`
-- Health (dev): `/health`, `/alive`. OpenAPI only outside Production.
+- Health (dev): `/health`, `/alive`. OpenAPI is available in Development, not in Production.
 - VS Code tasks (see `.vscode/tasks.json`):
   - `install certs`: `pwsh ./setup-certs.ps1` (from AppHost dir)
   - EF (Restaurant): `List Migrations`, `Add Migration`, `Remove Last Migration`, `Update Database`
@@ -77,6 +77,6 @@ Goal: Make AI agents productive immediately in this .NET 9 + Aspire microservice
 - Testing & OpenAPI docs: `.github/copilot-testing.md`
 
 ## When updating architecture
-- Keep `docs/diagrams.md` and `docs/layout.md` in sync with changes (Keycloak above Gateway; token exchange in C4). Register new services in `AppHost` and expose external endpoints where needed.
+- Keep `docs/proposal.md`, `docs/diagrams.md`, and `docs/layout.md` in sync with architecture changes. Register new services in `AppHost`, update visual flows when integration paths change, and keep gateway/token exchange wording aligned with the code.
 
 If something here diverges from the current code, update this file alongside the relevant code/docs so agents stay aligned.

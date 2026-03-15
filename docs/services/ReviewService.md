@@ -1,206 +1,103 @@
-# Агрегаты сервиса ReviewService
+# Review Service
 
-## Review
+Сервис принимает отзывы, проводит первичную валидацию, отправляет отзыв на модерацию и публикует финальные события для пересчёта рейтинга.
 
-```csharp
-namespace RestoRate.ReviewService.Domain;
+## Базовый концепт
 
-public sealed class Review : AggregateRoot<ReviewId>
-{
-    private readonly List<ReviewStatusTransition> _history = new();
-
-    private Review() { }
-
-    private Review(
-        ReviewId id,
-        RestaurantId restaurantId,
-        UserId authorId,
-        int rating,
-        string text,
-        IEnumerable<string> tags,
-        Money? suggestedAverageCheck)
-    {
-        Id = id;
-        RestaurantId = restaurantId;
-        AuthorId = authorId;
-        Rating = rating;
-        Comment = text;
-        Tags = tags.ToArray();
-        SuggestedAverageCheck = suggestedAverageCheck;
-        Status = ReviewStatus.Pending;
-        CreatedAt = DateTimeOffset.UtcNow;
-        AddDomainEvent(new ReviewAddedDomainEvent(id, restaurantId, rating));
-    }
-
-    public static Review Create(
-        ReviewId id,
-        RestaurantId restaurantId,
-        UserId authorId,
-        int rating,
-        string text,
-        IEnumerable<string> tags,
-        Money? suggestedAverageCheck = null)
-        => new(id, restaurantId, authorId, rating, text, tags, suggestedAverageCheck);
-
-    public RestaurantId RestaurantId { get; private set; }
-    public UserId AuthorId { get; private set; }
-    public int Rating { get; private set; }
-    public string Comment { get; private set; } = string.Empty;
-    public string[] Tags { get; private set; } = Array.Empty<string>();
-    public Money? SuggestedAverageCheck { get; private set; }
-    public ReviewStatus Status { get; private set; }
-    public string? ModerationReason { get; private set; }
-    public DateTimeOffset CreatedAt { get; private set; }
-
-    public void UpdateContent(int rating, string text, IEnumerable<string> tags, Money? suggestedAverageCheck)
-    {
-        Rating = rating;
-        Comment = text;
-        Tags = tags.ToArray();
-        SuggestedAverageCheck = suggestedAverageCheck;
-        AddDomainEvent(new ReviewUpdatedDomainEvent(Id, RestaurantId, rating));
-    }
-
-    public void ApplyModerationDecision(ReviewStatus status, string? reason, string moderatorId)
-    {
-        if (Status == status) return;
-
-        Status = status;
-        ModerationReason = reason;
-        AddDomainEvent(new ReviewModeratedDomainEvent(Id, RestaurantId, status, reason, moderatorId));
-    }
-}
-```
+- Создаёт и хранит отзыв.
+- Валидирует ресторан и пользователя перед переходом к модерации.
+- Держит локальную проекцию ресторанов на основе событий из Restaurant Service.
+- После решения модерации переводит отзыв в `Approved` или `Rejected`.
+- Публикует события, которые использует Rating Service.
 
 ## Интеграционные события
 
-- Публикует: `ReviewAddedEvent`, `ReviewApprovedEvent`, `ReviewRejectedEvent`
-- Подписывается на: `ReviewModeratedEvent` (публикуется сервисом ModerationService),
-  `RestaurantCreatedEvent`, `RestaurantUpdatedEvent`, `RestaurantArchivedEvent`
+Исходящие:
+
+- `ReviewAddedEvent` — только после успешной первичной валидации и перехода в `ModerationPending`
+- `ReviewApprovedEvent`
+- `ReviewRejectedEvent` — только если отзыв отклонён именно после модерации
+
+Входящие:
+
+- `RestaurantCreatedEvent`
+- `RestaurantUpdatedEvent`
+- `RestaurantArchivedEvent`
+- `ReviewModeratedEvent`
+
+Межсервисные запросы:
+
+- `GetRestaurantStatusRequest` -> `GetRestaurantStatusResponse`
 
 ```mermaid
 flowchart LR
-    %% Справочные события от Restaurant
-    RSVC[Restaurant Service] -- RestaurantCreatedEvent / RestaurantUpdatedEvent / RestaurantArchivedEvent --> MQ[(RabbitMQ)]
-    MQ --> RV
+    REV[Review Service]
+    REST[Restaurant Service]
 
-    %% Исходящие события сервиса Review
-    subgraph Review_Service[Review Service]
-        RV[API/Application]
-    end
+    REV -->|GetRestaurantStatusRequest| REST
+    REST -. GetRestaurantStatusResponse .-> REV
 
-    RV -- ReviewAddedEvent / ReviewApprovedEvent / ReviewRejectedEvent --> MQ[(RabbitMQ)]
-
-    MQ --> ModSvc[Moderation Service]
-
-    MQ --> RatingSvc[Rating Service]
-
-    %% Входящие результаты модерации
-    ModSvc -- ReviewModeratedEvent --> MQ
-    MQ --> RV
-
-    %% Link styling to visualize event families (order-dependent)
-    %% 0: RSVC->MQ (restaurant events)
-    linkStyle 0 stroke:#f59e0b,stroke-width:2px
-    %% 1: MQ->RV (restaurant events delivery)
-    linkStyle 1 stroke:#f59e0b,stroke-dasharray: 4 2
-
-    %% 2: RV->MQ (review events)
-    linkStyle 2 stroke:#10b981,stroke-width:2px
-    %% 3: MQ->ModSvc (review events to Moderation)
-    linkStyle 3 stroke:#10b981,stroke-dasharray: 4 2
-    %% 4: MQ->RatingSvc (review events to Rating)
-    linkStyle 4 stroke:#10b981,stroke-dasharray: 4 2
-
-    %% 5: ModSvc->MQ (moderation result)
-    linkStyle 5 stroke:#7c3aed,stroke-width:2px
-    %% 6: MQ->RV (moderation result delivery)
-    linkStyle 6 stroke:#7c3aed,stroke-dasharray: 4 2
+    linkStyle 0 stroke:#2e8b57,stroke-width:2px
+    linkStyle 1 stroke:#2e8b57,stroke-width:2px,stroke-dasharray:5 5
 ```
 
-### Примечания
+## Общая схема
 
-- Review Service поддерживает локальную проекцию «разрешённых ресторанов»,
-    синхронизируемую событиями `RestaurantCreatedEvent` / `RestaurantUpdatedEvent` / `RestaurantArchivedEvent`.
+```mermaid
+flowchart LR
+    C[Create review]
+    VAL[Первичная валидация]
+    MOD[Модерация]
+    RAT[Rating Service]
 
-- При создании отзыва сервис валидирует `RestaurantId` по этой проекции:
-    отзыв можно добавить только для существующего и не архивированного ресторана.
+    C --> VAL
+    VAL -->|ok| MOD
+    VAL -->|fail| REJ[Rejected locally]
+    MOD -->|approved| APP[ReviewApprovedEvent]
+    MOD -->|rejected| REJMOD[ReviewRejectedEvent]
+    APP --> RAT
+    REJMOD --> RAT
+```
 
-Примечание по цветам стрелок:
-
-- Оранжевый — события Restaurant (Created/Updated/Archived)
-- Зелёный — события Review (Added/Approved)
-- Фиолетовый — событие Moderation (ReviewModerated)
-Пунктир — доставка события от RabbitMQ к потребителю; сплошная линия — публикация события.
-
-## Последовательность событий (Sequence)
-
-Последовательность создания и модерации отзыва с точки зрения Review Service.
+## Детальный поток создания review
 
 ```mermaid
 sequenceDiagram
     autonumber
     participant C as Клиент
-    participant GW as API Gateway
-    participant RV as Review Service
-    participant DBR as MongoDB (reviews)
-    participant MQ as RabbitMQ (events)
-    participant MS as Moderation Service
-    participant RT as Rating Service
-
-    C->>GW: POST /api/restaurants/{id}/reviews
-    GW->>RV: POST /reviews (restaurantId, text, rating)
-    RV->>DBR: Insert Review (status=Pending)
-    RV-->>C: 202 Accepted (На модерации)
-    RV->>MQ: Publish ReviewAddedEvent
-
-    MQ->>MS: Deliver ReviewAddedEvent
-    MS->>MS: Авто-проверка/или ожидание решения модератора
-    MS->>MQ: Publish ReviewModeratedEvent(Approved/Rejected)
-
-    MQ->>RV: Deliver ReviewModeratedEvent
-    RV->>DBR: Update Review Status
-    RV->>MQ: Publish ReviewApprovedEvent / ReviewRejectedEvent (final result)
-
-    note over RV,RT: Rating может потреблять ReviewAddedEvent (черновой расчёт)
-    note over RV,RT: и ReviewApprovedEvent / ReviewRejectedEvent (финальная фиксация/откат рейтинга)
-    MQ->>RT: Deliver ReviewAddedEvent / ReviewApprovedEvent / ReviewRejectedEvent
-```
-
-### Saga Обновление ресторана
-
-```mermaid
-sequenceDiagram
-    participant RS as RestaurantService
+    participant REV as Review Service
+    participant REST as Restaurant Service
     participant MQ as RabbitMQ
-    participant RVS as ReviewValidationSaga (by ReviewId)
-    participant RstVS as RestaurantValidationSaga (by RestaurantId)
-    participant RefC as RestaurantRefConsumer (projection)
-    participant DB as ReviewService DB (RestaurantReference)
+    participant MOD as Moderation Service
+    participant RAT as Rating Service
 
-    RVS->>MQ: ReviewAddedEvent(reviewId, restaurantId)
-    MQ->>RstVS: ReviewAddedEvent
+    C->>REV: Create review
+    REV->>MQ: Publish ReviewValidationRequested
+    REV->>REST: GetRestaurantStatusRequest
+    REST-->>REV: GetRestaurantStatusResponse
+    REV->>REV: Validate restaurant and user
 
-    RstVS->>DB: Query RestaurantReference(restaurantId)
-    alt status known + acceptable
-    RstVS->>MQ: ValidationOk(reviewId, restaurantId)
-    else missing/unknown
-    RstVS->>RS: GetRestaurantStatusRequest(restaurantId)
-    RstVS->>RstVS: Schedule ValidationTimeout(restaurantId)
-    RS-->>RstVS: GetRestaurantStatusResponse(exists, status)
-    RstVS->>DB: Upsert RestaurantReference(restaurantId,status)
-    RstVS->>MQ: ValidationOk/ValidationFailed(for each pending reviewId)
+    alt Validation failed
+        REV->>REV: Reject review locally
+        Note over REV: ReviewRejectedEvent не публикуется
+    else Validation passed
+        REV->>REV: Move to ModerationPending
+        REV->>MQ: Publish ReviewAddedEvent
+        MQ->>MOD: Deliver ReviewAddedEvent
+        MOD->>MQ: Publish ReviewModeratedEvent
+        MQ->>REV: Deliver ReviewModeratedEvent
+
+        alt Approved
+            REV->>MQ: Publish ReviewApprovedEvent
+            MQ->>RAT: Deliver ReviewApprovedEvent
+        else Rejected by moderation
+            REV->>MQ: Publish ReviewRejectedEvent
+            MQ->>RAT: Deliver ReviewRejectedEvent
+        end
     end
-
-    RS->>MQ: RestaurantCreated/Updated/Archived(restaurantId,status)
-    MQ->>RefC: Restaurant*Event
-    RefC->>DB: Upsert RestaurantReference(restaurantId,status)
-
-    MQ->>RVS: ValidationOk(reviewId, restaurantId)
-    RVS->>MQ: ReviewReadyForModerationEvent(reviewId, restaurantId)
 ```
 
-### Замечания по надёжности
+## Что важно
 
-- Публикации осуществляются через outbox; потребители — идемпотентны.
-- Временные сбои в ModerationService или RatingService не блокируют основную операцию создания отзыва — события будут доставлены повторно.
+- Review Service оркестрирует поток от создания отзыва до финального решения.
+- `ReviewRejectedEvent` не означает любой отказ: он появляется только после модераторского отклонения.

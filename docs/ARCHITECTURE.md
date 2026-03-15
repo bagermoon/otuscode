@@ -1,26 +1,37 @@
 # RestoRate Architecture Index
 
-- Proposal and system overview: [docs/proposal.md](./proposal.md)
-- Diagrams (High-level, C4, Sequence, Events): [docs/diagrams.md](./diagrams.md)
-- Layout and layering (structure, responsibilities): [docs/layout.md](./layout.md)
-- Contracts structure and package rules: [docs/layout.contracts.md](./layout.contracts.md)
-- Common hosting defaults (telemetry/auth/resilience): `RestoRate.ServiceDefaults`
-- Shared auth and identity helpers: `RestoRate.Auth`
-- Cross-service contracts (integration events & DTOs): `RestoRate.Contracts`
-- Reusable infrastructure & technical helpers (messaging, migrations, seeding, MassTransit, EF helpers): `RestoRate.BuildingBlocks`
-- Application‑level abstractions and pipeline behaviors: `RestoRate.Abstractions` (may depend on `SharedKernel`; contains Mediation behaviors and app‑level contracts; no transports/ORM/web frameworks). `SharedKernel` remains framework‑free and independent of higher layers.
-- Testing and integration tests: [docs/testing.md](./testing.md)
+This document is the navigation entrypoint for architecture documentation. Use it to find the right source of truth instead of repeating the same overview across multiple files.
 
-Bounded contexts
+- Proposal and system context: [docs/proposal.md](./proposal.md)
+  Explains what the system is, why the bounded contexts exist, and which architectural invariants matter.
+- Diagrams and flows: [docs/diagrams.md](./diagrams.md)
+  Contains Mermaid diagrams for topology, key sequences, and simplified event/domain views.
+- Layout and layering: [docs/layout.md](./layout.md)
+  Describes repository structure, allowed dependencies, and layer responsibilities.
+- Contracts layout: [docs/layout.contracts.md](./layout.contracts.md)
+  Defines how shared contracts and related packages should be organized.
+- Testing strategy: [docs/testing.md](./testing.md)
+  Covers unit, integration, and E2E testing workflows.
+- Service-specific interactions: [docs/services](./services/)
+  Contains focused integration summaries for Restaurant, Review, Rating, and Moderation services.
 
-- Current service contexts in `src/`: RestaurantService, ReviewService, RatingService, ModerationService.
-- Each context is organized into `Domain`, `Application`, `Infrastructure`, and `Api` projects.
+## Repository Snapshot
 
-Diagnostics
+- Solution entrypoint: `RestoRate.slnx`
+- Runtime orchestration: `src/RestoRate.AppHost`
+- Current bounded contexts: `RestaurantService`, `ReviewService`, `RatingService`, `ModerationService`
+- Service shape: each context is split into `Domain`, `Application`, `Infrastructure`, and `Api`
 
-- Diagnostic constants live in `RestoRate.SharedKernel.Diagnostics`:
-  - `ActivitySources` — string names for tracing sources
-  - `LoggingEventIds` — int IDs for LoggerMessage
-- Convert to framework types (e.g., `EventId`) at call sites.
+## Shared Packages
 
-Historic note: older `RestoRate.Shared.*` (Application/Infrastructure/SharedKernel) packages were consolidated into focused `Contracts`, `BuildingBlocks`, and optional `Abstractions` to avoid leaking application layer cross‑service and to reduce coupling.
+- `RestoRate.ServiceDefaults` — hosting defaults, resilience, telemetry, service discovery
+- `RestoRate.Auth` — auth and identity helpers shared across services
+- `RestoRate.Contracts` — cross-service contracts and integration events
+- `RestoRate.BuildingBlocks` — reusable infrastructure helpers
+- `RestoRate.Abstractions` — application-level abstractions and behaviors
+- `RestoRate.SharedKernel` — framework-free primitives and shared domain concepts
+
+## Notes
+
+- Diagnostics constants live in `RestoRate.SharedKernel.Diagnostics`.
+- Older `RestoRate.Shared.*` packages were consolidated into more focused packages to reduce coupling.

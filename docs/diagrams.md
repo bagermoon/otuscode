@@ -1,6 +1,6 @@
 # Архитектура
 
-Ниже приведены актуальные схемы в формате Mermaid для текущего состояния репозитория. Они отражают AppHost-конфигурацию, текущие хранилища сервисов, gateway/token exchange и фактические интеграции через RabbitMQ/MassTransit.
+Этот файл содержит визуальные схемы текущей архитектуры. За общим контекстом и архитектурными инвариантами обращайтесь к [proposal.md](./proposal.md).
 
 ## 1. Общая архитектура
 
@@ -65,11 +65,11 @@ flowchart LR
     class KC idp
 ```
 
-Примечания:
+Короткие примечания:
 
-- `Moderation Service` в текущем AppHost не использует отдельное persistent storage.
+- `Moderation Service` в текущем AppHost не использует отдельное постоянное хранилище.
 - `Rating Service` использует `MongoDB` для собственных данных и `Redis` для кэша/дебаунса пересчёта.
-- `Gateway` использует `Redis` для output cache.
+- `Gateway` использует `Redis` для выходного кэша.
 
 ## 2. Контейнерная схема
 
@@ -144,8 +144,8 @@ sequenceDiagram
             REV->>MQ: Publish ReviewApprovedEvent
             MQ->>RAT: Consume ReviewApprovedEvent
         else Rejected
-            REV->>REVDB: mark review rejected
-            REV->>MQ: Publish ReviewRejectedEvent
+            REV->>REVDB: mark review rejected with moderation reason
+            REV->>MQ: Publish ReviewRejectedEvent(reason)
             MQ->>RAT: Consume ReviewRejectedEvent
         end
 
@@ -208,8 +208,13 @@ classDiagram
     class RestaurantArchivedEvent
     class ReviewAddedEvent
     class ReviewApprovedEvent
-    class ReviewRejectedEvent
-    class ReviewModeratedEvent
+    class ReviewRejectedEvent {
+        string Reason
+    }
+    class ReviewModeratedEvent {
+        bool Approved
+        string Reason
+    }
     class RestaurantRatingRecalculatedEvent
 
     Restaurant "1" <-- "many" Review : has
@@ -220,12 +225,13 @@ classDiagram
     Restaurant --> RestaurantArchivedEvent
     Review --> ReviewAddedEvent
     Review --> ReviewApprovedEvent
-    Review --> ReviewRejectedEvent
 
     ReviewAddedEvent ..> ReviewModeratedEvent : moderation outcome
+    ReviewModeratedEvent ..> ReviewApprovedEvent : approved
+    ReviewModeratedEvent ..> ReviewRejectedEvent : rejected with reason
     ReviewApprovedEvent ..> RestaurantRatingRecalculatedEvent : recalculate
     ReviewRejectedEvent ..> RestaurantRatingRecalculatedEvent : recalculate
     RestaurantRatingRecalculatedEvent ..> RatingSnapshot : update snapshot
 ```
 
-Примечание: эта схема намеренно упрощена. Она показывает текущие ключевые сущности и интеграционные события, но не заменяет документацию по конкретным use case, saga и consumer-ам.
+Эта схема намеренно упрощена. Она показывает ключевые сущности и интеграционные события, но не заменяет документацию по конкретным сценариям, saga и consumer-ам.
