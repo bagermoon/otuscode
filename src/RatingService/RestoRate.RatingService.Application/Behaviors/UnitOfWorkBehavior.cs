@@ -15,22 +15,22 @@ internal sealed class UnitOfWorkBehavior<TMessage, TResponse>(
         MessageHandlerDelegate<TMessage, TResponse> next,
         CancellationToken cancellationToken)
     {
-        var response = await next(request, cancellationToken);
-
         try
         {
             await sessionContext.BeginTransactionAsync(cancellationToken);
 
+            var response = await next(request, cancellationToken);
+
             await unitOfWork.SaveEntitiesAsync(cancellationToken);
             await sessionContext.CommitTransactionAsync(cancellationToken);
+
+            await unitOfWork.FlushDomainEventsAsync(cancellationToken);
+            return response;
         }
         catch
         {
             await sessionContext.RollbackTransactionAsync(cancellationToken);
             throw;
         }
-
-        await unitOfWork.FlushDomainEventsAsync(cancellationToken);
-        return response;
     }
 }

@@ -8,5 +8,6 @@ namespace RestoRate.ReviewService.Application.UseCases.RestaurantReferences.Upse
 
 public record UpsertRestaurantCommand(
     Guid RestaurantId,
-    RestaurantStatus Status
+    RestaurantStatus Status,
+    DateTime? SynchronizedAtUtc = null
 ) : ICommand<Result<RestaurantStatus>>;

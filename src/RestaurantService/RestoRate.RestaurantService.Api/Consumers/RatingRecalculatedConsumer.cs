@@ -1,4 +1,3 @@
-
 using MassTransit;
 
 using Mediator;
@@ -9,7 +8,9 @@ using RestoRate.Contracts.Rating.Events;
 using RestoRate.RestaurantService.Application.Mappings;
 using RestoRate.RestaurantService.Application.UseCases.Restaurants.RatingChange;
 
-public class RatingRecalculatedHandler(ISender sender) : IConsumer<RestaurantRatingRecalculatedEvent>
+namespace RestoRate.RestaurantService.Api.Consumers;
+
+public class RatingRecalculatedConsumer(ISender sender) : IConsumer<RestaurantRatingRecalculatedEvent>
 {
     public async Task Consume(ConsumeContext<RestaurantRatingRecalculatedEvent> context)
     {

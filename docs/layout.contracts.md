@@ -1,51 +1,78 @@
 # RestoRate.Contracts — структура и рекомендации
 
-Этот документ описывает рекомендуемую структуру проекта `RestoRate.Contracts` — пакета межсервисных контрактов (интеграционные события и переносимые DTO).
+Этот документ описывает текущую структуру проекта `RestoRate.Contracts` и правила для её расширения. Пакет используется для межсервисных контрактов: интеграционных событий, переносимых DTO и отдельных request/response моделей.
 
-Цели:
+## Что хранить в `RestoRate.Contracts`
 
-- Однозначные, сериализуемые и версионируемые контракты для взаимодействия между сервисами.
-- Упрощение миграции схем (поддержка нескольких версий одновременно).
-- Минимальная зависимость от инфраструктуры и отсутствие бизнес-логики.
+- DTO для обмена между сервисами.
+- Интеграционные события.
+- Request/response модели, если они нужны для межсервисного взаимодействия.
+- Общие переносимые примитивы, не завязанные на доменную модель конкретного сервиса.
 
-Текущая структура (по коду в репозитории) и рекомендации по расширению:
+В `RestoRate.Contracts` не должно быть бизнес-логики, поведения агрегатов, EF-специфики, web-specific типов и ссылок на доменные проекты сервисов.
+
+## Текущая структура
 
 ```fundamental
 RestoRate.Contracts/
-├── Restaurant/
+├── Common/
 │   ├── Dtos/
-│   │   ├── RestaurantDto.cs               # плоские данные каталога
-│   │   └── RestaurantDetailsDto.cs        # детали (опционально)
-│   └── Events/
-│       ├── RestaurantCreatedEvent.cs
-│       ├── RestaurantUpdatedEvent.cs
-│       └── RestaurantArchivedEvent.cs
-├── Review/
-│   ├── Dtos/
-│   │   └── ReviewDto.cs                   # переносимый DTO отзыва (без доменных типов)
-│   └── Events/
-│       ├── ReviewAddedEvent.cs
-│       ├── ReviewApprovedEvent.cs
-│       └── ReviewRejectedEvent.cs
+│   │   ├── MoneyDto.cs
+│   │   └── TagDto.cs
+│   └── PagedResult.cs
 ├── Moderation/
-│   ├── Dtos/
-│   │   └── ModerationTaskDto.cs           # опционально, если нужен обмен DTO
 │   └── Events/
 │       └── ReviewModeratedEvent.cs
-└── Rating/
+├── Rating/
+│   ├── Dtos/
+│   │   └── RestaurantRatingDto.cs
+│   └── Events/
+│       └── RestaurantRatingRecalculatedEvent.cs
+├── Restaurant/
+│   ├── DTOs/
+│   │   ├── AddressDto.cs
+│   │   ├── LocationDto.cs
+│   │   ├── OpenHoursDto.cs
+│   │   ├── RatingDto.cs
+│   │   ├── RestaurantDto.cs
+│   │   ├── RestaurantImageDto.cs
+│   │   └── CRUD/
+│   │       ├── CreateRestaurantDto.cs
+│   │       ├── CreateRestaurantImageDto.cs
+│   │       ├── ModerationRestaurantDto.cs
+│   │       └── UpdateRestaurantDto.cs
+│   ├── Events/
+│   │   ├── RestaurantArchivedEvent.cs
+│   │   ├── RestaurantCreatedEvent.cs
+│   │   └── RestaurantUpdatedEvent.cs
+│   ├── Requests/
+│   │   ├── GetRestaurantStatusRequest.cs
+│   │   └── GetRestaurantStatusResponse.cs
+│   └── RestaurantStatus.cs
+└── Review/
     ├── Dtos/
-    │   └── RatingDto.cs                   # опционально, переносимая проекция
-    └── Events/
-        └── RestaurantRatingRecalculatedEvent.cs
+    │   ├── CreateReviewDto.cs
+    │   ├── ReviewDto.cs
+    │   └── UserReferenceDto.cs
+    ├── Events/
+    │   ├── ReviewAddedEvent.cs
+    │   ├── ReviewApprovedEvent.cs
+    │   └── ReviewRejectedEvent.cs
+    └── ReviewStatus.cs
 ```
 
-Ключевые принципы:
+Примечание: в текущем репозитории есть смешение `Dtos` и `DTOs`. Это отражает текущее состояние кода. При расширении существующего раздела сохраняйте текущий namespace и структуру конкретного bounded context, а не переименовывайте папки точечно внутри одного изменения.
 
-- Простота вместо версионирования пространств имён: держим одну актуальную версию контрактов без `V1/V2` в путях и неймспейсах.
-- Если потребуются несовместимые изменения — повышайте мажорную версию NuGet‑пакета и синхронно обновляйте потребителей.
-- Контракты — только DTO и события; никакой бизнес‑логики.
-- Зависимости: `RestoRate.Contracts` ссылается только на `RestoRate.Abstractions` (для маркерного интерфейса событий) и не зависит от доменных проектов.
-- Сериализация: использовать простые record/POCO, избегать доменных типов и интерфейсов в полях; типы должны быть сериализуемыми (System.Text.Json по умолчанию).
+## Правила расширения
+
+- Держим одну актуальную версию контрактов без `V1`/`V2` в путях и namespaces.
+- Для несовместимых изменений повышаем мажорную версию пакета и синхронно обновляем потребителей.
+- Контракты должны оставаться сериализуемыми через `System.Text.Json` без специальных доменных конвертеров.
+- Используем простые `record` или POCO.
+- Не переносим в Contracts доменные value objects, сущности, репозитории и application services.
+- `RestoRate.Contracts` может зависеть от `RestoRate.Abstractions` для маркерных интерфейсов событий, но не от доменных проектов сервисов.
+
+## Маркер интеграционного события
 
 Интерфейс маркера интеграционного события расположен в `RestoRate.Abstractions`:
 
@@ -55,7 +82,7 @@ namespace RestoRate.Abstractions.Messaging;
 public interface IIntegrationEvent { }
 ```
 
-Пример события (из `Review/Events/ReviewAddedEvent.cs`):
+Пример события:
 
 ```csharp
 using RestoRate.Abstractions.Messaging;
@@ -73,18 +100,17 @@ public sealed record ReviewAddedEvent(
     string[]? Tags) : IIntegrationEvent;
 ```
 
-Замечания по распространению:
+## Практические рекомендации
 
-- Публикуйте единый NuGet‑пакет без параллельных `V1/V2` пространств имён и папок.
-- Для больших несовместимых изменений — повышайте мажорную версию пакета и выполняйте согласованное обновление сервисов.
-- Фиксируйте несовместимые изменения в CHANGELOG и добавляйте краткие инструкции миграции.
+- Новые контракты группируйте по bounded context, а не по техническому типу на верхнем уровне.
+- Если контракт используется несколькими контекстами и не принадлежит одному из них, размещайте его в `Common`.
+- Если рядом с DTO нужен межсервисный запрос/ответ, допустима отдельная папка `Requests`, как в `Restaurant`.
+- При больших несовместимых изменениях фиксируйте миграцию в CHANGELOG и обновляйте все потребители согласованно.
 
-Тесты:
+## Тесты
 
-- Контрактные тесты (consumer‑driven или snapshot) для проверки сериализации и совместимости типов.
+- Контрактные тесты (consumer-driven или snapshot) для проверки сериализации и совместимости типов.
 
-Дополнительно:
+## Дополнительно
 
 - При межъязыковой интеграции возможно вынесение схем (JSON Schema/Avro) в отдельный артефакт, но в текущей кодовой базе это не используется.
-
----

@@ -8,8 +8,8 @@ using Microsoft.Extensions.Logging;
 
 using NSubstitute;
 
-using RestoRate.Contracts.Review.Events;
 using RestoRate.ReviewService.Application.Handlers;
+using RestoRate.ReviewService.Application.Sagas.ReviewSaga.Messages;
 using RestoRate.ReviewService.Domain.Events;
 
 namespace RestoRate.ReviewService.UnitTests.Handlers;
@@ -33,6 +33,8 @@ public sealed class ReviewCreatedDomainEventHandlerTests(ITestContextAccessor te
             var restaurantId = Guid.NewGuid();
             var userId = Guid.NewGuid();
             var review = Review.Create(restaurantId, userId, rating: 4.5m, averageCheck: null, comment: "test");
+
+            review.RejectionSource.Should().Be(ReviewRejectionSource.None);
 
             var handler = new ReviewCreatedDomainEventHandler(
                 scope.ServiceProvider.GetRequiredService<IPublishEndpoint>());

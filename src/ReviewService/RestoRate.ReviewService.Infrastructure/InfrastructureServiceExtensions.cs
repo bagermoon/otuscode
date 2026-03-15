@@ -14,6 +14,7 @@ using RestoRate.BuildingBlocks.Data;
 using RestoRate.BuildingBlocks.Messaging;
 using RestoRate.BuildingBlocks.Serialization;
 using RestoRate.Contracts.Restaurant.Requests;
+using RestoRate.ReviewService.Application.Configurations;
 using RestoRate.ReviewService.Domain.Interfaces;
 using RestoRate.ReviewService.Infrastructure.Data;
 using RestoRate.ReviewService.Infrastructure.Repositories;
@@ -32,6 +33,11 @@ public static class InfrastructureServiceExtensions
         {
             assemblies = [Assembly.GetCallingAssembly()];
         }
+
+        builder.Services.AddOptions<RestaurantProjectionOptions>()
+            .Bind(builder.Configuration.GetSection(RestaurantProjectionOptions.SectionName))
+            .Validate(options => options.FreshnessTtl > TimeSpan.Zero, "Restaurant projection freshness TTL must be greater than zero.")
+            .ValidateOnStart();
 
         builder.AddMongoDbContext<ReviewDbContext>(AppHostProjects.ReviewDb);
 
@@ -54,20 +60,11 @@ public static class InfrastructureServiceExtensions
                 }
                 configs.AddRequestClient<GetRestaurantStatusRequest>();
 
-                // Для работы MongoDbSagaOutbox требуется MongoDb в режиме ReplicaSet. 
-                // Этот режим не поддерживается в Aspire на момент разработки.
-                var useMongoDbSagaOutbox = builder.Configuration.GetValue("MassTransit:UseMongoDbSagaOutbox", false);
-
-                if (useMongoDbSagaOutbox
-                    && reviewMongoUrl is not null
-                    && !string.IsNullOrWhiteSpace(reviewMongoUrl.DatabaseName))
-                {
-                    configs.SetMongoDbSagaOutbox(reviewMongoUrl);
-                }
-                else
-                {
-                    configs.SetInMemorySagaOutbox();
-                }
+                // В идеале перевести этот сервис MongoDb Driver вместо EF Core,
+                // тогда можно будет включить настоящий Outbox, а не InMemory.
+                // Так же это упростит серилизацию полей. Все в принципе готово в серивсе Rating,
+                // но пока оставляем как есть.
+                configs.SetInMemorySagaOutbox();
             }
         );
 

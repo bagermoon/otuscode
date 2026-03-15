@@ -1,4 +1,4 @@
-namespace RestoRate.Contracts.Review.Events;
+namespace RestoRate.ReviewService.Application.Sagas.RestaurantValidationSaga.Messages;
 
 public sealed record RestaurantReferenceValidationStatus(
     Guid RestaurantId,

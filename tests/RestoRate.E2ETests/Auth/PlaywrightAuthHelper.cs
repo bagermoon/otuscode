@@ -16,11 +16,12 @@ public static class PlaywrightAuthHelper
         var page = await context.NewPageAsync();
 
         await page.GotoAsync(dashboardUrl);
-        await page.GetByRole(AriaRole.Link, new() { Name = "Войти" }).ClickAsync();
-        await page.GetByRole(AriaRole.Textbox, new() { Name = "Username or email" }).FillAsync(username);
-        await page.GetByRole(AriaRole.Textbox, new() { Name = "Password" }).FillAsync(password);
-        await page.GetByRole(AriaRole.Button, new() { Name = "Sign In" }).ClickAsync();
-        await page.GetByRole(AriaRole.Button, new() { Name = "Выход" }).IsVisibleAsync();
+        await page.GetByRole(AriaRole.Toolbar).Locator("a[href='authentication/login']").ClickAsync();
+        await page.Locator("input[name='username']").FillAsync(username);
+        await page.Locator("input[name='password']").FillAsync(password);
+        await page.Locator("button[name='login']").ClickAsync();
+        await page.GetByRole(AriaRole.Toolbar).Locator("a[href='user-claims']").IsVisibleAsync();
+
 
         await context.StorageStateAsync(new() { Path = GetAuthStatePath(user) });
         await browser.CloseAsync();

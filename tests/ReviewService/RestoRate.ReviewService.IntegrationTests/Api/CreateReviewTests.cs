@@ -2,8 +2,8 @@ using FluentAssertions;
 
 using RestoRate.Contracts.Common.Dtos;
 using RestoRate.Contracts.Review.Dtos;
+using RestoRate.ReviewService.Domain.ReviewAggregate;
 using RestoRate.ReviewService.Domain.UserReferenceAggregate;
-using RestoRate.Testing.Common.Auth;
 using RestoRate.Testing.Common.Helpers;
 
 namespace RestoRate.ReviewService.IntegrationTests.Api;
@@ -39,6 +39,28 @@ public class CreateReviewTests : IClassFixture<ReviewWebApplicationFactory>
         created.Comment.Should().Be(createDto.Comment);
         created.Rating.Should().Be(createDto.Rating);
         created.AverageCheck.Should().Be(createDto.AverageCheck);
+    }
+
+    [Fact]
+    public async Task CreateReview_PersistsRejectionSourceAsNone()
+    {
+        var userId = TestUsers.Get(TestUser.User).UserId;
+        var createDto = new CreateReviewDto(Guid.NewGuid(), userId, 4m, null, "Integration persisted rejection source");
+
+        var response = await _client.PostAsJsonAsync("/reviews/", createDto, CancellationToken);
+
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        var created = await response.Content.ReadFromJsonAsync<ReviewDto>(CancellationToken);
+        created.Should().NotBeNull();
+
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var repository = scope.ServiceProvider.GetRequiredService<Ardalis.SharedKernel.IRepository<Review>>();
+
+        var persisted = await repository.GetByIdAsync(created!.Id, CancellationToken);
+
+        persisted.Should().NotBeNull();
+        persisted!.RejectionSource.Should().Be(ReviewRejectionSource.None);
     }
 
     [Fact]

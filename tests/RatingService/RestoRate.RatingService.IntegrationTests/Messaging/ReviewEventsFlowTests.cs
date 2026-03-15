@@ -100,6 +100,51 @@ public sealed class ReviewEventsFlowTests : IClassFixture<RatingWebApplicationFa
     }
 
     [Fact]
+    public async Task DuplicateReviewAddedEvents_CreateSingleReference_And_SingleRecalculation()
+    {
+        var collection = _factory.Services.GetRequiredService<IMongoCollection<ReviewReference>>();
+
+        var restaurantId = Guid.NewGuid();
+        var reviewId = Guid.NewGuid();
+
+        var evt = new ReviewAddedEvent(
+            ReviewId: reviewId,
+            RestaurantId: restaurantId,
+            AuthorId: Guid.NewGuid(),
+            Rating: 4.4m,
+            AverageCheck: new MoneyDto(150m, "USD"),
+            Comment: null,
+            Tags: null);
+
+        await Task.WhenAll(
+            Harness.Bus.Publish(evt, CancellationToken),
+            Harness.Bus.Publish(evt, CancellationToken));
+
+        await Eventually.SucceedsAsync(() =>
+        {
+            Harness.Consumed.Select<ReviewAddedEvent>(CancellationToken)
+                .Count(x => x.Context.Message.ReviewId == reviewId)
+                .Should().BeGreaterThanOrEqualTo(2);
+
+            return Task.CompletedTask;
+        }, timeout: TimeSpan.FromSeconds(15));
+
+        await Eventually.SucceedsAsync(async () =>
+        {
+            var saved = await collection.Find(x => x.Id == reviewId).ToListAsync(CancellationToken);
+            saved.Should().HaveCount(1);
+            saved[0].IsApproved.Should().BeFalse();
+            saved[0].IsRejected.Should().BeFalse();
+        }, timeout: TimeSpan.FromSeconds(5));
+
+        await Task.Delay(350, CancellationToken);
+
+        Harness.Published.Select<RestaurantRatingRecalculatedEvent>(CancellationToken)
+            .Count(x => x.Context.Message.RestaurantId == restaurantId)
+            .Should().Be(1);
+    }
+
+    [Fact]
     public async Task ReviewApprovedEvent_MarksApproved_And_PublishesRatingRecalculatedEvent()
     {
         var collection = _factory.Services.GetRequiredService<IMongoCollection<ReviewReference>>();

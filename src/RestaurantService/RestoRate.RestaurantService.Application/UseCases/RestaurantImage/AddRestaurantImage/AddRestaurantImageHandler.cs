@@ -18,17 +18,14 @@ public sealed class AddRestaurantImageHandler(
         AddRestaurantImageCommand request,
         CancellationToken cancellationToken)
     {
-        logger.LogInformation(
-            "Добавление изображения к ресторану {RestaurantId}: {Url}",
-            request.RestaurantId,
-            request.Url);
+        logger.LogAdding(request.RestaurantId, request.Url);
 
         try
         {
             var restaurant = await repository.GetByIdAsync(request.RestaurantId, cancellationToken);
             if (restaurant == null)
             {
-                logger.LogWarning("Ресторан {RestaurantId} не найден", request.RestaurantId);
+                logger.LogRestaurantNotFound(request.RestaurantId);
                 return Result<Guid>.NotFound();
             }
 
@@ -37,16 +34,13 @@ public sealed class AddRestaurantImageHandler(
 
             await repository.UpdateAsync(restaurant, cancellationToken);
 
-            logger.LogInformation(
-                "Изображение {ImageId} добавлено к ресторану {RestaurantId}",
-                addedImage.Id,
-                request.RestaurantId);
+            logger.LogAdded(addedImage.Id, request.RestaurantId);
 
             return Result<Guid>.Success(addedImage.Id);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Ошибка при добавлении изображения");
+            logger.LogAddError(ex);
             return Result<Guid>.Error(ex.Message);
         }
     }

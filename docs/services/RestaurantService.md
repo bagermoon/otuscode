@@ -1,147 +1,55 @@
-# Агрегаты сервиса Restaurant
+# Restaurant Service
 
-## Restaurant
+Сервис отвечает за каталог ресторанов: создание, обновление, публикацию, архивирование и хранение витрины рейтинга ресторана.
 
-```csharp
-namespace RestoRate.RestaurantService.Domain;
+## Базовый концепт
 
-public sealed class Restaurant : AggregateRoot<RestaurantId>
-{
-    private readonly List<string> _tags = new();
-    private readonly List<Uri> _photos = new();
-
-    private Restaurant() { }
-
-    public Restaurant(RestaurantId id, string name, Address address, string cuisine)
-    {
-        Id = id;
-        Name = name;
-        Address = address;
-        Cuisine = cuisine;
-        Rating = RatingSnapshot.Empty();
-        Status = RestaurantStatus.Draft;
-        AddDomainEvent(new RestaurantCreatedDomainEvent(id));
-    }
-
-    public string Name { get; private set; }
-    public string Description { get; private set; } = string.Empty;
-    public Address Address { get; private set; }
-    public string Cuisine { get; private set; }
-    public IReadOnlyCollection<string> Tags => _tags.AsReadOnly();
-    public IReadOnlyCollection<Uri> Photos => _photos.AsReadOnly();
-    public RestaurantStatus Status { get; private set; }
-    public RatingSnapshot Rating { get; private set; }
-
-    public void Publish()
-    {
-        if (Status == RestaurantStatus.Published) return;
-        Status = RestaurantStatus.Published;
-        AddDomainEvent(new RestaurantPublishedDomainEvent(Id));
-    }
-
-    public void Archive()
-    {
-        if (Status == RestaurantStatus.Archived) return;
-        Status = RestaurantStatus.Archived;
-        AddDomainEvent(new RestaurantArchivedDomainEvent(Id));
-    }
-
-    public void UpdateProfile(string name, string description, Address address, string cuisine, IEnumerable<string> tags)
-    {
-        Name = name;
-        Description = description;
-        Address = address;
-        Cuisine = cuisine;
-        _tags.Clear();
-        _tags.AddRange(tags);
-        AddDomainEvent(new RestaurantUpdatedDomainEvent(Id));
-    }
-
-    public void ApplyExternalRating(decimal averageRate, int reviewCount)
-    {
-        Rating = Rating with { AverageRate = averageRate, ReviewCount = reviewCount };
-        AddDomainEvent(new RestaurantRatingAppliedDomainEvent(Id, Rating));
-    }
-
-    public void ApplyAverageCheck(Money value)
-    {
-        Rating = Rating with { AverageCheck = value };
-        AddDomainEvent(new RestaurantAverageCheckAppliedDomainEvent(Id, value));
-    }
-}
-```
+- Источник истины по ресторанам и их статусам.
+- Публикует изменения ресторана для других сервисов.
+- Принимает пересчитанный рейтинг от Rating Service и обновляет свой `RatingSnapshot`.
+- Отвечает на межсервисный запрос `GetRestaurantStatusRequest`, который использует Review Service при валидации отзыва.
 
 ## Интеграционные события
 
-Сервис Restaurant публикует следующие интеграционные события из `RestoRate.Contracts.Restaurant.Events`:
+Исходящие:
 
-- Публикует: `RestaurantCreatedEvent`, `RestaurantUpdatedEvent`, `RestaurantArchivedEvent`
-- Подписывается на: `RestaurantRatingRecalculatedEvent`
+- `RestaurantCreatedEvent`
+- `RestaurantUpdatedEvent`
+- `RestaurantArchivedEvent`
+
+Входящие:
+
+- `RestaurantRatingRecalculatedEvent`
+
+Межсервисный request/response:
+
+- `GetRestaurantStatusRequest` -> `GetRestaurantStatusResponse`
 
 ```mermaid
 flowchart LR
-    %% Исходящие события сервиса Restaurant
-    subgraph Restaurant_Service[Restaurant Service]
-        RS[API/Application]
-    end
+    REST[Restaurant Service]
+    REV[Review Service]
+    RAT[Rating Service]
+    MQ[(RabbitMQ)]
 
-    RS -- RestaurantCreatedEvent / RestaurantUpdatedEvent / RestaurantArchivedEvent --> MQ[(RabbitMQ)]
+    REST -->|RestaurantCreated / Updated / Archived| MQ
+    MQ --> REV
 
-    MQ --> ReviewSvc[Review Service]
+    RAT -->|RestaurantRatingRecalculatedEvent| MQ
+    MQ --> REST
 
-    %% Входящая проекция рейтинга
-    RatingSvc[Rating Service] -- RestaurantRatingRecalculatedEvent --> MQ
-    MQ --> RS
-
-    %% Подсветка стрелок для визуализации семейств событий
-    %% 0: RS->MQ (события Restaurant)
-    linkStyle 0 stroke:#f59e0b,stroke-width:2px
-    %% 1: MQ->ReviewSvc (доставка событий Restaurant)
-    linkStyle 1 stroke:#f59e0b,stroke-dasharray: 4 2
-
-    %% 2: RatingSvc->MQ (проекция рейтинга)
-    linkStyle 2 stroke:#2563eb,stroke-width:2px
-    %% 3: MQ->RS (доставка проекции рейтинга)
-    linkStyle 3 stroke:#2563eb,stroke-dasharray: 4 2
+    REV --> |GetRestaurantStatusRequest| REST
+    REST -. GetRestaurantStatusResponse .-> REV
+    
+    linkStyle 0 stroke:#7e57c2,stroke-width:2px
+    linkStyle 1 stroke:#7e57c2,stroke-width:2px
+    linkStyle 2 stroke:#1f77b4,stroke-width:2px
+    linkStyle 3 stroke:#1f77b4,stroke-width:2px
+    linkStyle 4 stroke:#2e8b57,stroke-width:2px
+    linkStyle 5 stroke:#2e8b57,stroke-width:2px,stroke-dasharray:5 5
 ```
 
-### Примечания
+## Что важно
 
-- Оранжевый — события Restaurant (Created/Updated/Archived), публикуемые сервисом Restaurant и доставляемые в Review Service.
-- Синий — событие Rating (`RestaurantRatingRecalculatedEvent`), публикуемое сервисом Rating и доставляемое обратно в Restaurant для проекции.
-- Пунктир — доставка события от RabbitMQ к потребителю; сплошная линия — публикация события в RabbitMQ.
-- **Внутренние события** (Domain): `RestaurantCreatedDomainEvent`, `RestaurantPublishedDomainEvent`, `RestaurantArchivedDomainEvent`, `RestaurantRatingAppliedDomainEvent`, `RestaurantAverageCheckAppliedDomainEvent`.
-
-## Последовательность событий (Sequence)
-
-Ниже показана последовательность событий вокруг жизненного цикла ресторана и обновления его рейтинга.
-
-```mermaid
-sequenceDiagram
-    autonumber
-    participant RS as Restaurant Service
-    participant MQ as RabbitMQ (events)
-    participant RV as Review Service
-    participant RT as Rating Service
-
-    RS->>MQ: Publish RestaurantCreatedEvent
-    MQ->>RV: Deliver RestaurantCreatedEvent (инициализация каталога отзывов)
-
-    RS->>MQ: Publish RestaurantUpdatedEvent
-    MQ->>RV: Deliver RestaurantUpdatedEvent (обновление каталога отзывов)
-
-    RS->>MQ: Publish RestaurantArchivedEvent
-    MQ->>RV: Deliver RestaurantArchivedEvent
-
-    note over RS,RT: Рейтинг рассчитывается сервисом Rating по событиям Review
-
-    RT->>MQ: Publish RestaurantRatingRecalculatedEvent
-    MQ->>RS: Deliver RestaurantRatingRecalculatedEvent
-    RS->>RS: ApplyExternalRating(averageRate, reviewCount)
-```
-
-### Замечания по надёжности
-
-- Публикации из Restaurant выполняются через MassTransit с retry и in-memory outbox (в рамках процесса); устойчивого (persisted) outbox сейчас нет.
-- Обработчики в Review/Restaurant должны быть идемпотентны, т.к. доставка сообщений допускает повторы.
-- Отсутствие события пересчёта рейтинга временно не блокирует операции Restaurant; проекция будет догнана после восстановления доставки.
+- Restaurant Service не считает рейтинг сам, а только применяет готовую проекцию из Rating Service.
+- Для Review Service этот сервис ещё и справочник статуса ресторана: существует ли ресторан и можно ли принимать по нему отзыв.

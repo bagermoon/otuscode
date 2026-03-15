@@ -21,7 +21,7 @@ public sealed class RejectReviewHandler(
             return Result.NotFound($"Отзыв {request.ReviewId} не найден.");
         }
 
-        review.Reject();
+        review.Reject(request.RejectionSource);
         await repository.UpdateAsync(review, cancellationToken);
 
         return Result.Success();
