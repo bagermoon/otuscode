@@ -18,27 +18,21 @@ public sealed class SetPrimaryImageHandler(
         SetPrimaryImageCommand request,
         CancellationToken cancellationToken)
     {
-        logger.LogInformation(
-            "Установка главного изображения {ImageId} для ресторана {RestaurantId}",
-            request.ImageId,
-            request.RestaurantId);
+        logger.LogSettingPrimary(request.ImageId, request.RestaurantId);
 
         try
         {
             var restaurant = await repository.GetByIdAsync(request.RestaurantId, cancellationToken);
             if (restaurant == null)
             {
-                logger.LogWarning("Ресторан {RestaurantId} не найден", request.RestaurantId);
+                logger.LogRestaurantNotFound(request.RestaurantId);
                 return Result.NotFound();
             }
 
             var image = restaurant.Images.FirstOrDefault(img => img.Id == request.ImageId);
             if (image == null)
             {
-                logger.LogWarning(
-                    "Изображение {ImageId} не найдено в ресторане {RestaurantId}",
-                    request.ImageId,
-                    request.RestaurantId);
+                logger.LogImageNotFound(request.ImageId, request.RestaurantId);
                 return Result.NotFound();
             }
 
@@ -46,16 +40,13 @@ public sealed class SetPrimaryImageHandler(
 
             await repository.UpdateAsync(restaurant, cancellationToken);
 
-            logger.LogInformation(
-                "Изображение {ImageId} установлено как главное для ресторана {RestaurantId}",
-                request.ImageId,
-                request.RestaurantId);
+            logger.LogPrimarySet(request.ImageId, request.RestaurantId);
 
             return Result.Success();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Ошибка при установке главного изображения");
+            logger.LogSetPrimaryError(ex);
             return Result.Error(ex.Message);
         }
     }

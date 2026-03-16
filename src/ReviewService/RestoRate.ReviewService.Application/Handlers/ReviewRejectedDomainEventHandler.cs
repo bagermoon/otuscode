@@ -4,6 +4,7 @@ using RestoRate.Abstractions.Messaging;
 using RestoRate.Contracts.Review.Events;
 using RestoRate.ReviewService.Application.Mappings;
 using RestoRate.ReviewService.Domain.Events;
+using RestoRate.ReviewService.Domain.ReviewAggregate;
 
 namespace RestoRate.ReviewService.Application.Handlers;
 
@@ -13,6 +14,11 @@ public sealed class ReviewRejectedDomainEventHandler(
 {
     public async ValueTask Handle(ReviewRejectedDomainEvent notification, CancellationToken cancellationToken)
     {
+        if (notification.RejectionSource != ReviewRejectionSource.Moderation)
+        {
+            return;
+        }
+
         var review = notification.Review;
 
         var integrationEvent = new ReviewRejectedEvent(

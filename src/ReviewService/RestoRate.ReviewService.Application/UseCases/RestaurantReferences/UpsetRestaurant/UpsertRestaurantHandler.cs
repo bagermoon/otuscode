@@ -20,25 +20,28 @@ public sealed class UpsertRestaurantHandler(
         UpsertRestaurantCommand request,
         CancellationToken cancellationToken)
     {
+        var synchronizedAtUtc = request.SynchronizedAtUtc ?? DateTime.UtcNow;
         var restaurantReference = await repository.GetByIdAsync(request.RestaurantId, cancellationToken);
 
-        // If already present, update only when needed; otherwise return what's stored.
         if (restaurantReference is not null)
         {
             var requestedStatus = request.Status.ToDomain();
-            if (restaurantReference.RestaurantStatus == requestedStatus)
+            if (restaurantReference.RestaurantStatus == requestedStatus &&
+                restaurantReference.LastSynchronizedAt.HasValue &&
+                restaurantReference.LastSynchronizedAt.Value >= synchronizedAtUtc)
             {
                 return Result<RestaurantStatus>.Success(restaurantReference.RestaurantStatus.ToContract());
             }
 
-            restaurantReference.UpdateStatus(requestedStatus);
+            restaurantReference.Refresh(requestedStatus, synchronizedAtUtc);
             await repository.UpdateAsync(restaurantReference, cancellationToken);
             return Result<RestaurantStatus>.Success(restaurantReference.RestaurantStatus.ToContract());
         }
 
         var newReference = RestaurantReference.Create(
             request.RestaurantId,
-            request.Status.ToDomain());
+            request.Status.ToDomain(),
+            synchronizedAtUtc);
 
         try
         {

@@ -5,14 +5,14 @@ using Mediator;
 using RestoRate.Contracts.Restaurant.Events;
 using RestoRate.ReviewService.Application.UseCases.RestaurantReferences.RestaurantReferenceValidation;
 
-namespace RestoRate.ReviewService.Api.Handlers;
+namespace RestoRate.ReviewService.Api.Consumers;
 
-public sealed class RestaurantCreatedHandler(
+public sealed class RestaurantUpdatedConsumer(
     ISender sender
 )
-    : IConsumer<RestaurantCreatedEvent>
+    : IConsumer<RestaurantUpdatedEvent>
 {
-    public async Task Consume(ConsumeContext<RestaurantCreatedEvent> context)
+    public async Task Consume(ConsumeContext<RestaurantUpdatedEvent> context)
     {
         var message = context.Message;
 

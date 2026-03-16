@@ -1,7 +1,6 @@
 using NodaMoney;
 
 using RestoRate.RatingService.Domain.Interfaces;
-using RestoRate.RatingService.Domain.ReviewReferenceAggregate;
 
 namespace RestoRate.RatingService.Domain.Services;
 
@@ -14,20 +13,12 @@ public sealed class ReviewReferenceService(IReviewReferenceRepository repository
         Money? averageCheck,
         CancellationToken cancellationToken = default)
     {
-        var existing = await repository.GetReviewReferenceByIdAsync(reviewId, cancellationToken);
-        if (existing is not null)
-        {
-            // Idempotency for message retries: if the reference already exists, do not insert again.
-            return;
-        }
-
-        var reviewReference = ReviewReference.Create(
+        await repository.TryAddAsync(
             reviewId,
             restaurantId,
             rating,
-            averageCheck);
-
-        await repository.AddReviewReferenceAsync(reviewReference, cancellationToken);
+            averageCheck,
+            cancellationToken);
     }
 
     public async Task ApproveAsync(
@@ -37,26 +28,12 @@ public sealed class ReviewReferenceService(IReviewReferenceRepository repository
         Money? averageCheck,
         CancellationToken cancellationToken = default)
     {
-        var existing = await repository.GetReviewReferenceByIdAsync(reviewId, cancellationToken);
-        if (existing is null)
-        {
-            var reviewReference = ReviewReference.CreateApproved(
-                reviewId,
-                restaurantId,
-                rating,
-                averageCheck);
-
-            await repository.AddReviewReferenceAsync(reviewReference, cancellationToken);
-            return;
-        }
-
-        if (existing.IsApproved || existing.IsRejected)
-        {
-            return;
-        }
-
-        existing.Approve();
-        await repository.UpdateReviewReferenceAsync(existing, cancellationToken);
+        await repository.TryApproveAsync(
+            reviewId,
+            restaurantId,
+            rating,
+            averageCheck,
+            cancellationToken);
     }
 
     public async Task RejectAsync(
@@ -66,25 +43,11 @@ public sealed class ReviewReferenceService(IReviewReferenceRepository repository
         Money? averageCheck,
         CancellationToken cancellationToken = default)
     {
-        var existing = await repository.GetReviewReferenceByIdAsync(reviewId, cancellationToken);
-        if (existing is null)
-        {
-            var reviewReference = ReviewReference.CreateRejected(
-                reviewId,
-                restaurantId,
-                rating,
-                averageCheck);
-
-            await repository.AddReviewReferenceAsync(reviewReference, cancellationToken);
-            return;
-        }
-
-        if (existing.IsRejected)
-        {
-            return;
-        }
-
-        existing.Reject();
-        await repository.UpdateReviewReferenceAsync(existing, cancellationToken);
+        await repository.TryRejectAsync(
+            reviewId,
+            restaurantId,
+            rating,
+            averageCheck,
+            cancellationToken);
     }
 }

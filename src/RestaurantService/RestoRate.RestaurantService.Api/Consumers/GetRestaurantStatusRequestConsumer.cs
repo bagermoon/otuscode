@@ -1,19 +1,17 @@
-using MassTransit;
-
-using Microsoft.EntityFrameworkCore;
-
-using RestoRate.Contracts.Restaurant.Requests;
-using RestoRate.Contracts.Restaurant;
-using RestoRate.RestaurantService.Infrastructure.Data;
-using RestoRate.RestaurantService.Application.Mappings;
-
-using Mediator;
-using RestoRate.RestaurantService.Application.UseCases.Restaurants.GetStatus;
 using Ardalis.Result;
 
-namespace RestoRate.RestaurantService.Api.Handlers;
+using MassTransit;
 
-public sealed class GetRestaurantStatusRequestHandler(
+using Mediator;
+
+using RestoRate.Contracts.Restaurant;
+using RestoRate.Contracts.Restaurant.Requests;
+using RestoRate.RestaurantService.Application.Mappings;
+using RestoRate.RestaurantService.Application.UseCases.Restaurants.GetStatus;
+
+namespace RestoRate.RestaurantService.Api.Consumers;
+
+public sealed class GetRestaurantStatusRequestConsumer(
     ISender sender)
     : IConsumer<GetRestaurantStatusRequest>
 {
@@ -30,6 +28,7 @@ public sealed class GetRestaurantStatusRequestHandler(
                 Status: RestaurantStatus.Unknown));
             return;
         }
+
         var info = result.Value;
         await context.RespondAsync(new GetRestaurantStatusResponse(
             RestaurantId: info.RestaurantId,

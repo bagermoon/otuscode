@@ -10,11 +10,14 @@ using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 
 using RestoRate.Contracts.Moderation.Events;
-using RestoRate.Contracts.Review.Events;
+using RestoRate.ReviewService.Application.Sagas.RestaurantValidationSaga.Messages;
 using RestoRate.ReviewService.Application.Sagas.ReviewSaga;
+using RestoRate.ReviewService.Application.Sagas.ReviewSaga.Messages;
+using RestoRate.ReviewService.Application.Sagas.UserValidationSaga.Messages;
 using RestoRate.ReviewService.Application.UseCases.Reviews.Approve;
 using RestoRate.ReviewService.Application.UseCases.Reviews.MoveToModerationPending;
 using RestoRate.ReviewService.Application.UseCases.Reviews.Reject;
+using RestoRate.ReviewService.Domain.ReviewAggregate;
 using RestoRate.Testing.Common.Helpers;
 
 namespace RestoRate.ReviewService.UnitTests.Sagas;
@@ -188,9 +191,88 @@ public sealed class ReviewStateMachineTests(ITestContextAccessor testContextAcce
                 IsValid: true), CancellationToken);
 
             await Eventually.SucceedsAsync(() => sender.Received(1).Send(
-                    Arg.Is<RejectReviewCommand>(x => x.ReviewId == reviewId),
+                    Arg.Is<RejectReviewCommand>(x => x.ReviewId == reviewId && x.RejectionSource == ReviewRejectionSource.Validation),
                     Arg.Any<CancellationToken>())
                 .AsTask());
+
+            await Eventually.SucceedsAsync(async () =>
+            {
+                (await sagaHarness.NotExists(reviewId)).Should().BeNull();
+            });
+        }
+        finally
+        {
+            await harness.Stop(CancellationToken);
+        }
+    }
+
+    [Fact]
+    public async Task WhenModerationRejectsAfterSuccessfulValidation_SendsModerationRejectAndFinalizesSaga()
+    {
+        var sender = Substitute.For<ISender>();
+
+        var reviewId = Guid.NewGuid();
+        var restaurantId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+
+        var services = new ServiceCollection();
+        services.AddSingleton(sender);
+
+        services.AddMassTransitTestHarness(cfg =>
+        {
+            cfg.AddSagaStateMachine<ReviewStateMachine, ReviewState>()
+                .InMemoryRepository();
+        });
+
+        await using var provider = services.BuildServiceProvider(true);
+        var harness = provider.GetRequiredService<ITestHarness>();
+        var sagaHarness = provider.GetRequiredService<ISagaStateMachineTestHarness<ReviewStateMachine, ReviewState>>();
+
+        await harness.Start();
+        try
+        {
+            await harness.Bus.Publish(new ReviewValidationRequested(
+                RestaurantId: restaurantId,
+                ReviewId: reviewId,
+                UserId: userId), CancellationToken);
+
+            await Eventually.SucceedsAsync(async () =>
+            {
+                (await sagaHarness.Exists(reviewId, x => x.Validating)).Should().NotBeNull();
+            });
+
+            await harness.Bus.Publish(new RestaurantValidationCompleted(
+                RestaurantId: restaurantId,
+                ReviewId: reviewId,
+                ValidatedAt: DateTime.UtcNow,
+                IsValid: true), CancellationToken);
+
+            await harness.Bus.Publish(new UserValidationCompleted(
+                UserId: userId,
+                ReviewId: reviewId,
+                ValidatedAt: DateTime.UtcNow,
+                IsValid: true), CancellationToken);
+
+            await Eventually.SucceedsAsync(async () =>
+            {
+                (await sagaHarness.Exists(reviewId, x => x.ValidationOk)).Should().NotBeNull();
+            });
+
+            await harness.Bus.Publish(new ReviewModeratedEvent(
+                ReviewId: reviewId,
+                Approved: false,
+                Reason: "policy",
+                ModeratorId: Guid.NewGuid()), CancellationToken);
+
+            await Eventually.SucceedsAsync(() => sender.Received(1).Send(
+                    Arg.Is<RejectReviewCommand>(x => x.ReviewId == reviewId && x.RejectionSource == ReviewRejectionSource.Moderation),
+                    Arg.Any<CancellationToken>())
+                .AsTask());
+
+            await Eventually.SucceedsAsync(async () =>
+            {
+                (await sagaHarness.NotExists(reviewId)).Should().BeNull();
+            });
         }
         finally
         {

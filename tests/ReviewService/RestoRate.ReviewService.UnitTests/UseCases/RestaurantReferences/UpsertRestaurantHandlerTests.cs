@@ -28,7 +28,11 @@ public class UpsertRestaurantHandlerTests
     {
         // Arrange
         var restaurantId = Guid.NewGuid();
-        var existing = RestaurantReference.Create(restaurantId, SharedKernel.Enums.RestaurantStatus.Draft);
+        var synchronizedAtUtc = DateTime.UtcNow;
+        var existing = RestaurantReference.Create(
+            restaurantId,
+            SharedKernel.Enums.RestaurantStatus.Draft,
+            synchronizedAtUtc);
 
         var repo = _fixture.Freeze<Ardalis.SharedKernel.IRepository<RestaurantReference>>();
         repo.GetByIdAsync(restaurantId, Arg.Any<CancellationToken>()).Returns(existing);
@@ -36,7 +40,7 @@ public class UpsertRestaurantHandlerTests
         var logger = _fixture.Freeze<ILogger<UpsertRestaurantHandler>>();
         var handler = new UpsertRestaurantHandler(repo, logger);
 
-        var cmd = new UpsertRestaurantCommand(restaurantId, RestaurantStatus.Draft);
+        var cmd = new UpsertRestaurantCommand(restaurantId, RestaurantStatus.Draft, synchronizedAtUtc);
 
         // Act
         var result = await handler.Handle(cmd, CancellationToken.None);
@@ -52,7 +56,11 @@ public class UpsertRestaurantHandlerTests
     {
         // Arrange
         var restaurantId = Guid.NewGuid();
-        var existing = RestaurantReference.Create(restaurantId, SharedKernel.Enums.RestaurantStatus.Draft);
+        var existing = RestaurantReference.Create(
+            restaurantId,
+            SharedKernel.Enums.RestaurantStatus.Draft,
+            DateTime.UtcNow.AddMinutes(-10));
+        var refreshedAtUtc = DateTime.UtcNow;
 
         var repo = _fixture.Freeze<Ardalis.SharedKernel.IRepository<RestaurantReference>>();
         repo.GetByIdAsync(restaurantId, Arg.Any<CancellationToken>()).Returns(existing);
@@ -62,7 +70,7 @@ public class UpsertRestaurantHandlerTests
         var logger = _fixture.Freeze<ILogger<UpsertRestaurantHandler>>();
         var handler = new UpsertRestaurantHandler(repo, logger);
 
-        var cmd = new UpsertRestaurantCommand(restaurantId, RestaurantStatus.Published);
+        var cmd = new UpsertRestaurantCommand(restaurantId, RestaurantStatus.Published, refreshedAtUtc);
 
         // Act
         var result = await handler.Handle(cmd, CancellationToken.None);
@@ -70,6 +78,39 @@ public class UpsertRestaurantHandlerTests
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().Be(RestaurantStatus.Published);
+        existing.LastSynchronizedAt.Should().Be(refreshedAtUtc);
+        _ = repo.Received(1).UpdateAsync(Arg.Any<RestaurantReference>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Handle_WhenReferenceExistsAndSameStatusWithNewerTimestamp_UpdatesFreshness()
+    {
+        // Arrange
+        var restaurantId = Guid.NewGuid();
+        var previousSyncUtc = DateTime.UtcNow.AddMinutes(-10);
+        var refreshedAtUtc = DateTime.UtcNow;
+        var existing = RestaurantReference.Create(
+            restaurantId,
+            SharedKernel.Enums.RestaurantStatus.Draft,
+            previousSyncUtc);
+
+        var repo = _fixture.Freeze<Ardalis.SharedKernel.IRepository<RestaurantReference>>();
+        repo.GetByIdAsync(restaurantId, Arg.Any<CancellationToken>()).Returns(existing);
+        repo.UpdateAsync(Arg.Any<RestaurantReference>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(1));
+
+        var logger = _fixture.Freeze<ILogger<UpsertRestaurantHandler>>();
+        var handler = new UpsertRestaurantHandler(repo, logger);
+
+        var cmd = new UpsertRestaurantCommand(restaurantId, RestaurantStatus.Draft, refreshedAtUtc);
+
+        // Act
+        var result = await handler.Handle(cmd, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be(RestaurantStatus.Draft);
+        existing.LastSynchronizedAt.Should().Be(refreshedAtUtc);
         _ = repo.Received(1).UpdateAsync(Arg.Any<RestaurantReference>(), Arg.Any<CancellationToken>());
     }
 
@@ -78,7 +119,10 @@ public class UpsertRestaurantHandlerTests
     {
         // Arrange
         var restaurantId = Guid.NewGuid();
-        var existing = RestaurantReference.Create(restaurantId, SharedKernel.Enums.RestaurantStatus.OnModeration);
+        var existing = RestaurantReference.Create(
+            restaurantId,
+            SharedKernel.Enums.RestaurantStatus.OnModeration,
+            DateTime.UtcNow);
 
         var repo = _fixture.Freeze<Ardalis.SharedKernel.IRepository<RestaurantReference>>();
 
@@ -92,7 +136,7 @@ public class UpsertRestaurantHandlerTests
         var logger = _fixture.Freeze<ILogger<UpsertRestaurantHandler>>();
         var handler = new UpsertRestaurantHandler(repo, logger);
 
-        var cmd = new UpsertRestaurantCommand(restaurantId, RestaurantStatus.Published);
+        var cmd = new UpsertRestaurantCommand(restaurantId, RestaurantStatus.Published, DateTime.UtcNow);
 
         // Act
         var result = await handler.Handle(cmd, CancellationToken.None);

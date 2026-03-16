@@ -2,7 +2,7 @@ using Ardalis.SharedKernel;
 
 using MassTransit;
 
-using RestoRate.Contracts.Review.Events;
+using RestoRate.ReviewService.Application.Sagas.ReviewSaga.Messages;
 using RestoRate.ReviewService.Domain.Events;
 
 namespace RestoRate.ReviewService.Application.Handlers;

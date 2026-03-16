@@ -1,18 +1,18 @@
 # Testing Guidelines for Copilot
 
-This document provides testing instructions and guidance for finding OpenAPI documentation in the RestoRate project.
+This document is a compact Copilot-facing testing guide. Use [docs/testing.md](../docs/testing.md) as the canonical team document for the full testing strategy, E2E setup, and detailed authentication patterns.
 
-Note: this repository uses the Microsoft Testing Platform (MTP) for CI and local `dotnet test` runs. xUnit MTP configuration lives in `testconfig.json` inside individual test projects under `tests/*`, and MTP support is enabled via `tests/Directory.Build.props` (`UseMicrosoftTestingPlatformRunner` / `TestingPlatformDotnetTestSupport`). There are no projects targeting VSTest-only runners. CI runs `dotnet restore --locked-mode`, so regenerate and commit `packages.lock.json` locally after dependency changes.
+This repository uses the Microsoft Testing Platform (MTP) for CI and local `dotnet test` runs. xUnit MTP configuration lives in `testconfig.json` inside test projects under `tests/*`, and CI runs `dotnet restore --locked-mode`, so dependency changes must include updated `packages.lock.json` files.
 
 ## Related Documentation
 
 - [Copilot Instructions](copilot-instructions.md) - Main AI agent guidelines for this repository
-- [Architecture](../docs/ARCHITECTURE.md) - System architecture overview
-- [Testing Strategy](../docs/testing.md) - Comprehensive testing approach
+- [Architecture](../docs/ARCHITECTURE.md) - Documentation index
+- [Testing Strategy](../docs/testing.md) - Canonical testing approach and auth details
 
 ## Finding OpenAPI Endpoints
 
-Prefer the full build-time OpenAPI JSON as the canonical source for integration-test generation. The OpenAPI generator emits a complete JSON document during `dotnet build` which should be used as the primary contract.
+Prefer the full build-time OpenAPI JSON as the canonical source for integration-test generation.
 
 - **Primary (use for tests):** `artifacts/obj/RestoRate.{Project}/RestoRate.{Project}.json` — full OpenAPI JSON produced at build time.
 - **Supplementary (quick listing):** `artifacts/obj/RestoRate.{Project}/debug/ApiEndpoints.json` — lightweight endpoint map useful for quick discovery, but not a complete OpenAPI contract.
@@ -26,7 +26,7 @@ dotnet build RestoRate.slnx -c Debug
 Or build a single API project:
 
 ```powershell
-dotnet build src/Restaurant/RestoRate.RestaurantService.Api/RestoRate.RestaurantService.Api.csproj -c Debug
+dotnet build src/RestaurantService/RestoRate.RestaurantService.Api/RestoRate.RestaurantService.Api.csproj -c Debug
 ```
 
 Search pattern for artifacts:
@@ -38,13 +38,13 @@ artifacts/obj/<ProjectName>/debug/ApiEndpoints.json
 
 ### Accessing OpenAPI Documentation at Runtime
 
-When the services are running (via AppHost or individually), OpenAPI documentation is available in Development mode:
+When services are running in Development, OpenAPI is available at runtime:
 
 - **OpenAPI JSON:** `https://localhost:<port>/openapi/v1.json` (each service)
 
 Note: OpenAPI endpoints are only available in Development environment, not in Production.
 
-## Testing Strategy
+## Quick Test Commands
 
 ### Unit Tests
 Run unit tests for a specific bounded context:
@@ -63,80 +63,29 @@ dotnet test tests/<Context>/<Context>.IntegrationTests
 dotnet test RestoRate.slnx
 ```
 
+For broader testing guidance, E2E setup, and CI notes, see [docs/testing.md](../docs/testing.md).
+
 ## Authentication in Tests
 
 ### Integration Test Authentication
 
-Integration tests use `TestAuthHandler` from `RestoRate.Testing.Common` to simulate authenticated users without requiring a real Keycloak instance.
+Integration tests use `TestAuthHandler` from `RestoRate.Testing.Common` to simulate authenticated users without a real Keycloak instance.
 
-**Key Components:**
+Key references:
 
-- **`TestAuthHandler`** (`tests/RestoRate.Testing.Common/Auth/TestAuthHandler.cs`): Custom authentication handler that creates claims matching production JWT structure
-  - Uses `"roles"` claim type (not `ClaimTypes.Role`) to match production Keycloak JWTs
-  - Sets `ClaimsIdentity` with `roleType: "roles"` so ASP.NET Core role-based authorization works correctly
-  - Configures `nameType: "preferred_username"` to match Keycloak's username claim
+- `tests/RestoRate.Testing.Common/Auth/TestAuthHandler.cs`
+- `tests/RestoRate.Testing.Common/Auth/TestUsers.cs`
+- `tests/RestoRate.Testing.Common/WebApplicationFactoryExtensions.cs`
 
-- **`TestUsers`** (`tests/RestoRate.Testing.Common/Auth/TestUsers.cs`): Predefined test identities
-  - `TestUser.Anonymous`: No authentication
-  - `TestUser.User`: Standard user with `["user"]` role
-  - `TestUser.Admin`: Administrator with `["admin"]` role
+Important behavior:
 
-- **`CreateClientWithUser()`** extension (`tests/RestoRate.Testing.Common/WebApplicationFactoryExtensions.cs`):
-  - Creates an `HttpClient` configured with test authentication
-  - Example: `_client = _factory.CreateClientWithUser(TestUser.Admin);`
-  - Automatically injects `TestAuthHandler` with specified user into the test server
-
-**Usage Example:**
-
-```csharp
-public class MyApiTests : IClassFixture<MyWebApplicationFactory>
-{
-    private readonly HttpClient _client;
-    
-    public MyApiTests(MyWebApplicationFactory factory)
-    {
-        // Create client authenticated as Admin
-        _client = factory.CreateClientWithUser(TestUser.Admin);
-    }
-    
-    [Fact]
-    public async Task AdminEndpoint_WithAdminUser_Returns200()
-    {
-        var response = await _client.GetAsync("/admin/endpoint");
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-    }
-}
-```
-
-**Important:** The test authentication setup mirrors production behavior:
-- Claims use the same types as Keycloak JWTs (`"roles"`, `"preferred_username"`, etc.)
-- `IUserContext` works identically in tests and production
-- Role-based authorization policies (`[Authorize(Roles = "admin")]`) work without modification
+- test claims match production JWT conventions, including the `"roles"` claim;
+- `IUserContext` behaves the same in tests and production;
+- role-based authorization policies continue to work without changes.
 
 ### E2E Test Authentication
 
 E2E tests use real Keycloak authentication with Playwright browser automation. See `docs/testing.md` for details.
-
-## Service-Specific Testing
-
-### Restaurant Service
-- **API Project:** `src/Restaurant/RestoRate.RestaurantService.Api`
-- **Tests:** `tests/Restaurant/RestoRate.RestaurantService.UnitTests`, `tests/Restaurant/RestoRate.RestaurantService.IntegrationTests`
-- **Database:** PostgreSQL (via Aspire or standalone)
-
-### Review Service
-- **API Project:** `src/RestoRate.ReviewService.Api`
-- **Database:** MongoDB (planned)
-
-### Rating Service
-- **API Project:** `src/RestoRate.RatingService.Api` (placeholder)
-- **Cache:** Redis (planned)
-
-## Health Checks
-
-All services expose health check endpoints (Development and Production):
-- `/health` - Detailed health status
-- `/alive` - Simple liveness probe
 
 ## Troubleshooting
 

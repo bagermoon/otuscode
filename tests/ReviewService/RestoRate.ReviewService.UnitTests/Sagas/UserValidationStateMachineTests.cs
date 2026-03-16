@@ -11,8 +11,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 using NSubstitute;
 
-using RestoRate.Contracts.Review.Events;
 using RestoRate.ReviewService.Application.Sagas.UserValidationSaga;
+using RestoRate.ReviewService.Application.Sagas.ReviewSaga.Messages;
+using RestoRate.ReviewService.Application.Sagas.UserValidationSaga.Messages;
 using RestoRate.ReviewService.Application.UseCases.UserReferences.UserReferenceValidation;
 using RestoRate.ReviewService.Domain.ReviewAggregate.Specifications;
 using RestoRate.Testing.Common.Helpers;

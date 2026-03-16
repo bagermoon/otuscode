@@ -1,6 +1,7 @@
 using MassTransit;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using RestoRate.ServiceDefaults;
 using Testcontainers.MongoDb;
@@ -50,6 +51,14 @@ public class ReviewWebApplicationFactory
             logging.ClearProviders();
         });
 
-        builder.AddMassTransitInMemoryTestHarness();
+        builder.ConfigureTestServices(services =>
+        {
+            services.AddSingleton<TestRestaurantStatusResponder>();
+        });
+
+        builder.AddMassTransitInMemoryTestHarness(configure: cfg =>
+        {
+            cfg.AddConsumer<GetRestaurantStatusRequestTestConsumer>();
+        });
     }
 }

@@ -51,6 +51,9 @@ internal sealed class ReviewConfiguration() : IEntityTypeConfiguration<Review>
         builder.Property(r => r.Status)
             .IsRequired();
 
+        builder.Property(r => r.RejectionSource)
+            .IsRequired();
+
         builder.HasOne(r => r.Restaurant)
             .WithMany()
             .HasForeignKey(r => r.RestaurantId)

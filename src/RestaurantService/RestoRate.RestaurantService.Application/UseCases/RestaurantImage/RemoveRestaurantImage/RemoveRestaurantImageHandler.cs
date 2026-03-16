@@ -18,27 +18,21 @@ public sealed class RemoveRestaurantImageHandler(
         RemoveRestaurantImageCommand request,
         CancellationToken cancellationToken)
     {
-        logger.LogInformation(
-            "Удаление изображения {ImageId} из ресторана {RestaurantId}",
-            request.ImageId,
-            request.RestaurantId);
+        logger.LogRemoving(request.ImageId, request.RestaurantId);
 
         try
         {
             var restaurant = await repository.GetByIdAsync(request.RestaurantId, cancellationToken);
             if (restaurant == null)
             {
-                logger.LogWarning("Ресторан {RestaurantId} не найден", request.RestaurantId);
+                logger.LogRestaurantNotFound(request.RestaurantId);
                 return Result.NotFound();
             }
 
             var image = restaurant.Images.FirstOrDefault(img => img.Id == request.ImageId);
             if (image == null)
             {
-                logger.LogWarning(
-                    "Изображение {ImageId} не найдено в ресторане {RestaurantId}",
-                    request.ImageId,
-                    request.RestaurantId);
+                logger.LogImageNotFound(request.ImageId, request.RestaurantId);
                 return Result.NotFound();
             }
 
@@ -46,16 +40,13 @@ public sealed class RemoveRestaurantImageHandler(
 
             await repository.UpdateAsync(restaurant, cancellationToken);
 
-            logger.LogInformation(
-                "Изображение {ImageId} удалено из ресторана {RestaurantId}",
-                request.ImageId,
-                request.RestaurantId);
+            logger.LogRemoved(request.ImageId, request.RestaurantId);
 
             return Result.Success();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Ошибка при удалении изображения");
+            logger.LogRemoveError(ex);
             return Result.Error(ex.Message);
         }
     }
