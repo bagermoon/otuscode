@@ -90,7 +90,7 @@
                 <div class="d-flex align-center">
                     <MudIcon Icon="@Icons.Material.Filled.Place" Size="Size.Small" Color="Color.Secondary" Class="mr-1 icon-small" />
                     <MudText Typo="Typo.caption" Color="Color.Secondary" Class="text-truncate">
-                        @Restaurant.Address.FullAddress
+                        @Restaurant.Address.FullAddress@(string.IsNullOrWhiteSpace(Restaurant.Address.House) ? "" : $", {Restaurant.Address.House}")
                     </MudText>
                 </div>
             }

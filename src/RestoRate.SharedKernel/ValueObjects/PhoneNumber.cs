@@ -5,11 +5,17 @@ using Ardalis.SharedKernel;
 
 namespace RestoRate.SharedKernel.ValueObjects;
 
-public class PhoneNumber : ValueObject
+public partial class PhoneNumber : ValueObject
 {
     public string OperatorCode { get; }
     public string Number { get; }
     public string? Extension { get; }
+
+    [GeneratedRegex(@"^\d{7,15}$")]
+    private static partial Regex OnlyDigitsRegex();
+
+    [GeneratedRegex(@"\D")]
+    private static partial Regex NonDigitsRegex();
 
     public PhoneNumber(string operatorCode, string number, string? extension = null)
     {
@@ -20,13 +26,11 @@ public class PhoneNumber : ValueObject
 
     private static string ValidatePhoneNumber(string number)
     {
-        var cleaned = Guard.Against.NullOrWhiteSpace(number, nameof(number));
+        var input = Guard.Against.NullOrWhiteSpace(number, nameof(number));
+        var cleaned = NonDigitsRegex().Replace(input, string.Empty);
 
-        // +7(XXX) XXX-XX-XX или +7 XXX XXX XX XX
-        var pattern = @"^\+?(\d{1,3})?[-.\s]?(\(?)(\d{3})(\)?)[-.\s]?(\d{3})[-.\s]?(\d{2})[-.\s]?(\d{2})$";
-
-        if (!Regex.IsMatch(cleaned, pattern))
-            throw new ArgumentException("Неверный формат тел. номера. Верный формат: +7(XXX) XXX-XX-XX", nameof(number));
+        if (!OnlyDigitsRegex().IsMatch(cleaned))
+            throw new ArgumentException("Номер должен содержать только цифры (от 7 до 15)", nameof(number));
 
         return cleaned;
     }

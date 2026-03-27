@@ -11,12 +11,21 @@ internal static class UpdateRestaurantEndpoint
 {
     public static RouteGroupBuilder MapUpdateRestaurant(this RouteGroupBuilder group)
     {
-        group.MapPut("/{id:Guid}", async (Guid id, UpdateRestaurantDto body, ISender sender, CancellationToken ct) =>
+        group.MapPost("/{id:Guid}", async (Guid id, UpdateRestaurantDto body, ISender sender, CancellationToken ct) =>
         {
-            // Ensure path ID is authoritative
             var dto = body with { RestaurantId = id };
             var result = await sender.Send(new UpdateRestaurantCommand(dto), ct);
-            return result;
+
+            if (result.IsSuccess)
+                return Results.NoContent();
+
+            if (result.Status == ResultStatus.Invalid)
+                return Results.BadRequest(result.ValidationErrors);
+
+            if (result.Status == ResultStatus.NotFound)
+                return Results.NotFound(result.Errors);
+
+            return Results.BadRequest(result.Errors);
         })
         .WithName("UpdateRestaurant")
         .WithSummary("Обновить ресторан")

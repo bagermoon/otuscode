@@ -1,3 +1,5 @@
+using Ardalis.Result;
+
 using Mediator;
 
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +22,9 @@ internal static class CreateRestaurantEndpoint
             var result = await sender.Send(new CreateRestaurantCommand(dto), ct);
             if (result.IsSuccess)
                 return Results.Created($"/restaurants/{result.Value.RestaurantId}", result.Value);
+
+            if (result.Status == ResultStatus.Invalid)
+                return Results.BadRequest(result.ValidationErrors);
 
             return Results.BadRequest(result.Errors);
         })
