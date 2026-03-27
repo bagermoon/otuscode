@@ -33,13 +33,10 @@ builder.Services.AddAntiforgery();
 builder.Services.AddHttpContextAccessor();
 builder.AddIdentityServices();
 
-builder.Services.AddScoped<BlazorTokenProvider>();
-builder.Services.AddTransient<BlazorAuthorizationHandler>();
 builder.Services.AddTransient<TokenHandler>();
 
 builder.Services.AddHttpClient(AppHostProjects.Gateway,
     client => client.BaseAddress = new Uri($"https+http://{AppHostProjects.Gateway}/api/"))
-    .AddHttpMessageHandler<BlazorAuthorizationHandler>()
     .AddHttpMessageHandler<TokenHandler>();
 
 builder.Services.AddScoped<RestaurantWebService>();

@@ -11,7 +11,7 @@ internal static class UpdateRestaurantEndpoint
 {
     public static RouteGroupBuilder MapUpdateRestaurant(this RouteGroupBuilder group)
     {
-        group.MapPost("/{id:Guid}", async (Guid id, UpdateRestaurantDto body, ISender sender, CancellationToken ct) =>
+        group.MapPut("/{id:Guid}", async (Guid id, UpdateRestaurantDto body, ISender sender, CancellationToken ct) =>
         {
             var dto = body with { RestaurantId = id };
             var result = await sender.Send(new UpdateRestaurantCommand(dto), ct);

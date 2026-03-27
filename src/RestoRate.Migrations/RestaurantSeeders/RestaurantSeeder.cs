@@ -41,6 +41,8 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
         r1.AddImage("https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/39/68/9f/caption.jpg?w=600&h=600&s=1", "Карбонара", 2);
         r1.AddImage("https://www.tuttalavita.ru/images/about/about_01.webp", "Печь", 3);
 
+        r1.SendToModeration();
+        r1.Publish();
         AddRatings(r1, 4.5m, 120);
         restaurants.Add(r1);
 
@@ -63,6 +65,8 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
         r2.AddImage("https://img.freepik.com/premium-photo/blank-card-restaurant-table_1203353-41107.jpg", "Хинкали", 2);
 
         AddRatings(r2, 4.7m, 85);
+        r2.SendToModeration();
+        r2.Publish();
         restaurants.Add(r2);
 
         var r3 = new Restaurant(
@@ -84,6 +88,8 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
         r3.AddImage("https://account.spb.ru/upload/22358/photo.jpg", "Блюдо", 2);
 
         AddRatings(r3, 4.2m, 200);
+        r3.SendToModeration();
+        r3.Publish();
         restaurants.Add(r3);
 
         var r4 = new Restaurant(
@@ -105,6 +111,8 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
         r4.AddImage("https://i.pinimg.com/736x/d3/c6/df/d3c6dff867a80a7e91cc5391312bd398.jpg", "Сет роллов", 2);
 
         AddRatings(r4, 4.0m, 15);
+        r4.SendToModeration();
+        r4.Publish();
         restaurants.Add(r4);
 
         var r5 = new Restaurant(
@@ -118,6 +126,8 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
             new Money(1300m, Currency.FromCode("RUB")),
             Guid.NewGuid()
         );
+        r5.SendToModeration();
+        r5.Publish();
         r5.AddCuisineType(CuisineType.American);
         TryAddTag(r5, dbTags, "Стрит-фуд");
         TryAddTag(r5, dbTags, "Мясной ресторан");
@@ -148,6 +158,8 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
         r6.AddImage("https://media-cdn.tripadvisor.com/media/photo-m/1280/17/45/4e/fb/le-clarence.jpg", "Разное", 3);
 
         AddRatings(r6, 4.9m, 42);
+        r6.SendToModeration();
+        r6.Publish();
         restaurants.Add(r6);
 
         var r7 = new Restaurant(
@@ -169,6 +181,8 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
         r7.AddImage("https://i.pinimg.com/736x/39/fd/13/39fd132c42d02b72db85192d15f48544.jpg", "Пицца", 2);
 
         AddRatings(r7, 4.1m, 60);
+        r7.SendToModeration();
+        r7.Publish();
         restaurants.Add(r7);
 
         await context.Restaurants.AddRangeAsync(restaurants, ct);

@@ -1,11 +1,4 @@
 @using Microsoft.AspNetCore.Components.Web
-@using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.AspNetCore.Authentication
-@using MudBlazor
-@using RestoRate.SharedKernel.Enums
-@using RestoRate.BlazorDashboard.Services
-
-@inject BlazorTokenProvider TokenProvider
 
 <!DOCTYPE html>
 <html lang="ru">
@@ -28,14 +21,3 @@
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
 </body>
 </html>
-
-@code {
-    [CascadingParameter]
-    private HttpContext? HttpContext { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        if (HttpContext != null)
-            TokenProvider.AccessToken = await HttpContext.GetTokenAsync("access_token");
-    }
-}
