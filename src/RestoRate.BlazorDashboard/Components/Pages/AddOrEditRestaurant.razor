@@ -9,6 +9,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using System.Text.RegularExpressions
 @using System.Globalization
+@using System.ComponentModel.DataAnnotations
 
 @attribute [Authorize]
 @inject RestaurantWebService RestaurantService
@@ -36,6 +37,10 @@
         {
             <EditForm Model="@_formModel" OnValidSubmit="SubmitAsync">
                 <DataAnnotationsValidator />
+
+                <div class="mud-alert mud-alert-filled-error pa-2 mb-4">
+                    <ValidationSummary />
+                </div>
 
                 <MudGrid Spacing="4">
 
@@ -296,9 +301,7 @@
         try
         {
             string rawPhone = _formModel.PhoneNumber ?? "";
-            string digitsOnly = Regex.Replace(rawPhone, @"\D", "");
-            if (digitsOnly.Length == 11 && (digitsOnly.StartsWith("7") || digitsOnly.StartsWith("8"))) digitsOnly = digitsOnly.Substring(1);
-
+            string digitsOnly = Regex.Replace(_formModel.PhoneNumber ?? "", @"\D", "");
             var tagsList = _formModel.TagsInput.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToList();
 
             var openHoursList = _formModel.Schedule.Select(day => new OpenHoursDto(
@@ -311,8 +314,8 @@
             var validImages = _formModel.Images.Where(x => !string.IsNullOrWhiteSpace(x.Url))
                 .Select((x, index) => new CreateRestaurantImageDto(x.Url, null, index == 0)).ToList();
 
-            var lat = _formModel.Latitude ?? 00.0000;
-            var lon = _formModel.Longitude ?? 00.0000;
+            var lat = _formModel.Latitude ?? 0.0;
+            var lon = _formModel.Longitude ?? 0.0;
 
             var dto = new CreateRestaurantDto(
                 _formModel.Name, _formModel.Description, digitsOnly, _formModel.Email,
@@ -346,18 +349,46 @@
 
     public class CreateRestaurantFormModel
     {
+        [Required(ErrorMessage = "Название обязательно для заполнения")]
+        [StringLength(100, MinimumLength = 3, ErrorMessage = "Название должно быть от 3 до 100 символов")]
         public string Name { get; set; } = "";
+
+        [Required(ErrorMessage = "Описание обязательно для заполнения")]
+        [StringLength(1000, MinimumLength = 10, ErrorMessage = "Описание должно быть не менее 10 символов")]
         public string Description { get; set; } = "";
+
+        [Required(ErrorMessage = "Номер телефона обязателен")]
         public string PhoneNumber { get; set; } = "";
+
+        [Required(ErrorMessage = "Email обязателен")]
+        [EmailAddress(ErrorMessage = "Некорректный формат Email")]
         public string Email { get; set; } = "";
+
+        [Required(ErrorMessage = "Адрес обязателен")]
         public string AddressFull { get; set; } = "";
+
+        [Required(ErrorMessage = "Номер дома обязателен")]
         public string AddressHouse { get; set; } = "";
+
+        [Required(ErrorMessage = "Укажите широту")]
+        [Range(-90, 90, ErrorMessage = "Широта должна быть от -90 до 90")]
         public double? Latitude { get; set; }
+
+        [Required(ErrorMessage = "Укажите долготу")]
+        [Range(-180, 180, ErrorMessage = "Долгота должна быть от -180 до 180")]
         public double? Longitude { get; set; }
+
+        [Required(ErrorMessage = "Укажите средний чек")]
+        [Range(1, 1000000, ErrorMessage = "Сумма должна быть больше 0")]
         public decimal? AvgCheckAmount { get; set; }
+
         public string Currency { get; set; } = "RUB";
         public List<DayScheduleViewModel> Schedule { get; set; } = new();
+        
+        [MinLength(1, ErrorMessage = "Выберите хотя бы одну кухню")]
         public IEnumerable<string> SelectedCuisines { get; set; } = new HashSet<string>();
+
+        [Required(ErrorMessage = "Добавьте хотя бы один тег")]
         public string TagsInput { get; set; } = "";
         public List<ImageViewModel> Images { get; set; } = new();
     }

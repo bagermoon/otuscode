@@ -27,7 +27,7 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
             "Итальянский ресторан с домашней пастой.",
             new PhoneNumber("+7", "9990001122"),
             new Email("info@lapasta.ru"),
-            new Address("г. Москва, ул. Ленина, 10", "10"),
+            new Address("г. Москва, ул. Ленина", "10"),
             new Location(55.751244, 37.618423),
             CreateDailySchedule(new TimeOnly(10, 0), new TimeOnly(23, 00)),
             new Money(2500m, Currency.FromCode("RUB")),
@@ -41,6 +41,8 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
         r1.AddImage("https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/39/68/9f/caption.jpg?w=600&h=600&s=1", "Карбонара", 2);
         r1.AddImage("https://www.tuttalavita.ru/images/about/about_01.webp", "Печь", 3);
 
+        r1.SendToModeration();
+        r1.Publish();
         AddRatings(r1, 4.5m, 120);
         restaurants.Add(r1);
 
@@ -49,7 +51,7 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
             "Аутентичная грузинская кухня и вино.",
             new PhoneNumber("+7", "9991112233"),
             new Email("geo@tbilisi.rest"),
-            new Address("г. Москва, пр. Мира, 5", "5"),
+            new Address("г. Москва, пр. Мира", "5"),
             new Location(55.776123, 37.632111),
             CreateDailySchedule(new TimeOnly(12, 0), new TimeOnly(23, 59)),
             new Money(1800m, Currency.FromCode("RUB")),
@@ -63,6 +65,8 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
         r2.AddImage("https://img.freepik.com/premium-photo/blank-card-restaurant-table_1203353-41107.jpg", "Хинкали", 2);
 
         AddRatings(r2, 4.7m, 85);
+        r2.SendToModeration();
+        r2.Publish();
         restaurants.Add(r2);
 
         var r3 = new Restaurant(
@@ -70,7 +74,7 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
             "Традиционная русская кухня в современном исполнении.",
             new PhoneNumber("+7", "9993334455"),
             new Email("pel@sbp.rest"),
-            new Address("г. Санкт-Петербург, пр. Невский, 15", "45"),
+            new Address("г. Санкт-Петербург, пр. Невский", "45"),
             new Location(59.9311, 30.3609),
             CreateDailySchedule(new TimeOnly(09, 0), new TimeOnly(21, 00)),
             new Money(1200m, Currency.FromCode("RUB")),
@@ -84,6 +88,8 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
         r3.AddImage("https://account.spb.ru/upload/22358/photo.jpg", "Блюдо", 2);
 
         AddRatings(r3, 4.2m, 200);
+        r3.SendToModeration();
+        r3.Publish();
         restaurants.Add(r3);
 
         var r4 = new Restaurant(
@@ -91,7 +97,7 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
             "Свежайшие суши и роллы из под ножа.",
             new PhoneNumber("+7", "9995556677"),
             new Email("sushi@arigato.rest"),
-            new Address("г. Казань, ул. Баумана, 19", "17"),
+            new Address("г. Казань, ул. Баумана", "17"),
             new Location(55.7887, 49.1221),
             CreateDailySchedule(new TimeOnly(11, 0), new TimeOnly(23, 00)),
             new Money(1500m, Currency.FromCode("RUB")),
@@ -105,6 +111,8 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
         r4.AddImage("https://i.pinimg.com/736x/d3/c6/df/d3c6dff867a80a7e91cc5391312bd398.jpg", "Сет роллов", 2);
 
         AddRatings(r4, 4.0m, 15);
+        r4.SendToModeration();
+        r4.Publish();
         restaurants.Add(r4);
 
         var r5 = new Restaurant(
@@ -112,12 +120,14 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
             "Крафтовые бургеры и стейки на открытом огне.",
             new PhoneNumber("+7", "9998887766"),
             new Email("hero@burger.com"),
-            new Address("г. Екатеринбург, ул. Вайнера, 12", "1"),
+            new Address("г. Екатеринбург, ул. Вайнера", "1"),
             new Location(56.8389, 60.6057),
             CreateDailySchedule(new TimeOnly(12, 0), new TimeOnly(23, 00)),
             new Money(1300m, Currency.FromCode("RUB")),
             Guid.NewGuid()
         );
+        r5.SendToModeration();
+        r5.Publish();
         r5.AddCuisineType(CuisineType.American);
         TryAddTag(r5, dbTags, "Стрит-фуд");
         TryAddTag(r5, dbTags, "Мясной ресторан");
@@ -133,7 +143,7 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
             "Маленькая Франция в центре города. Вино и круассаны.",
             new PhoneNumber("+7", "9992223344"),
             new Email("bonjour@paris.ru"),
-            new Address("г. Нижний Новгород, ул. Рождественская, 24", "2"),
+            new Address("г. Нижний Новгород, ул. Рождественская", "2"),
             new Location(56.3269, 44.0059),
             CreateDailySchedule(new TimeOnly(08, 0), new TimeOnly(22, 00)),
             new Money(3000m, Currency.FromCode("RUB")),
@@ -148,6 +158,8 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
         r6.AddImage("https://media-cdn.tripadvisor.com/media/photo-m/1280/17/45/4e/fb/le-clarence.jpg", "Разное", 3);
 
         AddRatings(r6, 4.9m, 42);
+        r6.SendToModeration();
+        r6.Publish();
         restaurants.Add(r6);
 
         var r7 = new Restaurant(
@@ -155,7 +167,7 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
             "Домашняя пицца из дровяной печи.",
             new PhoneNumber("+7", "9990009988"),
             new Email("pizza@mama.rom"),
-            new Address("г. Сочи, Курортный проспект, 50", "1"),
+            new Address("г. Сочи, Курортный проспект", "50"),
             new Location(43.5808, 39.7203),
             CreateDailySchedule(new TimeOnly(12, 0), new TimeOnly(23, 30)),
             new Money(1600m, Currency.FromCode("RUB")),
@@ -169,6 +181,8 @@ public class RestaurantSeeder() : IDbSeeder<RestaurantDbContext>
         r7.AddImage("https://i.pinimg.com/736x/39/fd/13/39fd132c42d02b72db85192d15f48544.jpg", "Пицца", 2);
 
         AddRatings(r7, 4.1m, 60);
+        r7.SendToModeration();
+        r7.Publish();
         restaurants.Add(r7);
 
         await context.Restaurants.AddRangeAsync(restaurants, ct);

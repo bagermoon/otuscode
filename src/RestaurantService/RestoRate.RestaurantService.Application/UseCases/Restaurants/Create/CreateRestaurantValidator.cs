@@ -17,7 +17,7 @@ public class CreateRestaurantValidator : AbstractValidator<CreateRestaurantComma
 
         RuleFor(x => x.Dto.PhoneNumber)
             .NotEmpty().WithMessage("Номер телефона обязателен")
-            .Matches(@"^\d{3,15}$").WithMessage("Неверный формат телефона");
+            .Matches(@"^\d{10,15}$").WithMessage("Неверный формат телефона");
 
         RuleFor(x => x.Dto.Email)
             .NotEmpty().WithMessage("Email обязателен")
